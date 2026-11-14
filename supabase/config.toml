@@ -1,0 +1,23 @@
+project_id = "lnytuhsgzkqrkehemasu"
+
+# Fonctions publiques (pas de JWT exigé) : la landing, le formulaire et la signature.
+[functions.apply]
+verify_jwt = false
+[functions.contract]
+verify_jwt = false
+# Les autres fonctions vérifient elles-mêmes le JWT ou le secret cron (x-cron-secret),
+# car pg_cron les appelle sans JWT utilisateur.
+[functions.collect]
+verify_jwt = false
+[functions.emails]
+verify_jwt = false
+[functions.recruit]
+verify_jwt = false
+[functions.meta]
+verify_jwt = false
+[functions.payroll]
+verify_jwt = false
+[functions.briefs]
+verify_jwt = false
+[functions.creatives]
+verify_jwt = false

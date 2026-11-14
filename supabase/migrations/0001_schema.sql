@@ -113,6 +113,10 @@ create table if not exists public.categories (
   created_at timestamptz not null default now()
 );
 
+-- array_to_string n'est pas IMMUTABLE : enveloppe pour la colonne générée de recherche.
+create or replace function public.immutable_join(arr text[]) returns text
+language sql immutable parallel safe as $$ select coalesce(array_to_string(arr, ' '), '') $$;
+
 create table if not exists public.videos (
   id uuid primary key default gen_random_uuid(),
   platform public.platform not null,
@@ -153,7 +157,7 @@ create table if not exists public.videos (
   raw jsonb,
   search tsvector generated always as (
     setweight(to_tsvector('simple', coalesce(author_handle,'') || ' ' || coalesce(author_name,'') || ' ' || coalesce(ad_page_name,'')), 'A') ||
-    setweight(to_tsvector('simple', coalesce(array_to_string(hashtags, ' '),'')), 'B') ||
+    setweight(to_tsvector('simple', public.immutable_join(hashtags)), 'B') ||
     setweight(to_tsvector('simple', coalesce(caption,'')), 'C')
   ) stored,
   first_seen_at timestamptz not null default now(),
