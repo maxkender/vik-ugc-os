@@ -60,7 +60,7 @@ async function createPoster(db: SupabaseClient, a: any) {
   let uid: string | null = null;
   const { data: created, error } = await db.auth.admin.createUser({
     email: a.email, email_confirm: true,
-    user_metadata: { full_name: `${a.first_name} ${a.last_name}` },
+    user_metadata: { full_name: `${a.first_name} ${a.last_name}`, created_by: "contract" },
     app_metadata: { role: "poster" },
   });
   if (created?.user) uid = created.user.id;
@@ -70,7 +70,9 @@ async function createPoster(db: SupabaseClient, a: any) {
     uid = p.id;
   }
   const { data: country } = await db.from("countries").select("zone_code, language").eq("code", a.country).single();
-  await db.from("profiles").update({ full_name: `${a.first_name} ${a.last_name}`, locale: a.locale ?? "en" }).eq("id", uid);
+  // Un compte créé ici est toujours « poster » (jamais promu par le trigger « premier compte = admin ») ;
+  // un compte déjà existant (ex. un membre de l'équipe qui teste) garde son rôle.
+  await db.from("profiles").update({ full_name: `${a.first_name} ${a.last_name}`, locale: a.locale ?? "en", ...(created?.user ? { role: "poster" } : {}) }).eq("id", uid);
   await db.from("posters").upsert({
     id: uid, application_id: a.id, display_name: `${a.first_name} ${a.last_name.charAt(0)}.`, country: a.country,
     language: country?.language ?? a.locale, zone_code: country?.zone_code ?? null, status: "active",
