@@ -2,7 +2,9 @@
 
 Projet Supabase : **vik-ugc-os** (`lnytuhsgzkqrkehemasu`, eu-west-1). Le schéma, les données de départ, les 9 edge functions et les 10 crons sont **déjà en place**.
 
-## 1. Secrets à coller dans Supabase (obligatoire)
+## 1. Secrets Supabase
+
+✅ **Posés le 14/11** : `APIFY_TOKEN`, `META_ACCESS_TOKEN`, `META_AD_ACCOUNT_ID`, `BREVO_API_KEY`, `ELEVENLABS_API_KEY`, `CRON_SECRET`. **Reste à poser : `APP_URL`** (URL Vercel, une fois déployé), qui sert aux liens des emails et au logo de l'en-tête des emails.
 
 Supabase → Edge Functions → **Secrets** : https://supabase.com/dashboard/project/lnytuhsgzkqrkehemasu/functions/secrets
 
@@ -51,7 +53,7 @@ Réglages → Emails :
 - Compte pub : `act_1369526108446948` (Sophia, EUR, plafond **50 €/jour** par défaut).
 - Page utilisée pour les pubs : « Sophia » (1209366402267598). À changer dans Réglages → Intégrations si besoin.
 - **Rien n'est jamais activé automatiquement.** Activation manuelle dans Recrutement → Campagnes Meta.
-- Une campagne de test PAUSED a été créée pendant le build : « [TEST Vik UGC OS] Recrutement créateurs – validation API (PAUSED) » (id 52584959435009, ad set 52584959442009). Tu peux la supprimer dans le Gestionnaire de publicités.
+- Deux campagnes de test PAUSED ont été créées pendant le build : « [TEST Vik UGC OS] Recrutement créateurs – validation API (PAUSED) » (52584959435009) et « [TEST Vik UGC OS] via edge function (PAUSED) » (52584960892209, 1 €/jour, FR). Tu peux les supprimer dans le Gestionnaire de publicités.
 
 ## 7. Crons (déjà actifs, UTC)
 

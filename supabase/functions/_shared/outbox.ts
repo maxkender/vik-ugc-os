@@ -15,6 +15,12 @@ export interface QueueEmail {
   relatedId?: string;
 }
 
+/** Logo PNG servi par le front (public/brand) ; seulement si APP_URL est une vraie URL publique. */
+function logoUrl(): string | null {
+  const base = Deno.env.get("APP_URL");
+  return base && /^https:\/\//.test(base) ? `${base.replace(/\/$/, "")}/brand/vik-studios-logo.png` : null;
+}
+
 export async function queueEmail(db: SupabaseClient, e: QueueEmail): Promise<string | null> {
   const lang = (e.language ?? "en").split("-")[0];
   const { data: rows } = await db.from("email_templates").select("*").eq("key", e.template).in("language", [lang, "en"]);
@@ -29,6 +35,7 @@ export async function queueEmail(db: SupabaseClient, e: QueueEmail): Promise<str
     body: fillTemplate(tpl.body, vars),
     button: tpl.button_label && e.buttonUrl ? { label: fillTemplate(tpl.button_label, vars), url: e.buttonUrl } : null,
     brand,
+    logoUrl: logoUrl(),
   });
   const { data, error } = await db.from("email_outbox").insert({
     template_key: e.template, to_email: e.to, subject, html, text,

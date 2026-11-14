@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { applyTheme, currentTheme } from "@/lib/theme";
+import { Logo } from "@/components/brand/Logo";
 
 type Item = { to: string; label: string; icon: any; admin?: boolean; children?: { to: string; label: string; admin?: boolean }[] };
 const NAV: Item[] = [
@@ -49,7 +50,7 @@ export function AdminLayout() {
   const sidebar = (
     <aside className="flex h-full w-60 shrink-0 flex-col border-r bg-card">
       <div className="px-5 py-5">
-        <span className="text-base font-semibold tracking-tight">Vik Studios</span>
+        <Logo className="h-6" />
         <span className="ml-2 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase text-muted-foreground">UGC OS</span>
       </div>
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 pb-4">
@@ -89,7 +90,7 @@ export function AdminLayout() {
       <main className="flex-1 overflow-y-auto">
         <div className="sticky top-0 z-30 flex items-center border-b bg-background/80 px-4 py-2 backdrop-blur md:hidden">
           <button onClick={() => setOpen(true)} className="rounded p-1.5 hover:bg-muted"><Menu className="h-5 w-5" /></button>
-          <span className="ml-2 font-semibold">Vik Studios</span>
+          <Logo className="ml-2 h-5" />
         </div>
         <div className="mx-auto max-w-[1400px] px-6 py-8 lg:px-10"><Outlet /></div>
       </main>

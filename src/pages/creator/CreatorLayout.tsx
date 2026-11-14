@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { LANGS, uiLangForCountry } from "@/i18n";
+import { Logo } from "@/components/brand/Logo";
 
 export default function CreatorLayout() {
   const { t, i18n } = useTranslation();
@@ -25,7 +26,7 @@ export default function CreatorLayout() {
     <div className="min-h-full bg-muted/40">
       <header className="sticky top-0 z-30 border-b bg-background/90 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
-          <span className="font-semibold tracking-tight">Vik Studios</span>
+          <Logo className="h-6" />
           <div className="flex items-center gap-2">
             <select aria-label={t("common.language")} value={i18n.resolvedLanguage} onChange={(e) => i18n.changeLanguage(e.target.value)} className="h-8 rounded-md border bg-card px-2 text-xs">
               {LANGS.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}

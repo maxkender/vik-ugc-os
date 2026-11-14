@@ -182,8 +182,10 @@ async function ingestDownload(db: SupabaseClient, run: any, items: any[]) {
 }
 
 async function uploadMp4(db: SupabaseClient, videoId: string, url: string): Promise<string | null> {
-  const res = await fetch(url, { signal: AbortSignal.timeout(60_000) });
-  if (!res.ok) return null;
+  // Les MP4 téléchargés par l'acteur sont dans un key-value store Apify privé : il faut le token.
+  const headers: Record<string, string> = /^https:\/\/api\.apify\.com\//.test(url) ? { Authorization: `Bearer ${Deno.env.get("APIFY_TOKEN") ?? ""}` } : {};
+  const res = await fetch(url, { headers, signal: AbortSignal.timeout(60_000) });
+  if (!res.ok) throw new Error(`download ${res.status}`);
   const type = res.headers.get("content-type") ?? "video/mp4";
   if (!/video|octet-stream/.test(type)) return null;
   const buf = await res.arrayBuffer();

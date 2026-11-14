@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { Button, Card, Field, Input } from "@/components/ui";
+import { Logo } from "@/components/brand/Logo";
 
 export default function Login() {
   const { t } = useTranslation();
@@ -44,7 +45,7 @@ export default function Login() {
   return (
     <div className="flex min-h-full items-center justify-center bg-muted/40 p-6">
       <Card className="w-full max-w-sm p-8">
-        <p className="mb-1 text-sm font-semibold">Vik Studios</p>
+        <Logo className="mb-6 h-7" />
         <h1 className="mb-6 text-xl font-semibold">{t("login.title")}</h1>
         {sent ? (
           <p className="text-sm">{t("login.sent")}</p>

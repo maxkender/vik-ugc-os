@@ -9,6 +9,7 @@ import { uiLangForCountry } from "@/i18n";
 import { ageOn } from "@shared/zones.ts";
 import { flag } from "@/lib/utils";
 import { LangSwitcher, keptParams, useOpenCountries } from "./Landing";
+import { Logo } from "@/components/brand/Logo";
 
 const MAX_BYTES = 200 * 1024 * 1024;
 const BRAND = "Vik Studios";
@@ -110,7 +111,7 @@ export default function Apply() {
   return (
     <div className="min-h-full bg-muted/40">
       <header className="mx-auto flex max-w-2xl items-center justify-between px-6 py-5">
-        <Link to={`/join/${f.country.toLowerCase()}${keptParams(params)}`} className="text-base font-semibold tracking-tight">{BRAND}</Link>
+        <Link to={`/join/${f.country.toLowerCase()}${keptParams(params)}`} className="inline-flex"><Logo className="h-7" /></Link>
         <LangSwitcher />
       </header>
       <main className="mx-auto max-w-2xl px-6 pb-20">

@@ -7,7 +7,7 @@ import {
   dispatchBriefs, fillTemplate, heuristicClassify, landingUrl, maxChargeUsd, mondayOf, normalizeFacebookAd,
   normalizeInstagram, normalizeTikTok, organicScore, payoutsCsv, renderContract, routeEmail, ruulStep,
   sha256Hex, signatureNameMatches, signatureStep, viewsCheckpoint, zoneOfCountry, ageOn, detectLanguage,
-  campaignPayload, adsetPayload, adPayload, assertPaused, missingVariables, performanceScore,
+  campaignPayload, adsetPayload, adPayload, assertPaused, missingVariables, performanceScore, renderEmail,
 } from "./index.ts";
 
 const zoneA = { code: "A", price_per_video: 5, rpm: 1, rpm_views: 1000, currency: "USD" };
@@ -228,6 +228,10 @@ describe("garde-fou email", () => {
   });
   it("mode réel", () => {
     expect(routeEmail("a@b.com", { ...base, test_mode: false })).toMatchObject({ send: true, to: "a@b.com", redirected: false });
+  });
+  it("en-tête : logo PNG si fourni, sinon texte", () => {
+    expect(renderEmail({ subject: "s", body: "b", logoUrl: "https://x.app/brand/vik-studios-logo.png" }).html).toContain('<img src="https://x.app/brand/vik-studios-logo.png"');
+    expect(renderEmail({ subject: "s", body: "b" }).html).toContain(">Vik Studios</span>");
   });
   it("variables", () => {
     expect(fillTemplate("Hi {name}, {x}", { name: "Ana" })).toBe("Hi Ana, {x}");

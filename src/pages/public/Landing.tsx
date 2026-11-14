@@ -8,6 +8,7 @@ import { Badge, Button, Select, Spinner } from "@/components/ui";
 import { LANGS, uiLangForCountry } from "@/i18n";
 import { formatMoney, monthlyEstimate, rpmLabel, type ZoneRow } from "@shared/zones.ts";
 import { flag } from "@/lib/utils";
+import { Logo } from "@/components/brand/Logo";
 
 interface CountryWithZone {
   code: string;
@@ -84,7 +85,7 @@ export default function Landing() {
   return (
     <div className="min-h-full bg-background">
       <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
-        <span className="text-base font-semibold tracking-tight">{BRAND}</span>
+        <Logo className="h-7" />
         <div className="flex items-center gap-2"><LangSwitcher /></div>
       </header>
 

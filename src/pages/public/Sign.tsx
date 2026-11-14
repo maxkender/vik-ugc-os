@@ -7,6 +7,7 @@ import { callFn } from "@/lib/supabase";
 import { Button, Card, Field, Input, Spinner } from "@/components/ui";
 import { uiLangForCountry } from "@/i18n";
 import { LangSwitcher } from "./Landing";
+import { Logo } from "@/components/brand/Logo";
 
 interface ContractView {
   status: "sent" | "signed" | "expired" | "cancelled";
@@ -92,7 +93,7 @@ export default function Sign() {
   return (
     <div className="min-h-full bg-muted/40">
       <header className="mx-auto flex max-w-3xl items-center justify-between px-6 py-5">
-        <span className="text-base font-semibold tracking-tight">Vik Studios</span>
+        <Logo className="h-7" />
         <LangSwitcher />
       </header>
       <main className="mx-auto max-w-3xl px-6 pb-20">
