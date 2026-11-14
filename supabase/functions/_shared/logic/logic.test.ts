@@ -275,7 +275,9 @@ describe("contrats", () => {
 
 describe("Meta : tout en PAUSED", () => {
   it("payloads", () => {
-    expect(campaignPayload("x").status).toBe("PAUSED");
+    expect(campaignPayload("x", ["fr"]).status).toBe("PAUSED");
+    expect(campaignPayload("x", ["fr"]).special_ad_category_country).toEqual(["FR"]);
+    expect(adsetPayload({ name: "a", campaignId: "1", country: "fr", dailyBudget: 5, employment: true }).dsa_beneficiary).toBe("Vik Studios");
     expect(adsetPayload({ name: "a", campaignId: "1", country: "fr", dailyBudget: 5.5, employment: true }).daily_budget).toBe(550);
     expect(adPayload({ name: "a", adsetId: "1", creativeId: "2" }).status).toBe("PAUSED");
     expect(() => assertPaused({ status: "ACTIVE" })).toThrow();

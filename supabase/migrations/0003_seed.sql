@@ -88,7 +88,7 @@ join (values
   ('Diane','instagram','account','fr.diane.app', array['fr']),
   ('Quizlet','tiktok','account','quizlet', array['en']),
   ('Astra AI','facebook_ads','page','Astra AI', array[]::text[]),
-  ('Knowunity','facebook_ads','page','Knowunity', array[]::text[]),
+  ('Knowunity','facebook_ads','page','102545774445089', array[]::text[]),
   ('Gizmo','facebook_ads','page','Gizmo', array[]::text[]),
   ('Studyflash','facebook_ads','page','Studyflash', array[]::text[]),
   (null,'tiktok','hashtag','studytok', array['en']),
@@ -127,7 +127,7 @@ insert into public.settings (key, value) values
      'actors', jsonb_build_object(
         'tiktok', 'clockworks~tiktok-scraper',
         'instagram', 'apify~instagram-scraper',
-        'facebook_ads', 'curious_coder~facebook-ads-library-scraper'))),
+        'facebook_ads', 'apify~facebook-ads-scraper'))),
   ('meta', jsonb_build_object(
      'ad_account_id', 'act_1369526108446948',
      'page_id', '',

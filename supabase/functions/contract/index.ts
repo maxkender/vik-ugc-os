@@ -79,7 +79,7 @@ async function createPoster(db: SupabaseClient, a: any) {
   // Dans le pool par défaut.
   const { data: pool } = await db.from("pools").select("id").eq("name", "Tous les posteurs actifs").maybeSingle();
   if (pool) await db.from("pool_members").upsert({ pool_id: pool.id, poster_id: uid }, { onConflict: "pool_id,poster_id" });
-  return uid;
+  return uid!;
 }
 
 serve(async (req, body, db) => {

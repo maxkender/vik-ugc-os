@@ -25,12 +25,13 @@ export function landingUrl(base: string, p: { country: string; lang: string; cam
 /** Budget Meta en centimes (devise du compte). */
 export const toMinor = (amount: number) => Math.round(amount * 100);
 
-export function campaignPayload(name: string) {
+export function campaignPayload(name: string, countries: string[] = []) {
   const p = {
     name,
     objective: "OUTCOME_TRAFFIC",
     status: "PAUSED" as MetaStatus,
     special_ad_categories: ["EMPLOYMENT"],     // offres d'emploi : catégorie spéciale obligatoire
+    special_ad_category_country: countries.map((c) => c.toUpperCase()),
     buying_type: "AUCTION",
     is_adset_budget_sharing_enabled: false,
   };
@@ -44,7 +45,7 @@ export function campaignPayload(name: string) {
  * intention (targeting_intent) et on n'envoie que pays + âge 18–65 si la
  * catégorie est active. Voir DECISIONS.md.
  */
-export function adsetPayload(p: { name: string; campaignId: string; country: string; dailyBudget: number; employment: boolean; ageMin?: number; ageMax?: number }) {
+export function adsetPayload(p: { name: string; campaignId: string; country: string; dailyBudget: number; employment: boolean; ageMin?: number; ageMax?: number; beneficiary?: string }) {
   const targeting: Record<string, unknown> = {
     geo_locations: { countries: [p.country.toUpperCase()] },
     age_min: p.employment ? 18 : Math.max(18, p.ageMin ?? 18),
@@ -60,6 +61,9 @@ export function adsetPayload(p: { name: string; campaignId: string; country: str
     optimization_goal: "LANDING_PAGE_VIEWS",
     bid_strategy: "LOWEST_COST_WITHOUT_CAP",
     destination_type: "WEBSITE",
+    // DSA (UE) : annonceur et payeur obligatoires sur chaque ad set (vérifié le 14/11).
+    dsa_beneficiary: p.beneficiary ?? "Vik Studios",
+    dsa_payor: p.beneficiary ?? "Vik Studios",
     targeting,
   };
   assertPaused(payload);
