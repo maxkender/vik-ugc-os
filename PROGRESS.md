@@ -13,7 +13,7 @@
   - Ruul et « Payé sur Ruul ».
 - **Aucun email réel n'est parti** : 6 emails sont dans la boîte d'envoi, bloqués par le garde-fou.
 - **Pour démarrer : SETUP.md** (5 secrets à coller, Vercel, première connexion = admin).
-- ⚠️ Le code n'est **pas encore sur GitHub** : push refusé (403), l'app GitHub Claude n'a pas accès à `maxkender/vik-ugc-os`. Il y a 11 commits locaux, plus un `vik-ugc-os.bundle`.
+- ⚠️ Le code n'est **pas encore sur GitHub** : push refusé (403), l'app GitHub Claude n'a pas accès à `maxkender/vik-ugc-os`. Il y a 7 commits locaux, plus une copie dans `vik-ugc-os.bundle` (racine du dossier).
 
 ## Tester en 10 minutes (après SETUP.md §1–3)
 
