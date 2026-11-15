@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight, ExternalLink, Eye, Heart, Info, Layers, Megaphone, MessageCircle, Repeat2, Send, Users, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui";
 import { VideoSurface } from "@/components/video/VideoSurface";
@@ -42,8 +43,9 @@ export function VideoPlayer({ list, index, onIndex, fav, onFav, onAssign, assign
     : [[<Eye />, "Vues", compact(v.views)], [<Heart />, "Likes", compact(v.likes)], [<Zap />, "Outlier", times(v.outlier)],
        [<Heart />, "Engagement", pct(v.engagement)], [<MessageCircle />, "Commentaires", compact(v.comments)], [<Repeat2 />, "Partages", compact(v.shares)]];
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#070d1f]/85 backdrop-blur-md" onMouseDown={(e) => e.target === e.currentTarget && onIndex(null)} role="dialog" aria-label="Lecteur vidéo" data-testid="video-player">
+  // Portail vers <body> : un parent avec backdrop-filter (design verre) piégerait le position: fixed.
+  return createPortal(
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#070d1f]/85 backdrop-blur-md" onMouseDown={(e) => e.target === e.currentTarget && onIndex(null)} role="dialog" aria-label="Lecteur vidéo" data-testid="video-player">
       <button onClick={() => onIndex(null)} aria-label="Fermer" className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"><X className="h-5 w-5" /></button>
       <span className="tabular absolute left-5 top-5 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/80">{index! + 1} / {list.length}</span>
 
@@ -93,7 +95,8 @@ export function VideoPlayer({ list, index, onIndex, fav, onFav, onAssign, assign
         </aside>
         <NavButton dir="next" disabled={index === list.length - 1} onClick={() => go(1)} />
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

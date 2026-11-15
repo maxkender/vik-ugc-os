@@ -40,12 +40,13 @@ async function inspect(page) {
   const runs = [
     ["/admin/library?view=grid", "library-grid", 8, "[class*='aspect-[9/16]']"],
     ["/admin/library?view=table", "library-table", 4, "tbody tr"],
-    ["/admin/library?platform=instagram", "library-ig", 4, "[class*='aspect-[9/16]']"],
+    ["/admin/library?platform=instagram&scope=all", "library-ig", 4, "[class*='aspect-[9/16]']"],
     ["/admin/winning-ads", "winning-ads", 5, "[class*='aspect-[9/16]']"],
   ];
   for (const [path, name, n, sel] of runs) {
-    await page.goto(base + path, { waitUntil: "networkidle" });
-    await page.waitForTimeout(2500);
+    await page.goto(base + path, { waitUntil: "domcontentloaded" });
+    await page.locator(sel).first().waitFor({ timeout: 20000 });
+    await page.waitForTimeout(1500);
     await page.locator(sel).first().click();
     for (let i = 0; i < n; i++) {
       const r = await inspect(page);
