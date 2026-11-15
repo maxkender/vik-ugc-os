@@ -87,3 +87,25 @@ Edge functions : `npx supabase functions deploy <nom> --remote=lnytuhsgzkqrkehem
 ## 9. Nettoyage des données de test
 
 Le build a laissé une candidature de démonstration complète (« Zoé Martin-E2E », jusqu'à la paie) et ~150 vidéos réelles. Pour supprimer la démo : `scripts/cleanup-e2e.sql` (SQL Editor).
+
+## 10. Comptes de test (QA)
+
+Créés le 15/11 avec l'accord de Max, pour tester l'app connecté (Playwright) :
+
+| Email | Rôle |
+|---|---|
+| `qa-admin@vik-qa.test` | admin |
+| `qa-controller@vik-qa.test` | contrôleur |
+| `qa-poster@vik-qa.test` | posteur (FR, zone A) |
+
+- Domaine non routable (`.test`) : aucun email ne peut leur parvenir. Les mots de passe sont aléatoires et ne sont gardés que dans l'environnement de la session de build : ils ne sont ni dans le repo, ni dans les logs.
+- Marqués `profiles.is_test = true` et exclus :
+  - de la **paie** (calcul hebdo) ;
+  - des **emails** (`@vik-qa.test` → statut `cancelled`, raison `test_account`, jamais envoyé) ;
+  - des **statistiques** du tableau de bord.
+- Pour les tester toi-même : Réglages → Équipe → changer le mot de passe n'est pas prévu. Le plus simple est de te connecter avec ton propre compte, en changeant ton rôle.
+- **Suppression** (SQL Editor) :
+  ```sql
+  delete from auth.users where email like '%@vik-qa.test';   -- cascade : profiles, posters, assignations
+  ```
+- Script de captures (connecté) : `QA_EMAIL=… QA_PASSWORD=… node scripts/screenshots.cjs <url> <dossier> [pages…]`.
