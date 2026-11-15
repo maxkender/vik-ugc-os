@@ -14,6 +14,10 @@ const CreatorStats = lazy(() => import("./pages/creator/Stats"));
 const CreatorPayments = lazy(() => import("./pages/creator/Payments"));
 const Library = lazy(() => import("./pages/admin/Library"));
 const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
+const Creators = lazy(() => import("./pages/admin/Creators"));
+const AssistantLog = lazy(() => import("./pages/admin/AssistantLog"));
+const SettingsContent = lazy(() => import("./pages/admin/settings/Content"));
+const CreatorPreview = lazy(() => import("./pages/admin/CreatorPreview"));
 const Competitors = lazy(() => import("./pages/admin/Competitors"));
 const Onboarding = lazy(() => import("./pages/admin/Onboarding"));
 const CreatorAccount = lazy(() => import("./pages/creator/Account"));
@@ -79,6 +83,10 @@ export function App() {
           <Route path="recruitment/campaigns" element={<RequireRole roles={[...adminOnly]}><Campaigns /></RequireRole>} />
           <Route path="recruitment/creatives" element={<RequireRole roles={[...adminOnly]}><Creatives /></RequireRole>} />
           <Route path="posters" element={<Posters />} />
+          <Route path="creators" element={<RequireRole roles={[...staff]}><Creators /></RequireRole>} />
+          <Route path="creators/:id" element={<RequireRole roles={[...staff]}><Creators /></RequireRole>} />
+          <Route path="assistant" element={<RequireRole roles={[...recruiting]}><AssistantLog /></RequireRole>} />
+          <Route path="preview/creator" element={<RequireRole roles={[...adminOnly]}><CreatorPreview /></RequireRole>} />
           <Route path="payroll" element={<RequireRole roles={[...adminOnly]}><Payroll /></RequireRole>} />
           <Route path="paid-ads" element={<RequireRole roles={[...adminOnly]}><PaidAds /></RequireRole>} />
           <Route path="settings" element={<Navigate to="apps" replace />} />
@@ -90,6 +98,7 @@ export function App() {
           <Route path="settings/contracts" element={<RequireRole roles={[...adminOnly]}><SettingsContracts /></RequireRole>} />
           <Route path="settings/integrations" element={<RequireRole roles={[...adminOnly]}><SettingsIntegrations /></RequireRole>} />
           <Route path="settings/team" element={<RequireRole roles={[...adminOnly]}><SettingsTeam /></RequireRole>} />
+          <Route path="settings/content" element={<RequireRole roles={[...adminOnly]}><SettingsContent /></RequireRole>} />
         </Route>
         <Route path="*" element={<div className="p-10 text-center text-muted-foreground">404</div>} />
       </Routes>

@@ -103,7 +103,7 @@ const CRUMB_LABELS: Record<string, string> = {
   admin: "Admin", library: "Bibliothèque", "winning-ads": "Pubs gagnantes", competitors: "Concurrents", agents: "Agents de collecte",
   briefs: "Briefs", recruitment: "Recrutement", candidates: "Candidats", onboarding: "Onboarding", campaigns: "Campagnes Meta",
   creatives: "Créas", posters: "Posteurs", payroll: "Paie", "paid-ads": "Paid Ads", settings: "Réglages", apps: "Apps",
-  countries: "Pays & zones", categories: "Catégories", emails: "Emails", contracts: "Contrats", integrations: "Intégrations", team: "Équipe",
+  countries: "Pays & zones", categories: "Catégories", content: "Contenus & aperçus", creators: "Créateurs", assistant: "Assistant posteurs", preview: "Aperçu", emails: "Emails", contracts: "Contrats", integrations: "Intégrations", team: "Équipe",
   creator: "Espace créateur", stats: "Vues", payments: "Paiements", account: "Mon compte",
 };
 /** Sections sans page propre : le fil d'Ariane les affiche sans lien. */
