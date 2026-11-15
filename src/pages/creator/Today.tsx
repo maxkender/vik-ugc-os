@@ -6,9 +6,11 @@ import { publicUrl, supabase } from "@/lib/supabase";
 import { Button, Spinner, useToast } from "@/components/ui";
 import { formatMoney } from "@shared/zones.ts";
 import { cn } from "@/lib/utils";
+import { playSources } from "@shared/playback.ts";
+import { VideoSurface } from "@/components/video/VideoSurface";
 import { READ_ONLY_HINT, todayIso, useCreatorIdentity, useMyPoster } from "./shared";
 
-interface RefVideo { id: string; url: string | null; thumbnail_path: string | null; thumbnail_src: string | null; video_path: string | null; caption: string | null; platform: string }
+interface RefVideo { id: string; url: string | null; thumbnail_path: string | null; thumbnail_src: string | null; video_path: string | null; video_src?: string | null; external_id?: string | null; caption: string | null; platform: string }
 interface Assignment {
   id: string; due_date: string; status: "todo" | "posted" | "validated" | "rejected"; posted_url: string | null; rejection_reason: string | null;
   briefs: { title: string; hook: string | null; instructions: string | null; reference_video_id: string | null; videos: RefVideo | null } | null;
@@ -30,31 +32,24 @@ function StatusPill({ status }: { status: Assignment["status"] }) {
 function Reference({ v }: { v: RefVideo }) {
   const { t } = useTranslation();
   const [play, setPlay] = useState(false);
-  const signed = useQuery({
-    queryKey: ["ref-video", v.video_path],
-    enabled: !!v.video_path,
-    queryFn: async () => (await supabase.storage.from("reference-videos").createSignedUrl(v.video_path!, 3600)).data?.signedUrl ?? null,
-    staleTime: 50 * 60_000,
-  });
   const thumb = publicUrl("thumbnails", v.thumbnail_path) ?? v.thumbnail_src;
-  const canPlay = !!(v.video_path && signed.data);
+  // MP4 archivé, lien CDN encore valide ou lecteur officiel TikTok / Instagram.
+  const canPlay = playSources(v).some((s) => s.kind !== "link");
   return (
     <div>
       <p className="mb-2 text-xs font-medium text-subtle-foreground">{t("creator.reference")}</p>
-      <div className="relative mx-auto aspect-[9/16] w-full max-w-[220px] overflow-hidden rounded-2xl bg-[#f1f3f7] ring-1 ring-border sm:mx-0">
-        {canPlay && play ? (
-          <video src={signed.data!} controls autoPlay playsInline className="h-full w-full object-cover" poster={thumb ?? undefined} />
-        ) : (
-          <>
-            {thumb && <img src={thumb} alt="" className="h-full w-full object-cover" loading="lazy" onError={(e) => ((e.target as HTMLImageElement).style.visibility = "hidden")} />}
-            {canPlay ? (
-              <button onClick={() => setPlay(true)} className="absolute inset-0 flex items-center justify-center bg-black/10 transition-colors hover:bg-black/20" aria-label="Play">
-                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/95 shadow-lg"><Play className="ml-0.5 h-6 w-6 fill-[#0b1530] text-[#0b1530]" /></span>
-              </button>
-            ) : !thumb && <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-subtle-foreground"><Play className="h-8 w-8" /></div>}
-          </>
-        )}
-      </div>
+      {canPlay && play ? (
+        <VideoSurface v={v} className="mx-auto w-full max-w-[260px] rounded-2xl ring-1 ring-border sm:mx-0" />
+      ) : (
+        <div className="relative mx-auto aspect-[9/16] w-full max-w-[220px] overflow-hidden rounded-2xl bg-[#f1f3f7] ring-1 ring-border sm:mx-0">
+          {thumb && <img src={thumb} alt="" className="h-full w-full object-cover" loading="lazy" onError={(e) => ((e.target as HTMLImageElement).style.visibility = "hidden")} />}
+          {canPlay ? (
+            <button onClick={() => setPlay(true)} className="absolute inset-0 flex items-center justify-center bg-black/10 transition-colors hover:bg-black/20" aria-label="Play">
+              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/95 shadow-lg"><Play className="ml-0.5 h-6 w-6 fill-[#0b1530] text-[#0b1530]" /></span>
+            </button>
+          ) : !thumb && <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-subtle-foreground"><Play className="h-8 w-8" /></div>}
+        </div>
+      )}
       {v.url && (
         <a href={v.url} target="_blank" rel="noreferrer" className="mt-2.5 inline-flex items-center gap-1.5 text-[13px] font-medium text-accent hover:underline">
           <ExternalLink className="h-3.5 w-3.5" /> {t("creator.openOriginal")}
@@ -179,7 +174,7 @@ export default function Today() {
     enabled: !!me.id,
     queryFn: async () => {
       const { data, error } = await supabase.from("brief_assignments")
-        .select("id, due_date, status, posted_url, rejection_reason, briefs(title, hook, instructions, reference_video_id, videos(id, url, thumbnail_path, thumbnail_src, video_path, caption, platform))")
+        .select("id, due_date, status, posted_url, rejection_reason, briefs(title, hook, instructions, reference_video_id, videos(id, url, external_id, thumbnail_path, thumbnail_src, video_path, video_src, caption, platform))")
         .eq("poster_id", me.id!).order("due_date", { ascending: false }).limit(60);
       if (error) throw error;
       return (data ?? []) as unknown as Assignment[];

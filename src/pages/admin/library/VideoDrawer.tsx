@@ -1,24 +1,22 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Archive, Eye, ExternalLink, FolderPlus, Heart, Megaphone, Repeat2, Send, Sparkles, TrendingUp, Users, Zap } from "lucide-react";
 import { Badge, Button, Drawer, Input, Select, Sparkline, useToast } from "@/components/ui";
-import { PlatformIcon, ThumbPlaceholder } from "./VideoCard";
+import { PlatformIcon } from "./VideoCard";
 import { ScorePill } from "./VideoTable";
 import { callFn, supabase } from "@/lib/supabase";
 import { useCategories, useCompetitors } from "@/lib/hooks";
 import { compact, dateFr, flag } from "@/lib/utils";
 import { ORIGIN_LABEL, PLATFORM_LABEL, pct, times, type Video } from "./types";
-import { playableUrl, thumbOf } from "./media";
+import { VideoSurface } from "@/components/video/VideoSurface";
 
 export function VideoDrawer({ video, onClose, fav, onFav, onAssign }: { video: Video | null; onClose: () => void; fav: boolean; onFav: () => void; onAssign: () => void }) {
   const toast = useToast();
   const qc = useQueryClient();
   const { data: cats } = useCategories();
   const { data: comps } = useCompetitors();
-  const [src, setSrc] = useState<string | null>(null);
   const [newCollection, setNewCollection] = useState("");
   const [archiving, setArchiving] = useState(false);
-  useEffect(() => { setSrc(null); if (video) playableUrl(video).then(setSrc); }, [video?.id, video?.video_path]);
   const { data: collections, refetch } = useQuery({
     queryKey: ["collections"],
     queryFn: async () => (await supabase.from("collections").select("id, name, collection_videos(video_id)").order("name")).data ?? [],
@@ -60,7 +58,6 @@ export function VideoDrawer({ video, onClose, fav, onFav, onAssign }: { video: V
     } catch (e) { toast((e as Error).message, "danger"); } finally { setArchiving(false); }
   };
 
-  const thumb = thumbOf(v);
   const competitor = comps?.find((c: any) => c.id === v.competitor_id)?.name;
   return (
     <Drawer open onClose={onClose} title={
@@ -72,11 +69,8 @@ export function VideoDrawer({ video, onClose, fav, onFav, onAssign }: { video: V
     }>
       <div className="grid gap-8 md:grid-cols-[230px_1fr]">
         <div>
-          <div className="relative aspect-[9/16] overflow-hidden rounded-xl bg-[#0b1530] ring-1 ring-border">
-            {src ? <video key={src} src={src} controls autoPlay muted loop playsInline poster={thumb ?? undefined} className="h-full w-full object-contain" onError={() => setSrc(null)} />
-              : thumb ? <img src={thumb} className="h-full w-full object-cover" onError={(e) => ((e.target as HTMLImageElement).style.visibility = "hidden")} /> : <ThumbPlaceholder v={v} />}
-          </div>
-          {!v.video_path && <p className="mt-3 text-xs leading-relaxed text-subtle-foreground">Lecture depuis le CDN de la plateforme (lien temporaire). Archive le MP4 pour le garder.</p>}
+          <VideoSurface v={v} muted className="ring-1 ring-border" />
+          {!v.video_path && <p className="mt-3 text-xs leading-relaxed text-subtle-foreground">Lecture via le lecteur de la plateforme. Archive le MP4 pour le garder même si la vidéo est supprimée.</p>}
           <div className="mt-4 space-y-2">
             {v.url && <a href={v.url} target="_blank" rel="noreferrer" className="block"><Button variant="secondary" className="w-full"><ExternalLink className="h-4 w-4" /> Voir l'original</Button></a>}
             {!v.video_path && <Button variant="secondary" className="w-full" onClick={archive} loading={archiving}><Archive className="h-4 w-4" /> Archiver le MP4</Button>}

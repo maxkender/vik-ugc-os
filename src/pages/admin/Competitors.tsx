@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/auth";
 import { cn, compact } from "@/lib/utils";
 import { PlatformIcon, VideoCard } from "./library/VideoCard";
 import { VideoDrawer } from "./library/VideoDrawer";
+import { VideoPlayer } from "./library/VideoPlayer";
 import { AssignBriefDialog } from "./library/AssignBriefDialog";
 import { times, type Video } from "./library/types";
 
@@ -176,6 +177,7 @@ function CompetitorDetail({ stat, color, onClose }: { stat: Stat_; color: (typeo
   const qc = useQueryClient();
   const { data: cats } = useCategories();
   const [open, setOpen] = useState<Video | null>(null);
+  const [playing, setPlaying] = useState<number | null>(null);
   const [assign, setAssign] = useState<Video | null>(null);
   const id = stat.competitor_id;
   const top = useQuery({ queryKey: ["competitor", "top", id], queryFn: async () => ((await supabase.rpc("explore_videos", { p_competitor: id, p_sort: "score", p_limit: 10 })).data ?? []) as Video[] });
@@ -231,7 +233,7 @@ function CompetitorDetail({ stat, color, onClose }: { stat: Stat_; color: (typeo
           <Empty title="Aucune vidéo pour ce concurrent" icon={<Film className="h-5 w-5" />}>Lance un backfill ou ajoute ses comptes officiels et termes de marque dans Réglages → Concurrents.</Empty>
         ) : (
           <div className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
-            {top.data.map((v) => <VideoCard key={v.id} v={v} fav={!!favs?.has(v.id)} onOpen={() => setOpen(v)} onFav={() => toggleFav(v)} competitorName={stat.name} categoryName={(cats ?? []).find((c: any) => c.id === v.category_id)?.name} />)}
+            {top.data.map((v) => <VideoCard key={v.id} v={v} fav={!!favs?.has(v.id)} onOpen={() => setPlaying(top.data!.indexOf(v))} onFav={() => toggleFav(v)} competitorName={stat.name} categoryName={(cats ?? []).find((c: any) => c.id === v.category_id)?.name} />)}
           </div>
         )}
       </Card>
@@ -277,6 +279,8 @@ function CompetitorDetail({ stat, color, onClose }: { stat: Stat_; color: (typeo
         </Card>
       </div>
 
+      <VideoPlayer list={top.data ?? []} index={playing} onIndex={setPlaying} fav={(v) => !!favs?.has(v.id)} onFav={toggleFav}
+        onAssign={(v) => { setPlaying(null); setAssign(v); }} onDetails={(v) => { setPlaying(null); setOpen(v); }} competitorName={() => stat?.name} />
       <VideoDrawer video={open} onClose={() => setOpen(null)} fav={!!(open && favs?.has(open.id))} onFav={() => open && toggleFav(open)} onAssign={() => setAssign(open)} />
       <AssignBriefDialog video={assign} open={!!assign} onClose={() => setAssign(null)} origin={assign?.is_ad ? "ad" : "library"} />
     </div>

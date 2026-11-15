@@ -3,7 +3,9 @@ import { Eye, Heart, Instagram, Layers, Megaphone, Music2, Zap } from "lucide-re
 import { MetricPill } from "@/components/ui";
 import { cn, compact, flag } from "@/lib/utils";
 import { ORIGIN_LABEL, PLATFORM_LABEL, pct, type Video } from "./types";
-import { playableUrl, thumbOf } from "./media";
+import { thumbOf } from "./media";
+import { hoverSource } from "@shared/playback.ts";
+import { signedVideoUrl } from "@/components/video/VideoSurface";
 
 export function PlatformIcon({ p, className }: { p: Video["platform"]; className?: string }) {
   const I = p === "tiktok" ? Music2 : p === "instagram" ? Instagram : Megaphone;
@@ -42,8 +44,10 @@ export const VideoCard = memo(function VideoCard({ v, fav, onOpen, onFav, catego
   const timer = useRef<number | null>(null);
   const thumb = thumbOf(v);
   const enter = () => {
-    if (failed) return;
-    timer.current = window.setTimeout(async () => setSrc(await playableUrl(v)), 250);
+    // Aperçu muet seulement si un MP4 est lisible (archivé ou lien CDN encore valide), sinon la miniature reste.
+    const h = failed ? null : hoverSource(v);
+    if (!h) return;
+    timer.current = window.setTimeout(async () => setSrc(h.kind === "stored" ? await signedVideoUrl(h.path) : h.kind === "mp4" ? h.url : null), 250);
   };
   const leave = () => {
     if (timer.current) clearTimeout(timer.current);

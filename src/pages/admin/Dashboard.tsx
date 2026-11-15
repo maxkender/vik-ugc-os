@@ -7,8 +7,11 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { compact, cn } from "@/lib/utils";
 import { VideoDrawer } from "./library/VideoDrawer";
+import { VideoPlayer } from "./library/VideoPlayer";
+import { hoverSource } from "@shared/playback.ts";
+import { signedVideoUrl } from "@/components/video/VideoSurface";
 import { AssignBriefDialog } from "./library/AssignBriefDialog";
-import { playableUrl, thumbOf } from "./library/media";
+import { thumbOf } from "./library/media";
 import type { Video } from "./library/types";
 
 interface Stats {
@@ -40,6 +43,7 @@ const money = (n: number, cur = "€") => `${n.toLocaleString("fr-FR", { maximum
 export default function Dashboard() {
   const { profile } = useAuth();
   const [open, setOpen] = useState<Video | null>(null);
+  const [playing, setPlaying] = useState<number | null>(null);
   const [assign, setAssign] = useState<Video | null>(null);
   const { data: s, isLoading } = useQuery({
     queryKey: ["dashboard"],
@@ -114,7 +118,7 @@ export default function Dashboard() {
             action={<Link to="/admin/library?sort=score&ads=organic" className="inline-flex items-center gap-1 text-[13px] font-medium text-accent hover:underline">Tout voir <ArrowRight className="h-3.5 w-3.5" /></Link>} />
           {top && top.length ? (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              {top.map((v) => <TopCard key={v.id} v={v} competitor={comps?.find((c: any) => c.id === v.competitor_id)?.name} onOpen={() => setOpen(v)} />)}
+              {top.map((v) => <TopCard key={v.id} v={v} competitor={comps?.find((c: any) => c.id === v.competitor_id)?.name} onOpen={() => setPlaying(top.indexOf(v))} />)}
             </div>
           ) : <Empty title="Pas encore de vidéos" icon={<Film className="h-5 w-5" />}>Lance un agent de collecte pour remplir la bibliothèque.</Empty>}
         </Card>
@@ -135,6 +139,8 @@ export default function Dashboard() {
         </div>
       </div>
 
+      <VideoPlayer list={top ?? []} index={playing} onIndex={setPlaying} onAssign={(v) => { setPlaying(null); setAssign(v); }}
+        onDetails={(v) => { setPlaying(null); setOpen(v); }} competitorName={(id) => comps?.find((c: any) => c.id === id)?.name} />
       <VideoDrawer video={open} onClose={() => setOpen(null)} fav={false} onFav={() => {}} onAssign={() => { setAssign(open); }} />
       <AssignBriefDialog video={assign} open={!!assign} onClose={() => setAssign(null)} origin={assign?.is_ad ? "ad" : "library"} />
     </div>
@@ -214,7 +220,7 @@ function TopCard({ v, competitor, onOpen }: { v: Video; competitor?: string; onO
   const thumb = thumbOf(v);
   const eng = (v as any).engagement as number | null;
   return (
-    <button onClick={onOpen} onMouseEnter={async () => setSrc(await playableUrl(v))} onMouseLeave={() => setSrc(null)} className="group text-left">
+    <button onClick={onOpen} onMouseEnter={async () => { const h = hoverSource(v); setSrc(!h ? null : h.kind === "stored" ? await signedVideoUrl(h.path) : h.kind === "mp4" ? h.url : null); }} onMouseLeave={() => setSrc(null)} className="group text-left">
       <div className="relative aspect-[9/16] overflow-hidden rounded-xl bg-[#f1f3f7] ring-1 ring-border">
         {thumb && <img src={thumb} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" onError={(e) => ((e.target as HTMLImageElement).style.visibility = "hidden")} />}
         {src && <video src={src} autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover" onError={() => setSrc(null)} />}

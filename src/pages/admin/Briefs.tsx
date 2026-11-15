@@ -7,14 +7,22 @@ import { useAuth } from "@/lib/auth";
 import { cn, compact, dateFr, flag } from "@/lib/utils";
 import { AssignBriefDialog } from "./library/AssignBriefDialog";
 import { thumbOf } from "./library/media";
+import { VideoPlayer } from "./library/VideoPlayer";
+import type { Video } from "./library/types";
+import { createContext, useContext } from "react";
+
+/** Clic sur une miniature de brief : ouvre le lecteur sur la vidéo de référence. */
+const PlayCtx = createContext<(v: Video) => void>(() => {});
 
 const ST_TONE: Record<string, any> = { todo: "default", posted: "accent", validated: "success", rejected: "danger" };
 const ST_LABEL: Record<string, string> = { todo: "À faire", posted: "Posté", validated: "Validé", rejected: "Refusé" };
 
 function Thumb({ v, className }: { v: any; className?: string }) {
   const src = v ? thumbOf(v) : null;
+  const play = useContext(PlayCtx);
   return (
-    <div className={cn("relative shrink-0 overflow-hidden rounded-lg bg-[#f1f3f7] ring-1 ring-border", className)}>
+    <div className={cn("relative shrink-0 overflow-hidden rounded-lg bg-[#f1f3f7] ring-1 ring-border", v?.platform && "cursor-pointer hover:ring-accent", className)}
+      onClick={v?.platform ? (e) => { e.stopPropagation(); play(v); } : undefined} title={v?.platform ? "Lire la vidéo de référence" : undefined}>
       {src ? <img src={src} alt="" loading="lazy" className="h-full w-full object-cover" onError={(e) => ((e.target as HTMLImageElement).style.visibility = "hidden")} />
         : <div className="flex h-full w-full items-center justify-center text-subtle-foreground"><Clapperboard className="h-4 w-4" /></div>}
     </div>
@@ -28,16 +36,17 @@ export default function Briefs() {
   const [creating, setCreating] = useState(false);
   const [open, setOpen] = useState<any | null>(null);
   const [busy, setBusy] = useState(false);
+  const [playing, setPlaying] = useState<Video | null>(null);
   const { profile } = useAuth();
   const isAdmin = profile?.role === "admin";
 
   const { data: briefs, isLoading: loadingBriefs } = useQuery({
     queryKey: ["briefs"],
-    queryFn: async () => (await supabase.from("briefs").select("*, apps(name), pools(name), videos(thumbnail_path, thumbnail_src, author_handle, url), brief_assignments(id, status)").order("created_at", { ascending: false }).limit(200)).data ?? [],
+    queryFn: async () => (await supabase.from("briefs").select("*, apps(name), pools(name), videos(*), brief_assignments(id, status)").order("created_at", { ascending: false }).limit(200)).data ?? [],
   });
   const { data: queue, isLoading: loadingQueue } = useQuery({
     queryKey: ["briefs", "queue"],
-    queryFn: async () => (await supabase.from("brief_assignments").select("*, briefs(title, hook, videos(thumbnail_path, thumbnail_src)), posters(display_name, country)").eq("status", "posted").order("posted_at").limit(200)).data ?? [],
+    queryFn: async () => (await supabase.from("brief_assignments").select("*, briefs(title, hook, videos(*)), posters(display_name, country)").eq("status", "posted").order("posted_at").limit(200)).data ?? [],
   });
   const refresh = () => qc.invalidateQueries({ queryKey: ["briefs"] });
   // Rien à valider mais des briefs existent : on ouvre directement la liste.
@@ -66,6 +75,7 @@ export default function Briefs() {
   };
 
   return (
+    <PlayCtx.Provider value={setPlaying}>
     <div>
       <PageHeader title="Briefs" description="Chaque posteur reçoit 2 briefs par jour. Les briefs « pool » sont répartis automatiquement chaque matin (5 h UTC)."
         actions={<>
@@ -147,7 +157,9 @@ export default function Briefs() {
 
       <BriefDrawer brief={open} onClose={() => setOpen(null)} onReview={review} />
       <AssignBriefDialog video={null} open={creating} onClose={() => { setCreating(false); refresh(); }} origin="manual" />
+      <VideoPlayer list={playing ? [playing] : []} index={playing ? 0 : null} onIndex={(i) => i === null && setPlaying(null)} />
     </div>
+    </PlayCtx.Provider>
   );
 }
 

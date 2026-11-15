@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { PlatformIcon, VideoCard } from "./library/VideoCard";
 import { FilterChip, Popover, SortMenu } from "./library/FilterChip";
 import { VideoDrawer } from "./library/VideoDrawer";
+import { VideoPlayer } from "./library/VideoPlayer";
 import { VideoTable } from "./library/VideoTable";
 import { AssignBriefDialog } from "./library/AssignBriefDialog";
 import { exportCsv } from "./library/csv";
@@ -38,7 +39,10 @@ export default function Library({ adsOnly = false }: { adsOnly?: boolean }) {
   const { data: countries } = useCountries();
   const [q, setQ] = useState(get("q"));
   const [author, setAuthor] = useState(get("author"));
-  const [open, setOpen] = useState<Video | null>(null);
+  const [open, setOpen] = useState<Video | null>(null); // fiche détaillée (drawer)
+  // Lecteur : la liste affichée (grille, tableau ou groupe) + position, pour ← →.
+  const [player, setPlayer] = useState<{ list: Video[]; index: number } | null>(null);
+  const play = (list: Video[], v: Video) => setPlayer({ list, index: Math.max(0, list.findIndex((x) => x.id === v.id)) });
   const [assign, setAssign] = useState<Video | null>(null);
   const [adhoc, setAdhoc] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -256,7 +260,7 @@ export default function Library({ adsOnly = false }: { adsOnly?: boolean }) {
           : table.error ? <Empty title="Erreur de chargement">{(table.error as Error).message}</Empty>
           : (table.data ?? []).length === 0 ? <EmptyLibrary adsOnly={adsOnly} filtered={anyFilter} onReset={resetAll} />
           : (
-            <VideoTable rows={table.data!} sort={sort} asc={asc} onSort={onSortColumn} onOpen={setOpen} competitorName={compName} categoryName={catName} adsOnly={adsOnly}
+            <VideoTable rows={table.data!} sort={sort} asc={asc} onSort={onSortColumn} onOpen={(v) => play(table.data!, v)} competitorName={compName} categoryName={catName} adsOnly={adsOnly}
               footer={<>
                 <span className="tabular text-[13px] text-muted-foreground">
                   {new Intl.NumberFormat("fr").format((page - 1) * pageSize + 1)}–{new Intl.NumberFormat("fr").format(Math.min(page * pageSize, total.data ?? 0))} sur {new Intl.NumberFormat("fr").format(total.data ?? 0)}
@@ -274,7 +278,7 @@ export default function Library({ adsOnly = false }: { adsOnly?: boolean }) {
       ) : grouped ? (
         <div className="space-y-12">
           {[...(comps ?? []), { id: null, name: "Hors concurrents" }].map((c: any) => (
-            <GroupSection key={c.id ?? "none"} competitor={c} filters={filters} favs={favs} onOpen={setOpen} onFav={toggleFav} catName={catName} />
+            <GroupSection key={c.id ?? "none"} competitor={c} filters={filters} favs={favs} onOpen={play} onFav={toggleFav} catName={catName} />
           ))}
         </div>
       ) : infinite.isLoading ? <div className="flex justify-center py-24"><Spinner /></div>
@@ -282,11 +286,14 @@ export default function Library({ adsOnly = false }: { adsOnly?: boolean }) {
         : gridVideos.length === 0 ? <EmptyLibrary adsOnly={adsOnly} filtered={anyFilter} onReset={resetAll} />
         : (
           <div className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {gridVideos.map((v) => <VideoCard key={v.id} v={v} fav={!!favs?.has(v.id)} onOpen={() => setOpen(v)} onFav={() => toggleFav(v)} categoryName={catName(v.category_id)} competitorName={v.competitor_id ? compName(v.competitor_id) : undefined} />)}
+            {gridVideos.map((v) => <VideoCard key={v.id} v={v} fav={!!favs?.has(v.id)} onOpen={() => play(gridVideos, v)} onFav={() => toggleFav(v)} categoryName={catName(v.category_id)} competitorName={v.competitor_id ? compName(v.competitor_id) : undefined} />)}
           </div>
         )}
       {view === "grid" && !grouped && <div ref={sentinel} className="flex justify-center py-10">{infinite.isFetchingNextPage && <Spinner />}</div>}
 
+      <VideoPlayer list={player?.list ?? []} index={player?.index ?? null} onIndex={(i) => setPlayer((p) => (i === null || !p ? null : { ...p, index: i }))}
+        fav={(v) => !!favs?.has(v.id)} onFav={toggleFav} onAssign={(v) => { setPlayer(null); setAssign(v); }} onDetails={(v) => { setPlayer(null); setOpen(v); }}
+        competitorName={(id) => (id ? compName(id) : undefined)} />
       <VideoDrawer video={open} onClose={() => setOpen(null)} fav={!!(open && favs?.has(open.id))} onFav={() => open && toggleFav(open)} onAssign={() => setAssign(open)} />
       <AssignBriefDialog video={assign} open={!!assign} onClose={() => setAssign(null)} origin={assign?.is_ad ? "ad" : "library"} />
       <AdhocDialog open={adhoc} onClose={() => setAdhoc(false)} onDone={() => toast("Run lancé : les vidéos arrivent dans quelques minutes (Agents de collecte)", "success")} />
@@ -307,7 +314,7 @@ function EmptyLibrary({ adsOnly, filtered, onReset }: { adsOnly: boolean; filter
 
 function GroupSection({ competitor, filters, favs, onOpen, onFav, catName }: {
   competitor: { id: string | null; name: string }; filters: Record<string, unknown>; favs?: Set<string>;
-  onOpen: (v: Video) => void; onFav: (v: Video) => void; catName: (id: string | null) => string | undefined;
+  onOpen: (list: Video[], v: Video) => void; onFav: (v: Video) => void; catName: (id: string | null) => string | undefined;
 }) {
   const [, setParams] = useSearchParams();
   const { data, isLoading } = useQuery({
@@ -337,7 +344,7 @@ function GroupSection({ competitor, filters, favs, onOpen, onFav, catName }: {
         {competitor.id && <button className="text-[13px] font-medium text-accent hover:underline" onClick={() => setParams((p) => { const n = new URLSearchParams(p); n.delete("group"); n.set("competitor", competitor.id!); return n; }, { replace: true })}>Tout voir →</button>}
       </div>
       <div className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-        {data.map((v) => <VideoCard key={v.id} v={v} fav={!!favs?.has(v.id)} onOpen={() => onOpen(v)} onFav={() => onFav(v)} categoryName={catName(v.category_id)} competitorName={competitor.id ? competitor.name : undefined} />)}
+        {data.map((v) => <VideoCard key={v.id} v={v} fav={!!favs?.has(v.id)} onOpen={() => onOpen(data, v)} onFav={() => onFav(v)} categoryName={catName(v.category_id)} competitorName={competitor.id ? competitor.name : undefined} />)}
       </div>
     </section>
   );

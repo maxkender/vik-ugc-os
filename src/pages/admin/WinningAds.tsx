@@ -1,5 +1,6 @@
 // Pubs gagnantes : les pubs vidéo des concurrents (Meta Ad Library), triées par longévité, variantes ou récence.
 // Une pub qui tourne longtemps, déclinée en plusieurs variantes, est une pub rentable : on la recycle en brief organique.
+import { VideoPlayer } from "./library/VideoPlayer";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
@@ -13,7 +14,8 @@ import { cn, flag } from "@/lib/utils";
 import { FilterChip, SortMenu } from "./library/FilterChip";
 import { ThumbPlaceholder, displayName } from "./library/VideoCard";
 import { AssignBriefDialog } from "./library/AssignBriefDialog";
-import { playableUrl, thumbOf } from "./library/media";
+import { thumbOf } from "./library/media";
+import { VideoSurface } from "@/components/video/VideoSurface";
 import type { Video } from "./library/types";
 
 type AdSort = "ad_days" | "variants" | "recent";
@@ -46,7 +48,8 @@ export default function WinningAds() {
   const sort = get("sort", "ad_days") as AdSort;
   const grouped = get("group", "1") === "1";
   const withUnattached = get("scope") === "all";
-  const [open, setOpen] = useState<Video | null>(null);
+  const [open, setOpen] = useState<Video | null>(null); // fiche pub (détails, archivage)
+  const [playing, setPlaying] = useState<number | null>(null);
   const [assign, setAssign] = useState<Video | null>(null);
 
   const { data: comps } = useQuery({ queryKey: ["competitors-names"], queryFn: async () => (await supabase.from("competitors").select("id, name")).data ?? [] });
@@ -111,6 +114,9 @@ export default function WinningAds() {
     } catch (e) { toast((e as Error).message, "danger"); }
   };
 
+  // Liste affichée (groupes à plat), pour ← → dans le lecteur.
+  const displayed: Video[] = grouped ? groups.flatMap(([, rows]: [string, Video[]]) => rows) : filtered;
+  const playAt = (v: Video) => setPlaying(Math.max(0, displayed.findIndex((x) => x.id === v.id)));
   return (
     <div>
       <PageHeader
@@ -164,15 +170,17 @@ export default function WinningAds() {
                   </div>
                 </div>
                 {view === "table"
-                  ? <AdsTable rows={rows} compName={compName} onOpen={setOpen} onRecycle={setAssign} hideCompetitor />
-                  : <AdGrid rows={rows} compName={compName} onOpen={setOpen} onRecycle={setAssign} />}
+                  ? <AdsTable rows={rows} compName={compName} onOpen={playAt} onRecycle={setAssign} hideCompetitor />
+                  : <AdGrid rows={rows} compName={compName} onOpen={playAt} onRecycle={setAssign} />}
               </section>
             ))}
           </div>
         ) : view === "table"
-          ? <AdsTable rows={filtered} compName={compName} onOpen={setOpen} onRecycle={setAssign} />
-          : <AdGrid rows={filtered} compName={compName} onOpen={setOpen} onRecycle={setAssign} />}
+          ? <AdsTable rows={filtered} compName={compName} onOpen={playAt} onRecycle={setAssign} />
+          : <AdGrid rows={filtered} compName={compName} onOpen={playAt} onRecycle={setAssign} />}
 
+      <VideoPlayer list={displayed} index={playing} onIndex={setPlaying} competitorName={compName}
+        onAssign={(v) => { setPlaying(null); setAssign(v); }} assignLabel="Recycler en brief organique" onDetails={(v) => { setPlaying(null); setOpen(v); }} />
       <AdPlayer ad={open} competitor={open ? compName(open.competitor_id) : undefined} onClose={() => setOpen(null)}
         onRecycle={() => { setAssign(open); setOpen(null); }} onArchive={() => open && archive(open)} canArchive={profile?.role !== "controller"} />
       <AssignBriefDialog video={assign} open={!!assign} onClose={() => setAssign(null)} origin="ad" />
@@ -309,10 +317,7 @@ function AdsTable({ rows, compName, onOpen, onRecycle, hideCompetitor }: { rows:
 function AdPlayer({ ad, competitor, onClose, onRecycle, onArchive, canArchive }: {
   ad: Video | null; competitor?: string; onClose: () => void; onRecycle: () => void; onArchive: () => void; canArchive: boolean;
 }) {
-  const { data: src, isLoading } = useQuery({ queryKey: ["ad-src", ad?.id, ad?.video_path], queryFn: () => playableUrl(ad!), enabled: !!ad });
-  const [failed, setFailed] = useState(false);
   if (!ad) return null;
-  const thumb = thumbOf(ad);
   const rows: [string, React.ReactNode][] = [
     ["Concurrent", competitor ?? "Hors concurrents"],
     ["Page", displayName(ad)],
@@ -325,20 +330,9 @@ function AdPlayer({ ad, competitor, onClose, onRecycle, onArchive, canArchive }:
     ["Plateformes", <Platforms list={ad.ad_platforms} />],
   ];
   return (
-    <Dialog open onClose={() => { setFailed(false); onClose(); }} title={`${competitor ?? "Pub"} · ${ad.ad_days ?? "?"} jours de diffusion`} wide>
+    <Dialog open onClose={onClose} title={`${competitor ?? "Pub"} · ${ad.ad_days ?? "?"} jours de diffusion`} wide>
       <div className="grid gap-6 md:grid-cols-[300px_1fr]">
-        <div className="relative aspect-[9/16] overflow-hidden rounded-xl bg-black">
-          {isLoading ? <div className="flex h-full items-center justify-center"><Spinner className="text-white" /></div>
-            : src && !failed ? <video key={src} src={src} poster={thumb ?? undefined} controls autoPlay playsInline className="h-full w-full object-contain" onError={() => setFailed(true)} />
-            : (
-              <div className="relative h-full w-full">
-                {thumb ? <img src={thumb} alt="" className="h-full w-full object-cover opacity-80" /> : <ThumbPlaceholder v={ad} />}
-                <div className="absolute inset-x-3 bottom-3 rounded-lg bg-white/95 p-3 text-xs text-muted-foreground shadow-xs">
-                  Le lien vidéo de l'Ad Library a expiré. {canArchive ? "Archive le MP4 pour le garder, ou ouvre la pub dans l'Ad Library." : "Ouvre la pub dans l'Ad Library."}
-                </div>
-              </div>
-            )}
-        </div>
+        <VideoSurface v={ad} />
         <div className="min-w-0 space-y-5">
           <div className="flex flex-wrap gap-2">
             <Button onClick={onRecycle}><Recycle className="h-4 w-4" /> Recycler en brief organique</Button>
