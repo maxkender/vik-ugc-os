@@ -16,7 +16,9 @@ export default function CreatorLayout() {
 
   useEffect(() => {
     let stored: string | null = null;
-    try { stored = localStorage.getItem("i18nextLng"); } catch { /* ignore */ }
+    // La langue du profil (celle de la candidature) gagne, sauf si le créateur a choisi lui-même dans le sélecteur.
+    // (Le détecteur i18next écrit « i18nextLng » dès le premier chargement : ce n'est pas un choix explicite.)
+    try { stored = localStorage.getItem("vik_lang_chosen"); } catch { /* ignore */ }
     if (profile?.locale && !stored) i18n.changeLanguage(uiLangForCountry(profile.locale));
   }, [profile?.locale]);
 
@@ -33,7 +35,7 @@ export default function CreatorLayout() {
         <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4 sm:h-16">
           <Logo className="h-[22px]" />
           <div className="flex items-center gap-1.5">
-            <select aria-label={t("common.language")} value={i18n.resolvedLanguage} onChange={(e) => i18n.changeLanguage(e.target.value)}
+            <select aria-label={t("common.language")} value={i18n.resolvedLanguage} onChange={(e) => { try { localStorage.setItem("vik_lang_chosen", e.target.value); } catch { /* ignore */ } i18n.changeLanguage(e.target.value); }}
               className="h-8 cursor-pointer rounded-full border border-border-strong bg-white px-3 text-xs font-medium text-muted-foreground hover:text-foreground focus:outline-none">
               {LANGS.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
             </select>
