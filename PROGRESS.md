@@ -1,4 +1,27 @@
-# PROGRESS : état au 15/11/2026 (V2)
+# PROGRESS : état au 15/11/2026 (V3)
+
+## V3 : ads, aperçus, assistant, créateurs, paie du lundi, design verre (15/11, soir)
+
+Tout est en prod (https://vik-ugc-os.vercel.app, build vérifié identique au local) et testé connecté avec les comptes QA, sans erreur console ni API. Captures : `docs/screenshots/v3/` (par bloc) et `docs/screenshots/v3/prod/` (prod, 1440 et 390 px).
+
+**Ce qui a été fait**
+- **Meta → landing** : une campagne ne peut plus partir sans URL de landing (URL de la campagne, sinon `settings.landing.base_url`, sinon `APP_URL`, sinon erreur explicite).
+- **Ads** : variantes regroupées (`ad_collation_id`), plateformes, vue cartes/tableau, 81 pubs concurrentes recollectées (~0,77 $ Apify).
+- **Contenus & aperçus** : emails (versions), contrat, landing et espace créateur prévisualisables et modifiables depuis l'admin.
+- **Assistant posteurs** : bulle de chat dans l'espace créateur (edge function `assistant`, claude-sonnet-5-5), journal côté admin.
+- **Créateurs** : liste + fiche (posts, vues, paie, onboarding).
+- **Paie du lundi** : ajustements, validation ligne par ligne ou globale, export CSV Ruul, email récap.
+- **30 langues** : landing, candidature, signature et espace créateur (RTL pour ar/he).
+- **Design verre** : sidebar et cartes translucides, couleurs par section, tableaux blancs denses.
+
+**À savoir / reste à faire**
+- `ANTHROPIC_API_KEY` n'est pas encore posé dans les secrets Supabase : l'assistant répond en mode dégradé, le vrai appel LLM n'a pas été testé.
+- Traductions générées : relecture native conseillée (surtout langues genrées) ; formats de prix variables selon la langue.
+- Ad Library : champ pays vide sur les pubs collectées.
+- Email admin de test non renseigné : « M'envoyer un test » renvoie une erreur tant qu'il est vide (voulu, rien ne part).
+- Conversations de démo de l'assistant (comptes QA) présentes dans le journal.
+- Récap paie du lundi pas encore testé avec de vrais créateurs.
+
 
 ## V2.1 : refonte visuelle + tests connectés (15/11, après-midi)
 
