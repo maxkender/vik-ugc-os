@@ -83,24 +83,28 @@ const fmtSince = (days: number) => (days < 1 ? `${Math.max(1, Math.floor(days * 
 function Stepper({ r }: { r: Row }) {
   const late = !!r.current && r.blockedDays >= 2;
   const curIdx = r.current ? STEPS.findIndex((s) => s.key === r.current) : STEPS.length;
+  const doneCount = STEPS.filter((s) => r.done[s.key]).length;
   return (
-    <div className="flex items-center">
-      {STEPS.map((s, i) => {
-        const at = r.done[s.key];
-        const isCurrent = s.key === r.current;
-        return (
-          <div key={s.key} className="flex items-center">
-            {i > 0 && <span className={cn("h-px w-3 lg:w-4", i <= curIdx ? "bg-[#9ad7b2]" : "bg-border-strong")} />}
-            <span title={`${s.label}${at ? ` · ${dateFr(at, true)}` : isCurrent ? ` · en attente depuis ${fmtSince(r.blockedDays)}` : ""}`}
-              className={cn("flex h-5 w-5 shrink-0 items-center justify-center rounded-full",
-                at ? "bg-tint-green text-success"
-                  : isCurrent ? (late ? "bg-tint-yellow text-[#b97800] ring-2 ring-[#ffbb43]/60" : "bg-white text-accent ring-2 ring-accent")
-                  : "bg-white ring-1 ring-border-strong")}>
-              {at ? <Check className="h-3 w-3" strokeWidth={3} /> : isCurrent ? <span className={cn("h-1.5 w-1.5 rounded-full", late ? "bg-[#ffbb43]" : "bg-accent")} /> : null}
-            </span>
-          </div>
-        );
-      })}
+    <div className="flex w-full min-w-[300px] items-center gap-3">
+      <div className="flex flex-1 items-center">
+        {STEPS.map((s, i) => {
+          const at = r.done[s.key];
+          const isCurrent = s.key === r.current;
+          return (
+            <div key={s.key} className={cn("flex items-center", i > 0 && "flex-1")}>
+              {i > 0 && <span className={cn("h-px min-w-1.5 flex-1", i <= curIdx ? "bg-[#9ad7b2]" : "bg-border-strong")} />}
+              <span title={`${s.label}${at ? ` · ${dateFr(at, true)}` : isCurrent ? ` · en attente depuis ${fmtSince(r.blockedDays)}` : ""}`}
+                className={cn("flex h-5 w-5 shrink-0 items-center justify-center rounded-full",
+                  at ? "bg-tint-green text-success"
+                    : isCurrent ? (late ? "bg-tint-yellow text-[#b97800] ring-2 ring-[#ffbb43]/60" : "bg-white text-accent ring-2 ring-accent")
+                    : "bg-white ring-1 ring-border-strong")}>
+                {at ? <Check className="h-3 w-3" strokeWidth={3} /> : isCurrent ? <span className={cn("h-1.5 w-1.5 rounded-full", late ? "bg-[#ffbb43]" : "bg-accent")} /> : null}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      <span className="tabular w-10 shrink-0 text-right text-xs text-subtle-foreground">{doneCount}/{STEPS.length}</span>
     </div>
   );
 }
@@ -203,7 +207,7 @@ export default function Onboarding() {
             {s.label} <span className="tabular text-subtle-foreground">{counts.get(s.key)}</span>
           </Chip>
         ))}
-        <Select className="ml-auto h-8 w-44 rounded-full text-[13px]" value={country} onChange={(e) => setCountry(e.target.value)}>
+        <Select className="ml-auto h-8 w-44 rounded-full py-0 text-[13px]" value={country} onChange={(e) => setCountry(e.target.value)}>
           <option value="">Tous les pays</option>
           {(countries ?? []).filter((c: any) => usedCountries.includes(c.code)).map((c: any) => <option key={c.code} value={c.code}>{flag(c.code)} {c.name}</option>)}
         </Select>
