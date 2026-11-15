@@ -83,6 +83,10 @@ export default function AssistantLog() {
   const counts = { all: all.length, escalated: kpi.escalated, open: all.filter((c) => c.status === "open").length, closed: all.filter((c) => c.status === "closed").length };
 
   const isDesktop = useIsDesktop();
+  // Desktop : on ouvre d'office la première conversation (les escaladées sont en tête).
+  useEffect(() => {
+    if (isDesktop && !selected && convs.length) select(convs[0].id);
+  }, [isDesktop, selected, convs.length]);
 
   return (
     <div className="space-y-6">

@@ -4,27 +4,48 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import en from "./en";
 import es from "./es";
 import fr from "./fr";
+import { LOCALES, LOCALE_LABELS } from "./locales";
 
-export const LANGS = [
+/** Langues proposées : English, Español, Français d'abord, puis le reste trié par nom natif. */
+export const LANGS: { code: string; label: string }[] = [
   { code: "en", label: "English" },
   { code: "es", label: "Español" },
   { code: "fr", label: "Français" },
+  ...Object.keys(LOCALES)
+    .map((code) => ({ code, label: LOCALE_LABELS[code] ?? code }))
+    .sort((a, b) => a.label.localeCompare(b.label, "en")),
 ];
 
-i18n.use(LanguageDetector).use(initReactI18next).init({
-  resources: { en: { translation: en }, es: { translation: es }, fr: { translation: fr } },
-  fallbackLng: "en",
-  supportedLngs: ["en", "es", "fr"],
-  nonExplicitSupportedLngs: true,
-  interpolation: { escapeValue: false },
-  returnObjects: true,
-  detection: { order: ["querystring", "localStorage", "navigator"], lookupQuerystring: "lang", caches: ["localStorage"] },
-});
+export const SUPPORTED_LANGS: string[] = LANGS.map((l) => l.code);
 
-/** Langue d'interface d'un pays : es pour les pays hispanophones, fr pour les francophones, sinon en. */
+const resources: Record<string, { translation: unknown }> = {
+  en: { translation: en },
+  es: { translation: es },
+  fr: { translation: fr },
+};
+for (const [code, dict] of Object.entries(LOCALES)) resources[code] = { translation: dict };
+
+i18n
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    resources,
+    fallbackLng: "en",
+    supportedLngs: SUPPORTED_LANGS,
+    nonExplicitSupportedLngs: true,
+    interpolation: { escapeValue: false },
+    returnObjects: true,
+    detection: {
+      order: ["querystring", "localStorage", "navigator"],
+      lookupQuerystring: "lang",
+      caches: ["localStorage"],
+    },
+  });
+
+/** Langue d'interface pour une langue de pays : elle-même si traduite, sinon l'anglais. */
 export function uiLangForCountry(lang: string | null | undefined): string {
-  const l = (lang ?? "en").split("-")[0];
-  return ["en", "es", "fr"].includes(l) ? l : "en";
+  const l = (lang ?? "en").split("-")[0].toLowerCase();
+  return SUPPORTED_LANGS.includes(l) ? l : "en";
 }
 
 export default i18n;
