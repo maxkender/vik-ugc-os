@@ -57,7 +57,9 @@ export function attributeVideo(v: AttributableVideo, competitors: CompetitorTerm
     }
   }
   // 4. indice de la source (ex. run lancé sur la page FB ou le hashtag d'un concurrent)
-  if (hint) return { competitor_id: hint, origin: v.is_ad ? "ad" : "ugc", matched: "source" };
+  // Une pub n'est jamais rattachée sur le seul indice de la source : la recherche Ad Library par mot-clé
+  // renvoie beaucoup de pubs sans rapport (corrigé le 15/11 après relecture de la bibliothèque).
+  if (hint && !v.is_ad) return { competitor_id: hint, origin: "ugc", matched: "source" };
   return { competitor_id: null, origin: v.is_ad ? "ad" : "other", matched: null };
 }
 

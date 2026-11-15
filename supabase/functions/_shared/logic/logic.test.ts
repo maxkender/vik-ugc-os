@@ -319,6 +319,7 @@ describe("attribution concurrents", () => {
     expect(attributeVideo(v({ is_ad: true, ad_page_name: "Knowunity" }), comps)).toMatchObject({ competitor_id: "ku", origin: "ad" });
     expect(attributeVideo(v({ caption: "random" }), comps, "di")).toMatchObject({ competitor_id: "di", origin: "ugc" });
     expect(attributeVideo(v({ is_ad: true, ad_page_name: "Other" }), comps).origin).toBe("ad");
+    expect(attributeVideo(v({ is_ad: true, ad_page_name: "Adobe Premiere" }), comps, "di")).toMatchObject({ competitor_id: null, origin: "ad" });
   });
   it("mentions et métriques dérivées", () => {
     expect(mentionsOf([{ userUniqueId: "Knowunity.FR" }], null, "merci @astra_ai_es !")).toEqual(["knowunity.fr", "astra_ai_es"]);
