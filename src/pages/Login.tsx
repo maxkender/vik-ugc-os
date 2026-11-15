@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
-import { Button, Card, Field, Input } from "@/components/ui";
+import { Button, Field, Input } from "@/components/ui";
 import { Logo } from "@/components/brand/Logo";
 
 export default function Login() {
@@ -43,24 +43,29 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-full items-center justify-center bg-muted/40 p-6">
-      <Card className="w-full max-w-sm p-8">
-        <Logo className="mb-6 h-7" />
-        <h1 className="mb-6 text-xl font-semibold">{t("login.title")}</h1>
-        {sent ? (
-          <p className="text-sm">{t("login.sent")}</p>
-        ) : (
-          <form onSubmit={submit} className="space-y-4">
-            <Field label={t("login.email")}><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoFocus /></Field>
-            {mode === "password" && <Field label={t("login.password")}><Input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} /></Field>}
-            {error && <p className="text-sm text-danger">{error}</p>}
-            <Button type="submit" className="w-full" loading={busy}>{mode === "link" ? t("login.send") : t("login.title")}</Button>
-            <button type="button" className="w-full text-xs text-muted-foreground hover:underline" onClick={() => setMode(mode === "link" ? "password" : "link")}>
-              {mode === "link" ? t("login.withPassword") : t("login.send")}
-            </button>
-          </form>
-        )}
-      </Card>
+    <div className="flex min-h-full flex-col bg-background">
+      <div className="flex flex-1 items-center justify-center px-6 py-16">
+        <div className="w-full max-w-[380px]">
+          <Logo className="mb-10 h-8" />
+          <div className="rounded-xl border bg-card p-7 shadow-[0_1px_3px_rgba(0,17,62,0.06),0_8px_24px_-12px_rgba(0,17,62,0.12)]">
+            <h1 className="text-xl font-semibold tracking-tight">{t("login.title")}</h1>
+            {sent ? (
+              <div className="mt-4 rounded-lg bg-accent/5 p-4 text-sm text-foreground ring-1 ring-accent/20">{t("login.sent")}</div>
+            ) : (
+              <form onSubmit={submit} className="mt-6 space-y-4">
+                <Field label={t("login.email")}><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoFocus placeholder="nom@exemple.com" className="h-10" /></Field>
+                {mode === "password" && <Field label={t("login.password")}><Input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="h-10" /></Field>}
+                {error && <p className="rounded-md bg-danger/5 px-3 py-2 text-sm text-danger ring-1 ring-danger/20">{error}</p>}
+                <Button type="submit" className="h-10 w-full" loading={busy}>{mode === "link" ? t("login.send") : t("login.title")}</Button>
+                <button type="button" className="w-full text-center text-xs text-muted-foreground hover:text-foreground hover:underline" onClick={() => setMode(mode === "link" ? "password" : "link")}>
+                  {mode === "link" ? t("login.withPassword") : t("login.send")}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      </div>
+      <p className="pb-6 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} Vik Studios</p>
     </div>
   );
 }

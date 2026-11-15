@@ -33,6 +33,39 @@ export interface Video {
   ad_days: number | null;
   ad_page_name: string | null;
   first_seen_at: string;
+  origin: "official" | "ugc" | "ad" | "other" | null;
+  engagement: number | null;
+  outlier: number | null;
+  velocity: number | null;
+  mentions: string[];
 }
+
+export const ORIGIN_LABEL: Record<string, string> = { official: "Officiel", ugc: "UGC", ad: "Pub", other: "Autre" };
+
+export type Sort = "score" | "views" | "likes" | "shares" | "engagement" | "outlier" | "velocity" | "date" | "recent" | "ad_days";
+export const SORT_LABEL: Record<Sort, string> = {
+  score: "Score", views: "Vues", likes: "Likes", shares: "Partages", engagement: "Engagement",
+  outlier: "Outlier (vues/abonnés)", velocity: "Vélocité (vues/jour)", date: "Date de publication", recent: "Ajout récent", ad_days: "Durée de diffusion (pubs)",
+};
+
+/** Valeur de curseur (keyset) pour un tri décroissant ; null est traité comme -1 côté SQL. */
+export function cursorValue(v: Video, sort: Sort): number {
+  const n = (x: number | null | undefined) => (x === null || x === undefined ? -1 : Number(x));
+  switch (sort) {
+    case "views": return n(v.views);
+    case "likes": return n(v.likes);
+    case "shares": return n(v.shares);
+    case "engagement": return n(v.engagement);
+    case "outlier": return n(v.outlier);
+    case "velocity": return n(v.velocity);
+    case "date": return v.published_at ? new Date(v.published_at).getTime() / 1000 : -1;
+    case "recent": return new Date(v.first_seen_at).getTime() / 1000;
+    case "ad_days": return n(v.ad_days);
+    default: return Number(v.score);
+  }
+}
+
+export const pct = (x: number | null | undefined) => (x === null || x === undefined ? "—" : `${(Number(x) * 100).toFixed(1)} %`);
+export const times = (x: number | null | undefined) => (x === null || x === undefined ? "—" : `×${Number(x) >= 100 ? Math.round(Number(x)) : Number(x).toFixed(1)}`);
 
 export const PLATFORM_LABEL: Record<Video["platform"], string> = { tiktok: "TikTok", instagram: "Instagram", facebook_ads: "Meta Ads" };

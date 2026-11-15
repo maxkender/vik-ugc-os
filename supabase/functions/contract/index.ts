@@ -8,6 +8,7 @@ import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { appUrl, audit, HttpError, serve } from "../_shared/http.ts";
 import { queueEmail } from "../_shared/outbox.ts";
 import { canSign } from "../_shared/logic/contract.ts";
+import { summaryLanguage } from "../_shared/logic/contractSummary.ts";
 
 async function load(db: SupabaseClient, token: string) {
   if (!/^[0-9a-f]{48}$/.test(token)) throw new HttpError(404, "not_found");
@@ -94,6 +95,9 @@ serve(async (req, body, db) => {
       return {
         ok: true, status: expired ? "expired" : k.status, body: k.body_rendered, doc_hash: k.doc_hash,
         expires_at: k.expires_at, signed_at: k.signed_at, first_name: a.first_name, last_name: a.last_name, locale: a.locale,
+        // Le résumé est la première section « ## … » jusqu'au premier « --- ».
+        summary: k.body_rendered.startsWith("## ") ? k.body_rendered.split(/\n---\n/)[0] : null,
+        language: summaryLanguage(a.locale),
       };
     }
     case "sign": {
@@ -116,7 +120,7 @@ serve(async (req, body, db) => {
       const posterId = await createPoster(db, a);
       await db.from("applications").update({ status: "signed", poster_id: posterId }).eq("id", a.id);
       await queueEmail(db, { template: "contract_signed", to: a.email, language: a.locale, vars: { first_name: a.first_name }, buttonUrl: appUrl(`/sign/${token}`), relatedType: "contract", relatedId: k.id });
-      await queueEmail(db, { template: "access", to: a.email, language: a.locale, vars: { first_name: a.first_name }, buttonUrl: appUrl(`/login?email=${encodeURIComponent(a.email)}`), relatedType: "poster", relatedId: posterId });
+      await queueEmail(db, { template: "access", to: a.email, language: a.locale, vars: { first_name: a.first_name }, buttonUrl: appUrl(`/login?email=${encodeURIComponent(a.email)}`), relatedType: "poster", relatedId: posterId, applicationId: a.id, onboardingStep: "access_sent" });
       await audit(db, null, "contract.signed", "contract", k.id, { ip, hash: k.doc_hash });
       return { ok: true, signed_at: at };
     }

@@ -1,6 +1,7 @@
 // Création d'un contrat à partir du modèle du pays (sinon le modèle par défaut).
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { renderContract, sha256Hex } from "./logic/contract.ts";
+import { composeContract } from "./logic/contractSummary.ts";
 import { formatMoney } from "./logic/zones.ts";
 import { appUrl } from "./http.ts";
 import { queueEmail } from "./outbox.ts";
@@ -15,7 +16,7 @@ export async function createContract(db: SupabaseClient, applicationId: string) 
   if (!tpl) throw new Error("no contract template");
   const { data: company } = await db.from("settings").select("value").eq("key", "company").maybeSingle();
   const cur = zone?.currency ?? "USD";
-  const body = renderContract(tpl.body_md, {
+  const full = renderContract(tpl.body_md, {
     company_name: company?.value?.name ?? "Vik Studios SAS",
     full_name: `${a.first_name} ${a.last_name}`,
     birthdate: a.birthdate,
@@ -29,6 +30,16 @@ export async function createContract(db: SupabaseClient, applicationId: string) 
     currency: cur,
     country_clauses: country?.contract_clauses ?? "",
   });
+  // Résumé en langage simple dans la langue du créateur (+ anglais), puis le contrat complet.
+  // Le texte juridique complet reste en anglais : c'est la version de référence (voir DECISIONS.md).
+  const { body } = composeContract(a.locale ?? country?.language, {
+    price: formatMoney(Number(zone?.price_per_video ?? 0), cur),
+    rpm: formatMoney(Number(zone?.rpm ?? 0), cur),
+    rpmViews: new Intl.NumberFormat("en").format(zone?.rpm_views ?? 1000),
+    videosPerDay: zone?.videos_per_day ?? 2,
+    zone: zone?.code ?? "?",
+    companyName: company?.value?.name ?? "Vik Studios SAS",
+  }, full);
   const hash = await sha256Hex(body);
   // un seul contrat ouvert par candidature
   await db.from("contracts").update({ status: "cancelled" }).eq("application_id", a.id).eq("status", "sent");
@@ -45,6 +56,7 @@ export async function createContract(db: SupabaseClient, applicationId: string) 
       rpm_views: new Intl.NumberFormat("en").format(zone?.rpm_views ?? 1000),
     },
     buttonUrl: appUrl(`/sign/${c.token}`), relatedType: "contract", relatedId: c.id,
+    applicationId: a.id, onboardingStep: "contract_email_sent",
   });
   return c;
 }

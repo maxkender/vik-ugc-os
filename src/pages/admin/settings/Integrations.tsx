@@ -66,13 +66,14 @@ export default function Integrations() {
         <p className="mt-2 text-xs text-muted-foreground">CRON_SECRET est déjà posé (appels planifiés pg_cron → fonctions). Détails dans SETUP.md.</p>
       </Card>
       <div className="grid gap-6 xl:grid-cols-2">
-        <Section title="Apify (collecte)" settingKey="apify" defaults={{ hard_cap_per_run: 200, default_max_results: 30, monthly_budget_usd: 30, collect_cron_enabled: false, views_cron_enabled: true, actors: {} }}
-          description="Plafonds de coût. Aucun run ne dépasse le plafond dur ; le budget mensuel bloque les nouveaux runs.">
+        <Section title="Apify (collecte)" settingKey="apify" defaults={{ hard_cap_per_run: 200, default_max_results: 30, monthly_budget_usd: 300, daily_budget_usd: 30, backfill_budget_usd: 50, collect_cron_enabled: false, views_cron_enabled: true, actors: {} }}
+          description="Plafonds de coût. Aucun run ne dépasse le plafond dur ; au-delà du plafond du jour ou du budget du mois, les nouveaux runs sont refusés.">
           {(d, set) => <>
             <Field label="Plafond dur par run (résultats)"><Input type="number" value={d.hard_cap_per_run} onChange={(e) => set("hard_cap_per_run", num(e.target.value))} /></Field>
             <Field label="Résultats par défaut"><Input type="number" value={d.default_max_results} onChange={(e) => set("default_max_results", num(e.target.value))} /></Field>
             <Field label="Budget mensuel (USD)"><Input type="number" value={d.monthly_budget_usd} onChange={(e) => set("monthly_budget_usd", num(e.target.value))} /></Field>
-            <div />
+            <Field label="Plafond quotidien (USD)" hint="Dépense Apify max. par jour (UTC), tous runs confondus. Défaut : 30 $."><Input type="number" value={d.daily_budget_usd ?? 30} onChange={(e) => set("daily_budget_usd", num(e.target.value))} /></Field>
+            <Field label="Budget backfill (USD)" hint="Plafond du jour quand on lance un backfill (collecte massive initiale). Défaut : 50 $."><Input type="number" value={d.backfill_budget_usd ?? 50} onChange={(e) => set("backfill_budget_usd", num(e.target.value))} /></Field>
             <div className="sm:col-span-2 space-y-2">
               <label className="flex items-center gap-3 text-sm"><Switch checked={!!d.collect_cron_enabled} onChange={(v) => set("collect_cron_enabled", v)} /> Collecte planifiée des sources activées (toutes les heures, selon leur fréquence)</label>
               {d.collect_cron_enabled && <p className="flex items-center gap-2 text-xs text-warning"><AlertTriangle className="h-3.5 w-3.5" /> Coûts récurrents : vérifiez les sources activées et le budget mensuel.</p>}

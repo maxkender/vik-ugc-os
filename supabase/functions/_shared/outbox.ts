@@ -13,6 +13,49 @@ export interface QueueEmail {
   sendAfter?: string;
   relatedType?: string;
   relatedId?: string;
+  /** Candidature liée (suivi d'onboarding) ; déduite de relatedType/relatedId si absente. */
+  applicationId?: string | null;
+  /** Étape d'onboarding à journaliser quand l'email est mis en file (ex. contract_email_sent, access_sent, reminder). */
+  onboardingStep?: string | null;
+  onboardingMeta?: Record<string, unknown> | null;
+}
+
+/** URL publique d'une edge function (suivi des ouvertures / clics). */
+function fnUrl(name: string): string {
+  return `${(Deno.env.get("SUPABASE_URL") ?? "").replace(/\/$/, "")}/functions/v1/${name}`;
+}
+
+export function trackedLink(outboxId: string, url: string): string {
+  return `${fnUrl("track")}?c=${outboxId}&u=${encodeURIComponent(url)}`;
+}
+export function openPixel(outboxId: string): string {
+  return `<img src="${fnUrl("track")}?o=${outboxId}" width="1" height="1" alt="" style="display:block;width:1px;height:1px;border:0" />`;
+}
+
+/** Candidature et posteur liés à un email, pour le suivi d'onboarding. */
+async function resolveLinks(db: SupabaseClient, e: QueueEmail): Promise<{ application_id: string | null; poster_id: string | null }> {
+  if (e.applicationId) {
+    const { data } = await db.from("applications").select("poster_id").eq("id", e.applicationId).maybeSingle();
+    return { application_id: e.applicationId, poster_id: data?.poster_id ?? null };
+  }
+  if (!e.relatedId) return { application_id: null, poster_id: null };
+  if (e.relatedType === "application") {
+    const { data } = await db.from("applications").select("poster_id").eq("id", e.relatedId).maybeSingle();
+    return { application_id: e.relatedId, poster_id: data?.poster_id ?? null };
+  }
+  if (e.relatedType === "contract") {
+    const { data } = await db.from("contracts").select("application_id, applications(poster_id)").eq("id", e.relatedId).maybeSingle();
+    return { application_id: data?.application_id ?? null, poster_id: (data as any)?.applications?.poster_id ?? null };
+  }
+  if (e.relatedType === "poster") {
+    const { data } = await db.from("posters").select("application_id").eq("id", e.relatedId).maybeSingle();
+    return { application_id: data?.application_id ?? null, poster_id: e.relatedId };
+  }
+  if (e.relatedType === "payout") {
+    const { data } = await db.from("payouts").select("poster_id, posters(application_id)").eq("id", e.relatedId).maybeSingle();
+    return { application_id: (data as any)?.posters?.application_id ?? null, poster_id: data?.poster_id ?? null };
+  }
+  return { application_id: null, poster_id: null };
 }
 
 /** Logo PNG servi par le front (public/brand) ; seulement si APP_URL est une vraie URL publique. */
@@ -30,20 +73,27 @@ export async function queueEmail(db: SupabaseClient, e: QueueEmail): Promise<str
   const brand = company?.value?.brand ?? "Vik Studios";
   const vars = { brand, ...e.vars };
   const subject = fillTemplate(tpl.subject, vars);
-  const { html, text } = renderEmail({
-    subject,
-    body: fillTemplate(tpl.body, vars),
-    button: tpl.button_label && e.buttonUrl ? { label: fillTemplate(tpl.button_label, vars), url: e.buttonUrl } : null,
-    brand,
-    logoUrl: logoUrl(),
-  });
-  const { data, error } = await db.from("email_outbox").insert({
-    template_key: e.template, to_email: e.to, subject, html, text,
+  // Identifiant connu d'avance : le bouton passe par /track (clic) et un pixel suit l'ouverture.
+  const id = crypto.randomUUID();
+  const button = tpl.button_label && e.buttonUrl ? { label: fillTemplate(tpl.button_label, vars), url: trackedLink(id, e.buttonUrl) } : null;
+  const rendered = renderEmail({ subject, body: fillTemplate(tpl.body, vars), button, brand, logoUrl: logoUrl() });
+  const html = rendered.html.replace("</body>", `${openPixel(id)}</body>`);
+  // Le texte brut garde le lien direct (pas de suivi dans la version texte).
+  const text = e.buttonUrl && button ? rendered.text.replace(button.url, e.buttonUrl) : rendered.text;
+  const links = await resolveLinks(db, e);
+  const { error } = await db.from("email_outbox").insert({
+    id, template_key: e.template, to_email: e.to, subject, html, text,
     send_after: e.sendAfter ?? new Date().toISOString(),
-    related_type: e.relatedType ?? null, related_id: e.relatedId ?? null,
-  }).select("id").single();
+    related_type: e.relatedType ?? null, related_id: e.relatedId ?? null, application_id: links.application_id,
+  });
   if (error) throw error;
-  return data.id;
+  if (e.onboardingStep && (links.application_id || links.poster_id)) {
+    await db.from("onboarding_events").insert({
+      application_id: links.application_id, poster_id: links.poster_id, step: e.onboardingStep,
+      meta: { email_id: id, template: e.template, ...(e.onboardingMeta ?? {}) },
+    });
+  }
+  return id;
 }
 
 /** Envoie les emails en file. Rien ne part sans expéditeur ; en mode test, tout va à l'admin de test. */

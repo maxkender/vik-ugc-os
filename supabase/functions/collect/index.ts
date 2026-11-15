@@ -127,11 +127,19 @@ async function ingestVideos(db: SupabaseClient, run: any, items: any[]) {
   let created = 0;
   const upserts: any[] = [];
   const metrics: any[] = [];
+  // Miniatures en parallèle (lots de 10) : une boucle séquentielle dépassait la durée max d'une edge function.
+  const thumbs = new Map<string, string | null>();
+  const need = rows.filter((r) => !byExt.get(r.external_id)?.thumbnail_path);
+  for (let i = 0; i < need.length; i += 10) {
+    const batch = need.slice(i, i + 10);
+    const paths = await Promise.all(batch.map((r) => storeThumbnail(db, r)));
+    batch.forEach((r, j) => thumbs.set(r.external_id, paths[j]));
+  }
   for (const r of rows) {
     const prev = byExt.get(r.external_id);
     const cls = heuristicClassify({ caption: r.caption, hashtags: r.hashtags, duration_s: r.duration_s, is_ad: r.is_ad, raw_type: r.raw_type }, (cats ?? []) as CategoryDef[]);
     const keepCat = prev && prev.category_auto === false;
-    const thumb = prev?.thumbnail_path ?? (await storeThumbnail(db, r));
+    const thumb = prev?.thumbnail_path ?? thumbs.get(r.external_id) ?? null;
     const { raw_type: _rt, ...cols } = r;
     const attr = attributeVideo(r, (comps ?? []) as CompetitorTerms[], run.params?.competitor_id ?? null);
     upserts.push({
@@ -212,7 +220,7 @@ async function uploadMp4(db: SupabaseClient, videoId: string, url: string): Prom
 }
 
 async function poll(db: SupabaseClient) {
-  const { data: runs } = await db.from("agent_runs").select("*").eq("status", "running").not("apify_run_id", "is", null).limit(20);
+  const { data: runs } = await db.from("agent_runs").select("*").eq("status", "running").not("apify_run_id", "is", null).order("started_at").limit(5);
   const out: any[] = [];
   for (const run of runs ?? []) {
     try {

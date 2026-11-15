@@ -5,7 +5,7 @@ import { Badge, Button, Drawer, Input, Select, useToast } from "@/components/ui"
 import { callFn, supabase } from "@/lib/supabase";
 import { useCategories, useCompetitors } from "@/lib/hooks";
 import { compact, dateFr, flag } from "@/lib/utils";
-import { PLATFORM_LABEL, type Video } from "./types";
+import { ORIGIN_LABEL, PLATFORM_LABEL, pct, times, type Video } from "./types";
 import { playableUrl, thumbOf } from "./media";
 
 export function VideoDrawer({ video, onClose, fav, onFav, onAssign }: { video: Video | null; onClose: () => void; fav: boolean; onFav: () => void; onAssign: () => void }) {
@@ -86,6 +86,9 @@ export function VideoDrawer({ video, onClose, fav, onFav, onAssign }: { video: V
               <Metric label="Likes" value={compact(v.likes)} />
               <Metric label="Commentaires" value={compact(v.comments)} />
               <Metric label="Partages" value={compact(v.shares)} />
+              <Metric label="Engagement" value={pct(v.engagement)} />
+              <Metric label="Outlier" value={times(v.outlier)} />
+              <Metric label="Vues / jour" value={compact(v.velocity)} />
             </>}
           </div>
           <dl className="grid grid-cols-[120px_1fr] gap-y-1.5 text-sm">
@@ -93,7 +96,8 @@ export function VideoDrawer({ video, onClose, fav, onFav, onAssign }: { video: V
             <dt className="text-muted-foreground">Langue / pays</dt><dd>{v.language ?? "—"} {flag(v.country)} {v.country ?? ""}</dd>
             <dt className="text-muted-foreground">Durée</dt><dd>{v.duration_s ? `${Math.round(v.duration_s)} s` : "—"}</dd>
             <dt className="text-muted-foreground">Son</dt><dd className="truncate">{v.sound_name ?? "—"}</dd>
-            <dt className="text-muted-foreground">Concurrent</dt><dd>{comps?.find((c: any) => c.id === v.competitor_id)?.name ?? "—"}</dd>
+            <dt className="text-muted-foreground">Concurrent</dt><dd className="flex items-center gap-2">{comps?.find((c: any) => c.id === v.competitor_id)?.name ?? "—"}{v.origin && <Badge tone={v.origin === "ugc" ? "accent" : v.origin === "ad" ? "warning" : "outline"}>{ORIGIN_LABEL[v.origin]}</Badge>}</dd>
+            {v.mentions?.length > 0 && <><dt className="text-muted-foreground">Mentions</dt><dd className="flex flex-wrap gap-1">{v.mentions.map((m) => <Badge key={m} tone="outline">@{m}</Badge>)}</dd></>}
             <dt className="text-muted-foreground">Catégorie</dt>
             <dd>
               <Select value={v.category_id ?? ""} onChange={(e) => setCategory(e.target.value)} className="h-8 max-w-56">

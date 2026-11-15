@@ -2,7 +2,7 @@ import { Fragment, useEffect, useState, type ReactNode } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { CheckCircle2, Download, AlertTriangle } from "lucide-react";
+import { CheckCircle2, Download, AlertTriangle, ChevronDown, Sparkles } from "lucide-react";
 import { callFn } from "@/lib/supabase";
 import { Button, Card, Field, Input, Spinner } from "@/components/ui";
 import { uiLangForCountry } from "@/i18n";
@@ -18,7 +18,11 @@ interface ContractView {
   first_name: string;
   last_name: string;
   locale: string;
+  summary?: string | null;
+  language?: string;
 }
+
+const FULL_LABEL: Record<string, string> = { en: "Read the full contract", fr: "Lire le contrat complet", es: "Leer el contrato completo" };
 
 /** **gras** → <strong>, sans HTML brut. */
 function inline(text: string): ReactNode[] {
@@ -60,6 +64,7 @@ export default function Sign() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [signedAt, setSignedAt] = useState<string | null>(null);
+  const [showFull, setShowFull] = useState(false);
 
   useEffect(() => {
     if (q.data?.locale) i18n.changeLanguage(uiLangForCountry(q.data.locale));
@@ -115,7 +120,23 @@ export default function Sign() {
               <h1 className="text-2xl font-semibold tracking-tight">{t("sign.title")}</h1>
               <p className="mt-1 text-sm text-muted-foreground">{t("sign.read")}</p>
             </div>
-            <Card className="max-h-[60vh] overflow-y-auto p-8"><Markdown text={q.data.body} /></Card>
+            {q.data.summary ? (
+              <>
+                <Card className="border-accent/40 bg-accent/5 p-8">
+                  <div className="mb-2 flex items-center gap-2 text-accent"><Sparkles className="h-4 w-4" /></div>
+                  <Markdown text={q.data.summary} />
+                </Card>
+                <Card className="p-0">
+                  <button type="button" onClick={() => setShowFull((v) => !v)} className="flex w-full items-center justify-between px-8 py-4 text-sm font-medium">
+                    {FULL_LABEL[(i18n.resolvedLanguage ?? "en").split("-")[0]] ?? FULL_LABEL.en}
+                    <ChevronDown className={`h-4 w-4 transition-transform ${showFull ? "rotate-180" : ""}`} />
+                  </button>
+                  {showFull && <div className="max-h-[60vh] overflow-y-auto border-t px-8 py-6"><Markdown text={q.data.body.slice(q.data.summary.length).replace(/^\s*---\s*/, "")} /></div>}
+                </Card>
+              </>
+            ) : (
+              <Card className="max-h-[60vh] overflow-y-auto p-8"><Markdown text={q.data.body} /></Card>
+            )}
             <Card className="space-y-4">
               <div className="flex items-start gap-2 rounded-md bg-warning/15 p-3 text-sm">
                 <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> {t("sign.warn")}

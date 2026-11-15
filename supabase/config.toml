@@ -21,3 +21,9 @@ verify_jwt = false
 verify_jwt = false
 [functions.creatives]
 verify_jwt = false
+[functions.track]
+verify_jwt = false
+[functions.team]
+verify_jwt = false
+[functions.handles]
+verify_jwt = false

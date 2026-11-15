@@ -6,6 +6,39 @@ import { appUrl, audit, caller, getSetting, HttpError, requireAdmin, requireRecr
 import { queueEmail } from "../_shared/outbox.ts";
 import { createContract } from "../_shared/contracts.ts";
 import { signatureStep } from "../_shared/logic/reminders.ts";
+import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
+import type { Caller } from "../_shared/http.ts";
+
+export const REMIND_STEPS = ["contract", "access", "handles", "ruul", "first_post"] as const;
+
+/** Relance manuelle d'une étape d'onboarding (bouton « Relancer » du suivi). */
+async function remind(db: SupabaseClient, c: Caller, applicationId: string, step: string) {
+  if (!(REMIND_STEPS as readonly string[]).includes(step)) throw new HttpError(400, "step");
+  const { data: a } = await db.from("applications").select("*").eq("id", applicationId).single();
+  if (!a) throw new HttpError(404, "application not found");
+  if (c.kind === "user" && c.role === "recruiter" && !c.countries.includes(a.country)) throw new HttpError(403, "country_not_assigned");
+  const meta = { step, by: c.kind === "user" ? c.id : "cron" };
+  const base = { to: a.email, language: a.locale, applicationId: a.id, onboardingStep: "reminder", onboardingMeta: meta };
+  if (step === "contract") {
+    const { data: k } = await db.from("contracts").select("id, token, expires_at").eq("application_id", a.id).eq("status", "sent")
+      .gt("expires_at", new Date().toISOString()).order("sent_at", { ascending: false }).limit(1).maybeSingle();
+    if (!k) {
+      // Plus de contrat ouvert (expiré / annulé) : nouveau contrat, nouvel email.
+      const nk = await createContract(db, a.id);
+      return { action: "new_contract", contract_id: nk.id };
+    }
+    await queueEmail(db, { ...base, template: "contract_reminder", vars: { first_name: a.first_name, expires_on: k.expires_at.slice(0, 10) }, buttonUrl: appUrl(`/sign/${k.token}`), relatedType: "contract", relatedId: k.id });
+    return { action: "contract_reminder" };
+  }
+  if (!a.poster_id) throw new HttpError(409, "Pas encore de compte posteur (contrat non signé)");
+  const { data: p } = await db.from("posters").select("id, ruul_email").eq("id", a.poster_id).single();
+  const first = { first_name: a.first_name };
+  if (step === "access") await queueEmail(db, { ...base, template: "access", vars: first, buttonUrl: appUrl(`/login?email=${encodeURIComponent(a.email)}`), relatedType: "poster", relatedId: a.poster_id });
+  if (step === "handles") await queueEmail(db, { ...base, template: "handles_reminder", vars: first, buttonUrl: appUrl("/creator/account"), relatedType: "poster", relatedId: a.poster_id });
+  if (step === "ruul") await queueEmail(db, { ...base, template: "ruul_reminder", vars: { ...first, ruul_email: p?.ruul_email ?? a.email }, buttonUrl: appUrl("/creator/payments"), relatedType: "poster", relatedId: a.poster_id });
+  if (step === "first_post") await queueEmail(db, { ...base, template: "first_post_reminder", vars: first, buttonUrl: appUrl("/creator"), relatedType: "poster", relatedId: a.poster_id });
+  return { action: step };
+}
 
 serve(async (req, body, db) => {
   const c = await caller(req, db);
@@ -38,6 +71,20 @@ serve(async (req, body, db) => {
         return { ok: true, status: decision };
       }
       throw new HttpError(400, "decision");
+    }
+    case "remind": {
+      requireStaff(c);
+      return { ok: true, ...(await remind(db, c, String(body.application_id), String(body.step))) };
+    }
+    case "remind_bulk": {
+      requireStaff(c);
+      const ids: string[] = Array.isArray(body.application_ids) ? body.application_ids.slice(0, 200) : [];
+      const results = [];
+      for (const id of ids) {
+        try { results.push({ application_id: id, ...(await remind(db, c, id, String(body.step))) }); }
+        catch (e) { results.push({ application_id: id, error: e instanceof Error ? e.message : String(e) }); }
+      }
+      return { ok: true, sent: results.filter((r: any) => !r.error).length, results };
     }
     case "resend_contract": {
       requireStaff(c);

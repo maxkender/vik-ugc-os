@@ -33,11 +33,19 @@ export default function Competitors() {
   };
   const saveComp = async () => {
     if (!comp.name?.trim()) return toast("Nom obligatoire", "danger");
-    const row = { app_id: app, name: comp.name.trim(), website: comp.website || null, notes: comp.notes || null, verified: !!comp.verified, active: comp.active !== false };
+    const row = { app_id: app, name: comp.name.trim(), website: comp.website || null, notes: comp.notes || null, verified: !!comp.verified, active: comp.active !== false,
+      brand_terms: list(comp._terms ?? (comp.brand_terms ?? []).join(", ")).map((t) => t.toLowerCase()),
+      official_handles: list(comp._handles ?? (comp.official_handles ?? []).join(", ")).map((t) => t.replace(/^@/, "").toLowerCase()) };
     const { error } = comp.id ? await supabase.from("competitors").update(row).eq("id", comp.id) : await supabase.from("competitors").insert(row);
     if (error) return toast(error.message, "danger");
     toast("Concurrent enregistré", "success");
     setComp(null);
+    refresh();
+  };
+  const validate = async (c: any) => {
+    const { error } = await supabase.from("competitors").update({ discovered: false, verified: true }).eq("id", c.id);
+    if (error) return toast(error.message, "danger");
+    toast(`${c.name} validé`, "success");
     refresh();
   };
   const delComp = async (c: any) => {
@@ -95,12 +103,20 @@ export default function Competitors() {
                     {c ? c.name : "Sources sans concurrent (hashtags, mots-clés)"}
                     {c?.verified ? <Badge tone="success">Vérifié</Badge> : c ? <Badge tone="warning">À vérifier</Badge> : null}
                     {c && !c.active && <Badge>Inactif</Badge>}
+                    {c?.discovered && <Badge tone="accent">Découvert · à valider</Badge>}
                   </div>
+                  {c && (c.official_handles?.length > 0 || c.brand_terms?.length > 0) && (
+                    <div className="mt-1.5 flex flex-wrap gap-1">
+                      {(c.official_handles ?? []).map((h: string) => <Badge key={`h-${h}`} tone="outline">@{h}</Badge>)}
+                      {(c.brand_terms ?? []).map((t: string) => <Badge key={`t-${t}`}>« {t} »</Badge>)}
+                    </div>
+                  )}
                   {c?.website && <a className="text-xs text-accent hover:underline" href={c.website} target="_blank" rel="noreferrer">{c.website}</a>}
                   {c?.notes && <p className="mt-1 max-w-2xl text-xs text-muted-foreground">{c.notes}</p>}
                 </div>
                 <div className="flex gap-1">
                   <Button size="sm" variant="outline" onClick={() => newSrc(c?.id ?? null)}><Plus className="h-3.5 w-3.5" /> Source</Button>
+                  {c?.discovered && <Button size="sm" variant="success" onClick={() => validate(c)}>Valider</Button>}
                   {c && <Button size="sm" variant="ghost" onClick={() => setComp(c)}>Modifier</Button>}
                   {c && <Button size="sm" variant="ghost" className="text-danger" onClick={() => delComp(c)}>Supprimer</Button>}
                 </div>
@@ -134,6 +150,10 @@ export default function Competitors() {
           <div className="space-y-4">
             <Field label="Nom"><Input value={comp.name ?? ""} onChange={(e) => setComp({ ...comp, name: e.target.value })} /></Field>
             <Field label="Site web"><Input value={comp.website ?? ""} onChange={(e) => setComp({ ...comp, website: e.target.value })} /></Field>
+            <Field label="Comptes officiels" hint="Handles TikTok / Instagram / page FB, séparés par des virgules. Une vidéo de ces comptes = « Officiel ».">
+              <Input value={comp._handles ?? (comp.official_handles ?? []).join(", ")} onChange={(e) => setComp({ ...comp, _handles: e.target.value })} placeholder="knowunity.fr, knowunity.de" /></Field>
+            <Field label="Termes de marque" hint="Mots, #hashtags ou @mentions qui signalent la marque dans une légende (≥ 4 lettres, évitez les mots ambigus comme un prénom seul). Une vidéo d'un autre compte qui les cite = « UGC ».">
+              <Input value={comp._terms ?? (comp.brand_terms ?? []).join(", ")} onChange={(e) => setComp({ ...comp, _terms: e.target.value })} placeholder="knowunity, astra ai, astraai" /></Field>
             <Field label="Notes"><Textarea value={comp.notes ?? ""} onChange={(e) => setComp({ ...comp, notes: e.target.value })} /></Field>
             <div className="flex gap-6">
               <label className="flex items-center gap-2 text-sm"><Switch checked={!!comp.verified} onChange={(v) => setComp({ ...comp, verified: v })} /> Comptes vérifiés</label>
