@@ -22,10 +22,11 @@ async function inspect(page) {
   await page.waitForTimeout(700);
   const surf = p.locator("[data-source]").first();
   const kind = await surf.getAttribute("data-source");
-  const iframe = await p.locator("iframe").first().getAttribute("src").catch(() => null);
-  const video = await p.locator("video").first().getAttribute("src").catch(() => null);
-  const link = await p.locator("[data-source] a").first().getAttribute("href").catch(() => null);
-  const counter = (await p.locator("span.tabular").first().textContent())?.trim();
+  const attr = async (sel, name) => ((await p.locator(sel).count()) ? p.locator(sel).first().getAttribute(name) : null);
+  const iframe = await attr("iframe", "src");
+  const video = await attr("video", "src");
+  const link = await attr("[data-source] a", "href");
+  const counter = (await p.locator("span.tabular").first().textContent({ timeout: 3000 }))?.trim();
   return { counter, kind, url: (iframe ?? video ?? link ?? "").replace(/\?.*$/, "").slice(0, 90) };
 }
 

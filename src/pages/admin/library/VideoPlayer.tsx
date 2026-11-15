@@ -39,7 +39,7 @@ export function VideoPlayer({ list, index, onIndex, fav, onFav, onAssign, assign
   const comp = competitorName?.(v.competitor_id);
   const isFav = fav?.(v) ?? false;
   const metrics: [React.ReactNode, string, string][] = v.is_ad
-    ? [[<Megaphone />, "Diffusion", `${v.ad_days ?? "?"} j`], [<Eye />, "Début", v.ad_started_at ? dateFr(v.ad_started_at) : "—"], [<Layers />, "Variantes", String(v.ad_variants ?? 1)]]
+    ? [[<Megaphone />, "Diffusion", `${v.ad_days ?? "?"} j`], [<Eye />, "Début", v.ad_started_at ? new Date(v.ad_started_at).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "2-digit" }) : "—"], [<Layers />, "Variantes", String(v.ad_variants ?? 1)]]
     : [[<Eye />, "Vues", compact(v.views)], [<Heart />, "Likes", compact(v.likes)], [<Zap />, "Outlier", times(v.outlier)],
        [<Heart />, "Engagement", pct(v.engagement)], [<MessageCircle />, "Commentaires", compact(v.comments)], [<Repeat2 />, "Partages", compact(v.shares)]];
 
