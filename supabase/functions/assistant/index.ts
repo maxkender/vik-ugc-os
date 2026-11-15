@@ -144,6 +144,8 @@ async function callFal(key: string, models: string[], system: string, messages: 
       body: JSON.stringify({
         model, max_tokens: 1200, temperature: 0.3,
         messages: [{ role: "system", content: `${STATIC_SYSTEM}\n\n${system}` }, ...messages],
+        // Sortie JSON imposée (sinon le modèle peut répondre en texte libre et l'escalade serait perdue).
+        response_format: { type: "json_schema", json_schema: { name: "assistant_output", strict: true, schema: ASSISTANT_OUTPUT_SCHEMA } },
       }),
       signal: AbortSignal.timeout(60_000),
     });
