@@ -26,15 +26,15 @@ export function VideoTable({ rows, sort, asc, onSort, onOpen, competitorName, ca
   competitorName: (id: string | null) => string; categoryName: (id: string | null) => string | undefined; adsOnly?: boolean; footer?: React.ReactNode;
 }) {
   const cols: Col[] = [
-    { key: "video", label: "Vidéo", className: "min-w-[260px]", cell: (v) => (
+    { key: "video", label: "Vidéo", className: "min-w-[240px]", cell: (v) => (
       <div className="flex items-center gap-3">
         <Thumb v={v} />
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
-            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-tint-violet text-[9px] font-semibold uppercase text-[#7a32ef]">{(v.author_handle ?? v.ad_page_name ?? "?").charAt(0)}</span>
-            <p className="truncate font-medium text-foreground">@{v.author_handle ?? v.ad_page_name ?? "?"}</p>
+            <span title={PLATFORM_LABEL[v.platform]} className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#f1f3f7] text-muted-foreground"><PlatformIcon p={v.platform} className="h-3 w-3" /></span>
+            <p className="max-w-[180px] truncate font-medium text-foreground">@{v.author_handle ?? v.ad_page_name ?? "?"}</p>
           </div>
-          <p className="mt-0.5 max-w-[240px] truncate text-xs text-subtle-foreground">{v.caption || "—"}</p>
+          <p className="mt-0.5 max-w-[220px] truncate text-xs text-subtle-foreground">{v.caption || "—"}</p>
         </div>
       </div>
     ) },
@@ -44,13 +44,14 @@ export function VideoTable({ rows, sort, asc, onSort, onOpen, competitorName, ca
         {v.origin && <Badge tone={ORIGIN_TONE[v.origin]}>{ORIGIN_LABEL[v.origin]}</Badge>}
       </div>
     ) },
-    { key: "platform", label: "Plateforme", cell: (v) => <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-muted-foreground"><PlatformIcon p={v.platform} className="h-3.5 w-3.5" />{PLATFORM_LABEL[v.platform]}</span> },
-    { key: "lang", label: "Langue", cell: (v) => <span className="whitespace-nowrap text-muted-foreground">{v.country ? `${flag(v.country)} ` : ""}{v.language ?? "—"}</span> },
-    { key: "format", label: "Format", cell: (v) => <span className="whitespace-nowrap text-muted-foreground">{categoryName(v.category_id) ?? "—"}</span> },
+    { key: "format", label: "Format · langue", cell: (v) => (
+      <div className="whitespace-nowrap">
+        <p className="text-foreground">{categoryName(v.category_id) ?? <span className="text-subtle-foreground">Non classé</span>}</p>
+        <p className="text-xs text-subtle-foreground">{v.country ? `${flag(v.country)} ` : ""}{v.language ?? "langue ?"}</p>
+      </div>
+    ) },
     ...(!adsOnly ? [
-      { key: "views", label: "Vues", sort: "views", num: true, cell: (v: Video) => <span className="font-medium text-foreground">{compact(v.views)}</span> },
-      { key: "likes", label: "Likes", sort: "likes", num: true, cell: (v: Video) => compact(v.likes) },
-      { key: "shares", label: "Partages", sort: "shares", num: true, cell: (v: Video) => compact(v.shares) },
+      { key: "views", label: "Vues", sort: "views", num: true, cell: (v: Video) => v.views === null ? <span className="text-subtle-foreground">—</span> : <span className="font-medium text-foreground">{compact(v.views)}</span> },
       { key: "eng", label: "Engag.", sort: "engagement", num: true, cell: (v: Video) => pct(v.engagement) },
       { key: "outlier", label: "Outlier", sort: "outlier", num: true, cell: (v: Video) => <span className={cn(Number(v.outlier) >= 10 && "font-medium text-[#c42a2d]")}>{times(v.outlier)}</span> },
       { key: "velocity", label: "Vues/j", sort: "velocity", num: true, cell: (v: Video) => compact(v.velocity) },

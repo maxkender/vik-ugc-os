@@ -2,9 +2,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import * as tus from "tus-js-client";
-import { CheckCircle2, Upload } from "lucide-react";
+import { CheckCircle2, Sparkles, Upload, User, Video } from "lucide-react";
 import { ANON_KEY, SUPABASE_URL, callFn } from "@/lib/supabase";
-import { Button, Card, Field, Input, Select, Spinner, Textarea } from "@/components/ui";
+import { Button, Field, IconTile, Input, Select, Spinner, Textarea, type Tint } from "@/components/ui";
 import { uiLangForCountry } from "@/i18n";
 import { ageOn } from "@shared/zones.ts";
 import { flag } from "@/lib/utils";
@@ -109,27 +109,28 @@ export default function Apply() {
   const underage = !!f.birthdate && /^\d{4}-\d{2}-\d{2}$/.test(f.birthdate) && ageOn(f.birthdate) < 18;
 
   return (
-    <div className="min-h-full bg-muted/40">
-      <header className="mx-auto flex max-w-2xl items-center justify-between px-6 py-5">
-        <Link to={`/join/${f.country.toLowerCase()}${keptParams(params)}`} className="inline-flex"><Logo className="h-7" /></Link>
+    <div className="min-h-full bg-white">
+      <header className="sticky top-0 z-30 border-b border-separator bg-white/90 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-2xl items-center justify-between px-5">
+        <Link to={`/join/${f.country.toLowerCase()}${keptParams(params)}`} className="inline-flex"><Logo className="h-[22px]" /></Link>
         <LangSwitcher />
+        </div>
       </header>
-      <main className="mx-auto max-w-2xl px-6 pb-20">
+      <main className="mx-auto max-w-2xl px-5 pb-24 pt-8 sm:pt-12">
         {done ? (
-          <Card className="p-10 text-center">
-            <CheckCircle2 className="mx-auto h-10 w-10 text-success" />
-            <p className="mt-4 text-lg font-medium">{t("apply.success")}</p>
-          </Card>
+          <div className="rounded-3xl border bg-white px-6 py-14 text-center shadow-xs">
+            <span className="mx-auto inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-tint-green text-success"><CheckCircle2 className="h-7 w-7" /></span>
+            <p className="mx-auto mt-5 max-w-md text-lg font-semibold text-foreground">{t("apply.success")}</p>
+          </div>
         ) : isLoading ? (
           <div className="flex justify-center py-20"><Spinner /></div>
         ) : (
-          <form onSubmit={submit} className="space-y-6">
-            <div>
-              <h1 className="text-2xl font-semibold tracking-tight">{t("apply.title")}</h1>
-              <p className="mt-1 text-sm text-muted-foreground">{t("apply.subtitle")}</p>
+          <form onSubmit={submit} className="space-y-5">
+            <div className="mb-8">
+              <h1 className="text-[28px] font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">{t("apply.title")}</h1>
+              <p className="mt-2 text-[15px] text-muted-foreground">{t("apply.subtitle")}</p>
             </div>
-            <Card className="space-y-4">
-              <h2 className="font-semibold">{t("apply.identity")}</h2>
+            <FormSection n={1} icon={<User />} tint="blue" title={t("apply.identity")}>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label={t("apply.firstName")}><Input required maxLength={80} value={f.first_name} onChange={(e) => set("first_name", e.target.value)} autoComplete="given-name" /></Field>
                 <Field label={t("apply.lastName")}><Input required maxLength={80} value={f.last_name} onChange={(e) => set("last_name", e.target.value)} autoComplete="family-name" /></Field>
@@ -146,9 +147,8 @@ export default function Apply() {
                 <Field label={t("apply.phone")}><Input type="tel" value={f.phone} onChange={(e) => set("phone", e.target.value)} autoComplete="tel" /></Field>
                 <Field label={t("apply.languages")} hint={t("apply.languagesHint")} className="sm:col-span-2"><Input value={f.languages} onChange={(e) => set("languages", e.target.value)} /></Field>
               </div>
-            </Card>
-            <Card className="space-y-4">
-              <h2 className="font-semibold">{t("apply.experience")}</h2>
+            </FormSection>
+            <FormSection n={2} icon={<Sparkles />} tint="violet" title={t("apply.experience")}>
               <Field label={t("apply.ugcExperience")}><Textarea maxLength={2000} value={f.ugc_experience} onChange={(e) => set("ugc_experience", e.target.value)} /></Field>
               <div className="grid gap-4 sm:grid-cols-[2fr_1fr]">
                 <Field label={t("apply.tiktok")}><Input type="url" placeholder="https://www.tiktok.com/@…" value={f.tiktok_url} onChange={(e) => set("tiktok_url", e.target.value)} /></Field>
@@ -159,34 +159,49 @@ export default function Apply() {
               <Field label={t("apply.equipment")}><Input maxLength={1000} value={f.equipment} onChange={(e) => set("equipment", e.target.value)} /></Field>
               <Field label={t("apply.availability")}><Input maxLength={1000} value={f.availability} onChange={(e) => set("availability", e.target.value)} /></Field>
               <Field label={t("apply.motivation")}><Textarea maxLength={2000} value={f.motivation} onChange={(e) => set("motivation", e.target.value)} /></Field>
-            </Card>
-            <Card className="space-y-3">
-              <h2 className="font-semibold">{t("apply.yap")}</h2>
-              <p className="text-sm text-muted-foreground">{t("apply.yapHint")}</p>
-              <label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-6 text-sm hover:bg-muted">
-                <Upload className="h-4 w-4" /> {t("apply.chooseVideo")}
+            </FormSection>
+            <FormSection n={3} icon={<Video />} tint="cyan" title={t("apply.yap")} hint={t("apply.yapHint")}>
+              <label className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-4 py-8 text-center transition-colors ${yapPath ? "border-[#bfe8cd] bg-tint-green" : "border-border-strong bg-muted hover:border-[#cddcff] hover:bg-accent-soft"}`}>
+                <span className={`inline-flex h-11 w-11 items-center justify-center rounded-xl ${yapPath ? "bg-white text-success" : "bg-white text-accent shadow-xs"}`}>{yapPath ? <CheckCircle2 className="h-5 w-5" /> : <Upload className="h-5 w-5" />}</span>
+                <span className="text-sm font-semibold text-foreground">{yapPath ? t("apply.uploaded") : t("apply.chooseVideo")}</span>
+                <span className="text-xs text-subtle-foreground">MP4 · MOV · ≤ 200 MB</span>
                 <input type="file" accept="video/*" className="hidden" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
               </label>
               {progress !== null && !yapPath && (
                 <div>
-                  <div className="h-2 overflow-hidden rounded-full bg-muted"><div className="h-full bg-accent transition-all" style={{ width: `${progress}%` }} /></div>
+                  <div className="h-2 overflow-hidden rounded-full bg-[#f1f3f7]"><div className="h-full rounded-full bg-accent transition-all" style={{ width: `${progress}%` }} /></div>
                   <p className="mt-1 text-xs text-muted-foreground">{t("apply.uploading", { pct: progress })}</p>
                 </div>
               )}
-              {yapPath && <p className="text-sm text-success">{t("apply.uploaded")}</p>}
               {uploadError && <p className="text-sm text-danger">{uploadError}</p>}
-            </Card>
+            </FormSection>
             {/* Pot de miel anti-bot */}
             <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" value={f.website} onChange={(e) => set("website", e.target.value)} aria-hidden="true" />
-            <Card className="space-y-3">
-              <label className="flex items-start gap-3 text-sm"><input type="checkbox" required className="mt-0.5" checked={f.adult} onChange={(e) => set("adult", e.target.checked)} /> {t("apply.adult")}</label>
-              <label className="flex items-start gap-3 text-sm"><input type="checkbox" required className="mt-0.5" checked={f.consent} onChange={(e) => set("consent", e.target.checked)} /> {t("apply.consent", { brand: BRAND })}</label>
-            </Card>
-            {messages.length > 0 && <div className="rounded-lg border border-danger/40 bg-danger/5 p-3 text-sm text-danger">{messages.map((m) => <p key={m}>{m}</p>)}</div>}
-            <Button type="submit" size="lg" className="w-full" loading={busy} disabled={underage || (progress !== null && !yapPath)}>{t("apply.submit")}</Button>
+            <div className="space-y-3 rounded-2xl border bg-white p-5 shadow-xs sm:p-6">
+              <label className="flex cursor-pointer items-start gap-3 text-sm text-foreground"><input type="checkbox" required className="mt-0.5 h-4 w-4 accent-[#004dff]" checked={f.adult} onChange={(e) => set("adult", e.target.checked)} /> {t("apply.adult")}</label>
+              <label className="flex cursor-pointer items-start gap-3 text-sm text-foreground"><input type="checkbox" required className="mt-0.5 h-4 w-4 accent-[#004dff]" checked={f.consent} onChange={(e) => set("consent", e.target.checked)} /> {t("apply.consent", { brand: BRAND })}</label>
+            </div>
+            {messages.length > 0 && <div className="rounded-xl bg-tint-red px-4 py-3 text-sm text-[#a52326]">{messages.map((m) => <p key={m}>{m}</p>)}</div>}
+            <Button type="submit" size="lg" className="h-12 w-full text-[15px]" loading={busy} disabled={underage || (progress !== null && !yapPath)}>{t("apply.submit")}</Button>
           </form>
         )}
       </main>
     </div>
+  );
+}
+
+function FormSection({ n, icon, tint, title, hint, children }: { n: number; icon: React.ReactNode; tint: Tint; title: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <section className="rounded-2xl border bg-white p-5 shadow-xs sm:p-7">
+      <div className="mb-5 flex items-start gap-3">
+        <IconTile icon={icon} tint={tint} className="h-10 w-10 rounded-xl" />
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-subtle-foreground">{n} / 3</p>
+          <h2 className="text-[16px] font-semibold text-foreground">{title}</h2>
+          {hint && <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">{hint}</p>}
+        </div>
+      </div>
+      <div className="space-y-4">{children}</div>
+    </section>
   );
 }

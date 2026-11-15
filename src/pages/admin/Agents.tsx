@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { Play, Plus, RefreshCw } from "lucide-react";
-import { Badge, Button, Dialog, Field, Input, PageHeader, Select, Stat, Switch, Table, Td, Th, useToast } from "@/components/ui";
+import { Activity, Bot, CalendarClock, Database, Facebook, Instagram, Music2, Play, Plus, RefreshCw, Search, Sparkles, Eye, Download } from "lucide-react";
+import { Badge, Button, Card, CardTitle, Chip, Dialog, Empty, Field, IconTile, Input, PageHeader, Select, Switch, Table, Td, Th, useToast, type Tint } from "@/components/ui";
 import { callFn, supabase } from "@/lib/supabase";
 import { useApps, useCompetitors, useSetting } from "@/lib/hooks";
 import { ago, cn, dateFr } from "@/lib/utils";
@@ -13,17 +13,37 @@ const BACKFILL_PLAN: PlanItem[] = [{"platform": "tiktok", "kind": "keyword", "va
 const UNIT: Record<string, number> = { tiktok: 0.0037, instagram: 0.0027, facebook_ads: 0.0058 };
 const planCost = (p: PlanItem[]) => p.reduce((s, x) => s + UNIT[x.platform] * x.max_results, 0);
 
-function Budget({ label, spent, cap, hint }: { label: string; spent: number; cap?: number; hint?: React.ReactNode }) {
+function Budget({ label, spent, cap, hint, tint = "blue" }: { label: string; spent: number; cap?: number; hint?: React.ReactNode; tint?: Tint }) {
   const ratio = cap ? Math.min(1, spent / cap) : 0;
+  const bar = ratio > 0.9 ? "#fe504f" : ratio > 0.7 ? "#ffbb43" : ({ blue: "#004dff", violet: "#8c43ff", cyan: "#1fafff", yellow: "#ffbb43", red: "#fe504f", green: "#12a150" } as const)[tint];
   return (
-    <div className="rounded-lg border bg-card p-4">
-      <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
-      <p className="mt-1 text-2xl font-semibold">{spent.toFixed(2)} ${cap ? <span className="text-sm font-normal text-muted-foreground"> / {cap} $</span> : null}</p>
-      {cap ? <div className="mt-2 h-1.5 rounded-full bg-muted"><div className={cn("h-1.5 rounded-full", ratio > 0.9 ? "bg-danger" : ratio > 0.7 ? "bg-warning" : "bg-accent")} style={{ width: `${ratio * 100}%` }} /></div> : null}
-      {hint && <p className="mt-1.5 text-xs text-muted-foreground">{hint}</p>}
-    </div>
+    <Card className="p-5">
+      <p className="text-[13px] font-medium text-muted-foreground">{label}</p>
+      <p className="tabular mt-2 text-[26px] font-semibold leading-none tracking-[-0.02em]">{spent.toFixed(2)} $
+        {cap ? <span className="ml-1 text-sm font-normal text-subtle-foreground">/ {cap} $</span> : null}</p>
+      {cap ? (
+        <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-[#f1f3f7]"><div className="h-full rounded-full transition-all" style={{ width: `${Math.max(ratio * 100, 2)}%`, background: bar }} /></div>
+      ) : <div className="mt-4 h-1.5" />}
+      {hint && <p className="mt-2.5 text-xs text-subtle-foreground">{hint}</p>}
+    </Card>
   );
 }
+
+/** Pastille de plateforme (icône teintée + libellé). */
+function PlatformCell({ p }: { p: string }) {
+  const meta: Record<string, { icon: React.ReactNode; tint: Tint }> = {
+    tiktok: { icon: <Music2 />, tint: "violet" }, instagram: { icon: <Instagram />, tint: "red" }, facebook_ads: { icon: <Facebook />, tint: "blue" },
+    views: { icon: <Eye />, tint: "cyan" }, download: { icon: <Download />, tint: "green" },
+  };
+  const m = meta[p] ?? { icon: <Bot />, tint: "blue" as Tint };
+  return <span className="flex items-center gap-2.5"><IconTile icon={m.icon} tint={m.tint} className="h-7 w-7 rounded-md [&_svg]:h-3.5 [&_svg]:w-3.5" /><span className="whitespace-nowrap">{PLATFORM[p] ?? p}</span></span>;
+}
+
+const STATUS_LABEL: Record<string, string> = { succeeded: "Terminé", failed: "Échec", running: "En cours", queued: "En file", aborted: "Interrompu" };
+function StatusPill({ status }: { status: string }) {
+  return <Badge tone={STATUS_TONE[status]}><span className={cn("h-1.5 w-1.5 rounded-full bg-current", status === "running" && "animate-pulse")} />{STATUS_LABEL[status] ?? status}</Badge>;
+}
+const TRIGGER_LABEL: Record<string, string> = { manual: "Manuel", cron: "Planifié", adhoc: "À la demande", backfill: "Backfill" };
 
 const PLATFORM: Record<string, string> = { tiktok: "TikTok", instagram: "Instagram", facebook_ads: "Meta Ad Library", views: "Relevé de vues", download: "Archivage MP4" };
 const KIND: Record<string, string> = { account: "Compte", hashtag: "Hashtag", keyword: "Mot-clé", page: "Page" };
@@ -72,7 +92,7 @@ export default function Agents() {
     },
   });
   const statOf = (id: string) => (stats ?? []).find((s: any) => s.source_id === id);
-  const { data: totalVideos } = useQuery({ queryKey: ["videos_count"], queryFn: async () => (await supabase.from("videos").select("id", { count: "estimated", head: true })).count ?? 0 });
+  const { data: totalVideos } = useQuery({ queryKey: ["videos_count"], queryFn: async () => (await supabase.from("videos").select("id", { count: "exact", head: true })).count ?? 0 });
 
   const refresh = () => ["sources", "agent_stats", "runs", "videos_count"].forEach((k) => qc.invalidateQueries({ queryKey: [k] }));
   const run = async (key: string, body: any, msg: string) => {
@@ -96,84 +116,109 @@ export default function Agents() {
     <div>
       <PageHeader title="Agents de collecte" description="Chaque source est un agent Apify (TikTok, Instagram, Meta Ad Library). Désactivées par défaut : active celles à suivre, ou lance-les à la main."
         actions={<>
-          <Button variant="outline" onClick={() => run("poll", { action: "poll" }, "Runs synchronisés")} loading={busy === "poll"}><RefreshCw className="h-4 w-4" /> Synchroniser les runs</Button>
-          <Button variant="outline" onClick={() => run("measure", { action: "measure_due", force: true }, "Relevé des vues lancé")} loading={busy === "measure"}>Relever les vues J+2/J+7</Button>
-          <Button variant="outline" onClick={() => run("discover", { action: "discover" }, "Découverte terminée")} loading={busy === "discover"} title="Crée une source « compte » (désactivée) pour chaque créateur UGC repéré (≥ 2 vidéos qui citent un concurrent, ou une vidéo ≥ 100 k vues)">Découvrir des créateurs UGC</Button>
-          <Button variant="outline" onClick={() => setBackfill(true)}>Backfill</Button>
+          <Button variant="secondary" onClick={() => run("poll", { action: "poll" }, "Runs synchronisés")} loading={busy === "poll"}><RefreshCw className="h-4 w-4" /> Synchroniser</Button>
+          <Button variant="secondary" onClick={() => run("measure", { action: "measure_due", force: true }, "Relevé des vues lancé")} loading={busy === "measure"}><Eye className="h-4 w-4" /> Relever les vues</Button>
+          <Button variant="secondary" onClick={() => run("discover", { action: "discover" }, "Découverte terminée")} loading={busy === "discover"} title="Crée une source « compte » (désactivée) pour chaque créateur UGC repéré (≥ 2 vidéos qui citent un concurrent, ou une vidéo ≥ 100 k vues)"><Sparkles className="h-4 w-4" /> Découvrir des UGC</Button>
+          <Button variant="secondary" onClick={() => setBackfill(true)}><Database className="h-4 w-4" /> Backfill</Button>
           <Button onClick={() => setAdding(true)}><Plus className="h-4 w-4" /> Source</Button>
         </>} />
 
-      <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
-        <Stat label="Vidéos en base" value={new Intl.NumberFormat("fr").format(totalVideos ?? 0)} />
-        <Stat label="Sources actives" value={`${(sources ?? []).filter((s: any) => s.enabled).length} / ${(sources ?? []).length}`} />
-        <Stat label="Runs en cours" value={spend?.running ?? 0} hint="Ingérés toutes les 5 min (ou « Synchroniser les runs »)" />
-        <Stat label="Collecte planifiée" value={apify?.collect_cron_enabled ? "Activée" : "Désactivée"} hint={<Link className="underline" to="/admin/settings/integrations">Réglages → Intégrations</Link>} />
+      <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <MiniKpi icon={<Database />} tint="blue" label="Vidéos en base" value={new Intl.NumberFormat("fr").format(totalVideos ?? 0)} />
+        <MiniKpi icon={<Search />} tint="violet" label="Sources actives" value={<>{(sources ?? []).filter((s: any) => s.enabled).length}<span className="text-base font-medium text-subtle-foreground"> / {(sources ?? []).length}</span></>} />
+        <MiniKpi icon={<Activity />} tint="cyan" label="Runs en cours" value={spend?.running ?? 0} hint="Ingérés toutes les 2 min" />
+        <MiniKpi icon={<CalendarClock />} tint={apify?.collect_cron_enabled ? "green" : "yellow"} label="Collecte planifiée" value={apify?.collect_cron_enabled ? "Activée" : "Désactivée"}
+          hint={<Link className="text-accent hover:underline" to="/admin/settings/integrations">Réglages → Intégrations</Link>} />
       </div>
-      <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
-        <Budget label="Apify aujourd'hui" spent={spend?.today ?? 0} cap={Number(apify?.daily_budget_usd ?? 30)} hint="Plafond quotidien (UTC)" />
-        <Budget label="Apify ce mois" spent={spend?.month ?? 0} cap={Number(apify?.monthly_budget_usd ?? 300)} hint={`Plafond dur : ${apify?.hard_cap_per_run ?? 200} vidéos / run`} />
-        <Budget label="Backfill (cumul)" spent={spend?.backfill ?? 0} cap={Number(apify?.backfill_budget_usd ?? 50)} hint="Budget du backfill initial" />
-        <Budget label="Apify depuis le début" spent={spend?.total ?? 0} hint="Coût réel des runs terminés + estimation des runs en cours" />
+      <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <Budget label="Apify aujourd'hui" spent={spend?.today ?? 0} cap={Number(apify?.daily_budget_usd ?? 30)} hint="Plafond quotidien (UTC)" tint="blue" />
+        <Budget label="Apify ce mois" spent={spend?.month ?? 0} cap={Number(apify?.monthly_budget_usd ?? 300)} hint={`Plafond dur : ${apify?.hard_cap_per_run ?? 200} vidéos / run`} tint="violet" />
+        <Budget label="Backfill (cumul)" spent={spend?.backfill ?? 0} cap={Number(apify?.backfill_budget_usd ?? 50)} hint="Budget du backfill initial" tint="cyan" />
+        <Budget label="Depuis le début" spent={spend?.total ?? 0} hint="Coût réel des runs terminés + estimation des runs en cours" tint="green" />
       </div>
 
-      <div className="mb-3 flex items-center gap-2">
-        <Select className="h-8 w-48 text-xs" value={filter} onChange={(e) => setFilter(e.target.value)}>
-          <option value="">Toutes les plateformes</option><option value="tiktok">TikTok</option><option value="instagram">Instagram</option><option value="facebook_ads">Meta Ad Library</option>
-        </Select>
-      </div>
-      <Table className="mb-10">
-        <thead><tr><Th>Active</Th><Th>Plateforme</Th><Th>Source</Th><Th>Concurrent</Th><Th>Fréquence</Th><Th>Plafond</Th><Th>Vidéos</Th><Th>Dernier run</Th><Th>Coût (mois)</Th><Th /></tr></thead>
-        <tbody>
-          {list.map((s: any) => {
-            const st = statOf(s.id);
-            return (
-              <tr key={s.id} className="hover:bg-muted/40">
-                <Td><Switch checked={s.enabled} onChange={(v) => toggle(s, v)} /></Td>
-                <Td>{PLATFORM[s.platform]}</Td>
-                <Td><span className="text-xs text-muted-foreground">{KIND[s.kind]}</span> <span className="font-medium">{s.kind === "account" ? "@" : s.kind === "hashtag" ? "#" : ""}{s.value}</span> {s.languages?.length > 0 && <Badge tone="outline">{s.languages.join(", ")}</Badge>}</Td>
-                <Td>{compName(s.competitor_id)}</Td>
-                <Td>{s.frequency_hours} h</Td>
-                <Td>{s.max_results}</Td>
-                <Td>{st?.videos ?? 0}</Td>
-                <Td>
-                  {st?.last_run_at ? <span className="flex items-center gap-2"><Badge tone={STATUS_TONE[st.last_status]}>{st.last_status}</Badge><span className="text-xs text-muted-foreground">{ago(st.last_run_at)}</span></span> : <span className="text-xs text-muted-foreground">jamais</span>}
-                  {st?.last_error && <p className="mt-1 max-w-64 truncate text-xs text-danger" title={st.last_error}>{st.last_error}</p>}
-                </Td>
-                <Td>{Number(st?.cost_month ?? 0).toFixed(3)} $</Td>
-                <Td><Button size="sm" variant="outline" loading={busy === s.id} onClick={() => run(s.id, { action: "run_source", source_id: s.id }, "Run lancé")}><Play className="h-3.5 w-3.5" /> Lancer</Button></Td>
+      <Card className="mb-8 p-0">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-6 pt-5">
+          <CardTitle title="Sources" description={`${list.length} source(s) · coût estimé par run selon le plafond`} />
+          <div className="mb-5 flex flex-wrap gap-2">
+            {[["", "Toutes"], ["tiktok", "TikTok"], ["instagram", "Instagram"], ["facebook_ads", "Meta Ad Library"]].map(([v, l]) => (
+              <Chip key={v} active={filter === v} onClick={() => setFilter(v)}>{l}</Chip>
+            ))}
+          </div>
+        </div>
+        <Table className="rounded-none border-x-0 border-b-0 shadow-none">
+          <thead><tr><Th>Active</Th><Th>Plateforme</Th><Th>Source</Th><Th>Concurrent</Th><Th num>Fréquence</Th><Th num>Plafond</Th><Th num>Vidéos</Th><Th>Dernier run</Th><Th num>Coût (mois)</Th><Th /></tr></thead>
+          <tbody>
+            {list.map((s: any) => {
+              const st = statOf(s.id);
+              return (
+                <tr key={s.id}>
+                  <Td><Switch checked={s.enabled} onChange={(v) => toggle(s, v)} label="Activer la source" /></Td>
+                  <Td><PlatformCell p={s.platform} /></Td>
+                  <Td><span className="font-medium text-foreground">{s.kind === "account" ? "@" : s.kind === "hashtag" ? "#" : ""}{s.value}</span>
+                    <span className="ml-2 text-xs text-subtle-foreground">{KIND[s.kind]}</span> {s.languages?.length > 0 && <Badge tone="outline" className="ml-1">{s.languages.join(", ")}</Badge>}</Td>
+                  <Td className="text-muted-foreground">{compName(s.competitor_id)}</Td>
+                  <Td num className="text-muted-foreground">{s.frequency_hours} h</Td>
+                  <Td num className="text-muted-foreground">{s.max_results}</Td>
+                  <Td num>{st?.videos ?? 0}</Td>
+                  <Td>
+                    {st?.last_run_at ? <span className="flex items-center gap-2"><StatusPill status={st.last_status} /><span className="text-xs text-subtle-foreground">{ago(st.last_run_at)}</span></span> : <span className="text-xs text-subtle-foreground">Jamais lancé</span>}
+                    {st?.last_error && <p className="mt-1 max-w-64 truncate text-xs text-danger" title={st.last_error}>{st.last_error}</p>}
+                  </Td>
+                  <Td num className="text-muted-foreground">{Number(st?.cost_month ?? 0).toFixed(3)} $</Td>
+                  <Td className="text-right"><Button size="sm" variant="secondary" loading={busy === s.id} onClick={() => run(s.id, { action: "run_source", source_id: s.id }, "Run lancé")}><Play className="h-3.5 w-3.5" /> Lancer</Button></Td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </Table>
+        {list.length === 0 && <div className="p-6"><Empty title="Aucune source" icon={<Search className="h-5 w-5" />} action={<Button onClick={() => setAdding(true)}><Plus className="h-4 w-4" /> Ajouter une source</Button>}>Ajoute un compte, un hashtag ou un mot-clé à surveiller.</Empty></div>}
+      </Card>
+
+      <Card className="p-0">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-6 pt-5">
+          <CardTitle title="Derniers runs" description="100 derniers, rafraîchis toutes les 15 s" />
+          <div className="mb-5 flex flex-wrap gap-2">
+            {[["", "Tous"], ["manual", "Manuel"], ["cron", "Planifié"], ["adhoc", "À la demande"], ["backfill", "Backfill"]].map(([v, l]) => (
+              <Chip key={v} active={trigger === v} onClick={() => setTrigger(v)}>{l}</Chip>
+            ))}
+          </div>
+        </div>
+        <Table className="rounded-none border-x-0 border-b-0 shadow-none">
+          <thead><tr><Th>Début</Th><Th>Agent</Th><Th>Source / paramètres</Th><Th>Déclencheur</Th><Th>Statut</Th><Th num>Trouvées</Th><Th num>Nouvelles</Th><Th num>Coût</Th></tr></thead>
+          <tbody>
+            {(runs ?? []).map((r: any) => (
+              <tr key={r.id}>
+                <Td className="whitespace-nowrap text-xs text-muted-foreground">{dateFr(r.started_at, true)}</Td>
+                <Td><PlatformCell p={r.agent} /></Td>
+                <Td className="max-w-72 truncate">{r.sources ? `${KIND[r.sources.kind]} ${r.sources.value}` : r.params?.spec ? `${KIND[r.params.spec.kind] ?? ""} ${r.params.spec.value}` : r.agent === "views" ? `${r.params?.targets?.length ?? 0} vidéo(s)` : "—"}</Td>
+                <Td><Badge tone="outline">{TRIGGER_LABEL[r.trigger] ?? r.trigger}</Badge></Td>
+                <Td><StatusPill status={r.status} />{r.error && <p className="mt-1 max-w-64 truncate text-xs text-danger" title={r.error}>{r.error}</p>}</Td>
+                <Td num>{r.items_found}</Td>
+                <Td num className="font-medium">{r.items_new}</Td>
+                <Td num className="text-xs text-muted-foreground">{r.cost_usd !== null ? `${Number(r.cost_usd).toFixed(3)} $` : `~${Number(r.params?.estimated_cost_usd ?? 0).toFixed(3)} $`}</Td>
               </tr>
-            );
-          })}
-        </tbody>
-      </Table>
-
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Derniers runs</h2>
-        <Select className="h-8 w-44 text-xs" value={trigger} onChange={(e) => setTrigger(e.target.value)}>
-          <option value="">Tous les déclencheurs</option><option value="manual">Manuel</option><option value="cron">Planifié</option><option value="adhoc">À la demande</option><option value="backfill">Backfill</option>
-        </Select>
-      </div>
-      <Table>
-        <thead><tr><Th>Début</Th><Th>Agent</Th><Th>Source / paramètres</Th><Th>Déclencheur</Th><Th>Statut</Th><Th>Trouvées</Th><Th>Nouvelles</Th><Th>Coût</Th></tr></thead>
-        <tbody>
-          {(runs ?? []).map((r: any) => (
-            <tr key={r.id}>
-              <Td className="whitespace-nowrap text-xs">{dateFr(r.started_at, true)}</Td>
-              <Td>{PLATFORM[r.agent] ?? r.agent}</Td>
-              <Td className="max-w-72 truncate text-xs">{r.sources ? `${KIND[r.sources.kind]} ${r.sources.value}` : r.params?.spec ? `${KIND[r.params.spec.kind] ?? ""} ${r.params.spec.value}` : r.agent === "views" ? `${r.params?.targets?.length ?? 0} vidéo(s)` : "—"}</Td>
-              <Td className="text-xs">{r.trigger}</Td>
-              <Td><Badge tone={STATUS_TONE[r.status]}>{r.status}</Badge>{r.error && <p className="max-w-64 truncate text-xs text-danger" title={r.error}>{r.error}</p>}</Td>
-              <Td>{r.items_found}</Td>
-              <Td>{r.items_new}</Td>
-              <Td className="text-xs">{r.cost_usd !== null ? `${Number(r.cost_usd).toFixed(3)} $` : `~${Number(r.params?.estimated_cost_usd ?? 0).toFixed(3)} $`}</Td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-      {(runs ?? []).length === 0 && <p className="mt-3 text-sm text-muted-foreground">Aucun run{trigger ? " pour ce déclencheur" : ""}. Lance une source ou un backfill.</p>}
+            ))}
+          </tbody>
+        </Table>
+        {(runs ?? []).length === 0 && <div className="p-6"><Empty title="Aucun run" icon={<Activity className="h-5 w-5" />}>{trigger ? "Aucun run pour ce déclencheur." : "Lance une source ou un backfill."}</Empty></div>}
+      </Card>
       <AddSource open={adding} onClose={() => setAdding(false)} apps={apps ?? []} comps={comps ?? []} onSaved={refresh} />
       <BackfillDialog open={backfill} onClose={() => setBackfill(false)} comps={comps ?? []} spent={spend?.backfill ?? 0} budget={Number(apify?.backfill_budget_usd ?? 50)} onDone={refresh} />
     </div>
+  );
+}
+
+function MiniKpi({ icon, tint, label, value, hint }: { icon: React.ReactNode; tint: Tint; label: string; value: React.ReactNode; hint?: React.ReactNode }) {
+  return (
+    <Card className="flex items-start gap-4 p-5">
+      <IconTile icon={icon} tint={tint} />
+      <div className="min-w-0">
+        <p className="text-[13px] font-medium text-muted-foreground">{label}</p>
+        <p className="tabular mt-1 text-[22px] font-semibold leading-tight tracking-[-0.02em]">{value}</p>
+        {hint && <p className="mt-1 text-xs text-subtle-foreground">{hint}</p>}
+      </div>
+    </Card>
   );
 }
 
@@ -211,7 +256,7 @@ function BackfillDialog({ open, onClose, comps, spent, budget, onDone }: { open:
         <button className="underline" onClick={() => setSelected(new Set(BACKFILL_PLAN.map((_, i) => i)))}>Tout cocher</button>
         <button className="underline" onClick={() => setSelected(new Set())}>Tout décocher</button>
       </div>
-      <div className="max-h-96 space-y-0.5 overflow-y-auto rounded-md border p-2">
+      <div className="max-h-96 space-y-0.5 overflow-y-auto rounded-xl border p-2">
         {BACKFILL_PLAN.map((p, i) => (
           <label key={i} className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-sm hover:bg-muted">
             <input type="checkbox" checked={selected.has(i)} onChange={() => setSelected((s) => { const n = new Set(s); n.has(i) ? n.delete(i) : n.add(i); return n; })} />

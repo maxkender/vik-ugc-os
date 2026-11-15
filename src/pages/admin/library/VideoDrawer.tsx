@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Archive, ExternalLink, FolderPlus, Heart, Send } from "lucide-react";
-import { Badge, Button, Drawer, Input, Select, useToast } from "@/components/ui";
+import { Archive, Eye, ExternalLink, FolderPlus, Heart, Megaphone, Repeat2, Send, Sparkles, TrendingUp, Users, Zap } from "lucide-react";
+import { Badge, Button, Drawer, Input, Select, Sparkline, useToast } from "@/components/ui";
+import { PlatformIcon, ThumbPlaceholder } from "./VideoCard";
+import { ScorePill } from "./VideoTable";
 import { callFn, supabase } from "@/lib/supabase";
 import { useCategories, useCompetitors } from "@/lib/hooks";
 import { compact, dateFr, flag } from "@/lib/utils";
@@ -58,91 +60,131 @@ export function VideoDrawer({ video, onClose, fav, onFav, onAssign }: { video: V
     } catch (e) { toast((e as Error).message, "danger"); } finally { setArchiving(false); }
   };
 
+  const thumb = thumbOf(v);
+  const competitor = comps?.find((c: any) => c.id === v.competitor_id)?.name;
   return (
-    <Drawer open onClose={onClose} title={<span className="flex items-center gap-2">{PLATFORM_LABEL[v.platform]} · @{v.author_handle ?? v.ad_page_name}</span>}>
-      <div className="grid gap-6 md:grid-cols-[240px_1fr]">
+    <Drawer open onClose={onClose} title={
+      <span className="flex items-center gap-2.5">
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-tint-violet text-[11px] font-semibold uppercase text-[#7a32ef]">{(v.author_handle ?? v.ad_page_name ?? "?").charAt(0)}</span>
+        <span className="truncate">@{v.author_handle ?? v.ad_page_name}</span>
+        <span className="inline-flex items-center gap-1 text-xs font-normal text-subtle-foreground"><PlatformIcon p={v.platform} className="h-3.5 w-3.5" />{PLATFORM_LABEL[v.platform]}</span>
+      </span>
+    }>
+      <div className="grid gap-8 md:grid-cols-[230px_1fr]">
         <div>
-          <div className="aspect-[9/16] overflow-hidden rounded-lg bg-black">
-            {src ? <video key={src} src={src} controls autoPlay muted loop playsInline poster={thumbOf(v) ?? undefined} className="h-full w-full object-contain" onError={() => setSrc(null)} />
-              : thumbOf(v) ? <img src={thumbOf(v)!} className="h-full w-full object-cover" /> : null}
+          <div className="relative aspect-[9/16] overflow-hidden rounded-xl bg-[#0b1530] ring-1 ring-border">
+            {src ? <video key={src} src={src} controls autoPlay muted loop playsInline poster={thumb ?? undefined} className="h-full w-full object-contain" onError={() => setSrc(null)} />
+              : thumb ? <img src={thumb} className="h-full w-full object-cover" onError={(e) => ((e.target as HTMLImageElement).style.visibility = "hidden")} /> : <ThumbPlaceholder v={v} />}
           </div>
-          {!v.video_path && <p className="mt-2 text-xs text-muted-foreground">Lecture depuis le CDN de la plateforme (peut expirer). Archive le MP4 pour le garder.</p>}
+          {!v.video_path && <p className="mt-3 text-xs leading-relaxed text-subtle-foreground">Lecture depuis le CDN de la plateforme (lien temporaire). Archive le MP4 pour le garder.</p>}
+          <div className="mt-4 space-y-2">
+            {v.url && <a href={v.url} target="_blank" rel="noreferrer" className="block"><Button variant="secondary" className="w-full"><ExternalLink className="h-4 w-4" /> Voir l'original</Button></a>}
+            {!v.video_path && <Button variant="secondary" className="w-full" onClick={archive} loading={archiving}><Archive className="h-4 w-4" /> Archiver le MP4</Button>}
+          </div>
         </div>
-        <div className="space-y-5">
-          <div className="flex flex-wrap gap-2">
+
+        <div className="min-w-0 space-y-7">
+          <div className="flex flex-wrap items-center gap-2">
             <Button onClick={onAssign}><Send className="h-4 w-4" /> Assigner en brief</Button>
-            <Button variant="outline" onClick={onFav}><Heart className={fav ? "h-4 w-4 fill-red-500 text-red-500" : "h-4 w-4"} /> {fav ? "Favori" : "Ajouter aux favoris"}</Button>
-            {v.url && <a href={v.url} target="_blank" rel="noreferrer"><Button variant="outline"><ExternalLink className="h-4 w-4" /> Original</Button></a>}
-            {!v.video_path && <Button variant="outline" onClick={archive} loading={archiving}><Archive className="h-4 w-4" /> Archiver le MP4</Button>}
+            <Button variant="secondary" onClick={onFav}><Heart className={fav ? "h-4 w-4 fill-[#fe504f] text-[#fe504f]" : "h-4 w-4"} /> {fav ? "Dans les favoris" : "Favori"}</Button>
           </div>
-          <div className="grid grid-cols-3 gap-3 text-sm">
-            <Metric label="Score" value={Math.round(v.score)} />
+
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="flex items-center gap-1.5 text-xs text-subtle-foreground">Score <ScorePill score={v.score} /></span>
+            <span className="mx-1 h-4 w-px bg-border-strong" />
+            <span className="text-[13px] font-medium text-foreground">{competitor ?? "Hors concurrents"}</span>
+            {v.origin && <Badge tone={v.origin === "ugc" ? "accent" : v.origin === "ad" ? "warning" : v.origin === "official" ? "violet" : "default"}>{ORIGIN_LABEL[v.origin]}</Badge>}
+            {v.language && <Badge>{flag(v.country)} {v.language}</Badge>}
+            {v.is_ad && <Badge tone={v.ad_active ? "success" : "default"}>{v.ad_active ? "Active" : "Arrêtée"}</Badge>}
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {v.is_ad ? <>
-              <Metric label="Diffusion" value={`${v.ad_days ?? "?"} j`} />
-              <Metric label="Statut" value={v.ad_active ? "Active" : "Arrêtée"} />
+              <Tile icon={<Megaphone />} tint="yellow" label="Diffusion" value={`${v.ad_days ?? "?"} jours`} />
+              <Tile icon={<TrendingUp />} tint="blue" label="Début" value={v.ad_started_at ? new Date(v.ad_started_at).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "2-digit" }) : "—"} />
+              <Tile icon={<Sparkles />} tint="green" label="Statut" value={v.ad_active ? "Active" : "Arrêtée"} />
             </> : <>
-              <Metric label="Vues" value={compact(v.views)} />
-              <Metric label="Abonnés" value={compact(v.author_followers)} />
-              <Metric label="Likes" value={compact(v.likes)} />
-              <Metric label="Commentaires" value={compact(v.comments)} />
-              <Metric label="Partages" value={compact(v.shares)} />
-              <Metric label="Engagement" value={pct(v.engagement)} />
-              <Metric label="Outlier" value={times(v.outlier)} />
-              <Metric label="Vues / jour" value={compact(v.velocity)} />
+              <Tile icon={<Eye />} tint="blue" label="Vues" value={compact(v.views)} />
+              <Tile icon={<Heart />} tint="red" label="Engagement" value={pct(v.engagement)} />
+              <Tile icon={<Zap />} tint="yellow" label="Outlier" value={times(v.outlier)} hint="vues ÷ abonnés" />
+              <Tile icon={<TrendingUp />} tint="green" label="Vues / jour" value={compact(v.velocity)} />
+              <Tile icon={<Users />} tint="violet" label="Abonnés" value={compact(v.author_followers)} />
+              <Tile icon={<Repeat2 />} tint="cyan" label="Partages · com." value={`${compact(v.shares)} · ${compact(v.comments)}`} />
             </>}
           </div>
-          <dl className="grid grid-cols-[120px_1fr] gap-y-1.5 text-sm">
-            <dt className="text-muted-foreground">Publication</dt><dd>{v.is_ad ? `${dateFr(v.ad_started_at)} → ${v.ad_active ? "aujourd'hui" : dateFr(v.ad_ended_at)}` : dateFr(v.published_at)}</dd>
-            <dt className="text-muted-foreground">Langue / pays</dt><dd>{v.language ?? "—"} {flag(v.country)} {v.country ?? ""}</dd>
-            <dt className="text-muted-foreground">Durée</dt><dd>{v.duration_s ? `${Math.round(v.duration_s)} s` : "—"}</dd>
-            <dt className="text-muted-foreground">Son</dt><dd className="truncate">{v.sound_name ?? "—"}</dd>
-            <dt className="text-muted-foreground">Concurrent</dt><dd className="flex items-center gap-2">{comps?.find((c: any) => c.id === v.competitor_id)?.name ?? "—"}{v.origin && <Badge tone={v.origin === "ugc" ? "accent" : v.origin === "ad" ? "warning" : "outline"}>{ORIGIN_LABEL[v.origin]}</Badge>}</dd>
-            {v.mentions?.length > 0 && <><dt className="text-muted-foreground">Mentions</dt><dd className="flex flex-wrap gap-1">{v.mentions.map((m) => <Badge key={m} tone="outline">@{m}</Badge>)}</dd></>}
-            <dt className="text-muted-foreground">Catégorie</dt>
-            <dd>
-              <Select value={v.category_id ?? ""} onChange={(e) => setCategory(e.target.value)} className="h-8 max-w-56">
-                <option value="">—</option>
-                {(cats ?? []).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </Select>
-              {v.category_auto && v.category_id && <span className="ml-2 text-xs text-muted-foreground">auto</span>}
-            </dd>
-          </dl>
-          <div>
-            <p className="mb-1 text-xs font-medium uppercase text-muted-foreground">Légende</p>
-            <p className="whitespace-pre-wrap text-sm">{v.caption || "—"}</p>
-            <div className="mt-2 flex flex-wrap gap-1">{v.hashtags.map((h) => <Badge key={h} tone="outline">#{h}</Badge>)}</div>
-          </div>
+
           {history && history.length > 1 && (
-            <div>
-              <p className="mb-1 text-xs font-medium uppercase text-muted-foreground">Historique des vues</p>
-              <Spark points={history.map((h: any) => Number(h.views))} />
-            </div>
+            <Block title="Évolution des vues"><Sparkline values={history.map((h: any) => Number(h.views))} height={56} /></Block>
           )}
-          <div>
-            <p className="mb-2 text-xs font-medium uppercase text-muted-foreground">Collections</p>
+
+          <Block title="Légende">
+            <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">{v.caption || "—"}</p>
+            {(v.hashtags.length > 0 || v.mentions?.length > 0) && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {v.mentions?.map((m) => <Badge key={`@${m}`} tone="accent">@{m}</Badge>)}
+                {v.hashtags.map((h) => <Badge key={h}>#{h}</Badge>)}
+              </div>
+            )}
+          </Block>
+
+          <Block title="Détails">
+            <dl className="grid grid-cols-[130px_1fr] gap-x-4 gap-y-2.5 text-[13px]">
+              <dt className="text-subtle-foreground">Publication</dt><dd className="text-foreground">{v.is_ad ? `${dateFr(v.ad_started_at)} → ${v.ad_active ? "aujourd'hui" : dateFr(v.ad_ended_at)}` : dateFr(v.published_at)}</dd>
+              <dt className="text-subtle-foreground">Durée</dt><dd className="text-foreground">{v.duration_s ? `${Math.round(v.duration_s)} s` : "—"}</dd>
+              <dt className="text-subtle-foreground">Son</dt><dd className="truncate text-foreground">{v.sound_name ?? "—"}</dd>
+              <dt className="text-subtle-foreground">Likes</dt><dd className="tabular text-foreground">{compact(v.likes)}</dd>
+              <dt className="flex items-center text-subtle-foreground">Format</dt>
+              <dd className="flex items-center gap-2">
+                <Select value={v.category_id ?? ""} onChange={(e) => setCategory(e.target.value)} className="h-8 max-w-56">
+                  <option value="">Non classé</option>
+                  {(cats ?? []).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </Select>
+                {v.category_auto && v.category_id && <span className="text-xs text-subtle-foreground">auto</span>}
+              </dd>
+            </dl>
+          </Block>
+
+          <Block title="Collections">
             <div className="flex flex-wrap gap-1.5">
+              {(collections ?? []).length === 0 && <p className="text-[13px] text-subtle-foreground">Aucune collection pour l'instant.</p>}
               {(collections ?? []).map((c: any) => {
                 const inside = c.collection_videos.some((x: any) => x.video_id === v.id);
-                return <button key={c.id} onClick={() => toggleCollection(c.id, inside)} className={`rounded-full border px-2.5 py-1 text-xs ${inside ? "border-accent bg-accent/10 text-accent" : "text-muted-foreground"}`}>{c.name}</button>;
+                return <button key={c.id} onClick={() => toggleCollection(c.id, inside)} className={`rounded-full border px-3 py-1 text-[13px] transition-colors ${inside ? "border-[#cddcff] bg-accent-soft text-[#0040d6]" : "border-border-strong text-muted-foreground hover:text-foreground"}`}>{c.name}</button>;
               })}
             </div>
-            <div className="mt-2 flex gap-2">
+            <div className="mt-3 flex gap-2">
               <Input placeholder="Nouvelle collection" value={newCollection} onChange={(e) => setNewCollection(e.target.value)} className="h-8 max-w-60" />
-              <Button size="sm" variant="outline" onClick={createCollection}><FolderPlus className="h-3.5 w-3.5" /> Créer</Button>
+              <Button size="sm" variant="secondary" onClick={createCollection}><FolderPlus className="h-3.5 w-3.5" /> Créer</Button>
             </div>
-          </div>
+          </Block>
         </div>
       </div>
     </Drawer>
   );
 }
 
-function Metric({ label, value }: { label: string; value: React.ReactNode }) {
-  return <div className="rounded-md bg-muted px-3 py-2"><p className="text-[11px] uppercase text-muted-foreground">{label}</p><p className="font-semibold">{value}</p></div>;
+const TILE_TINT = {
+  blue: "bg-tint-blue text-accent", red: "bg-tint-red text-[#e5383b]", yellow: "bg-tint-yellow text-[#c98a00]",
+  green: "bg-tint-green text-[#12a150]", violet: "bg-tint-violet text-[#8c43ff]", cyan: "bg-tint-cyan text-[#0a95e0]",
+} as const;
+function Tile({ icon, tint, label, value, hint }: { icon: React.ReactNode; tint: keyof typeof TILE_TINT; label: string; value: React.ReactNode; hint?: string }) {
+  return (
+    <div className="rounded-xl border border-separator bg-white p-3.5">
+      <div className="flex items-center gap-2">
+        <span className={`inline-flex h-6 w-6 items-center justify-center rounded-md [&_svg]:h-3.5 [&_svg]:w-3.5 ${TILE_TINT[tint]}`}>{icon}</span>
+        <span className="text-xs text-muted-foreground">{label}</span>
+      </div>
+      <p className="tabular mt-2 truncate text-base font-semibold tracking-tight text-foreground">{value}</p>
+      {hint && <p className="text-[11px] text-subtle-foreground">{hint}</p>}
+    </div>
+  );
+}
+function Block({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="border-t border-separator pt-6">
+      <h3 className="mb-3 text-[11px] font-medium uppercase tracking-[0.06em] text-subtle-foreground">{title}</h3>
+      {children}
+    </section>
+  );
 }
 
-function Spark({ points }: { points: number[] }) {
-  const max = Math.max(...points, 1), w = 300, h = 60;
-  const d = points.map((p, i) => `${(i / (points.length - 1)) * w},${h - (p / max) * h}`).join(" ");
-  return <svg viewBox={`0 0 ${w} ${h}`} className="h-16 w-full"><polyline points={d} fill="none" stroke="var(--accent)" strokeWidth="2" /></svg>;
-}

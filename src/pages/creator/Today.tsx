@@ -42,7 +42,7 @@ function Reference({ v }: { v: RefVideo }) {
   return (
     <div>
       <p className="mb-2 text-xs font-medium text-subtle-foreground">{t("creator.reference")}</p>
-      <div className="relative mx-auto aspect-[9/16] w-full max-w-[260px] overflow-hidden rounded-2xl bg-[#0b1530] ring-1 ring-border sm:mx-0">
+      <div className="relative mx-auto aspect-[9/16] w-full max-w-[220px] overflow-hidden rounded-2xl bg-[#f1f3f7] ring-1 ring-border sm:mx-0">
         {canPlay && play ? (
           <video src={signed.data!} controls autoPlay playsInline className="h-full w-full object-cover" poster={thumb ?? undefined} />
         ) : (
@@ -52,7 +52,7 @@ function Reference({ v }: { v: RefVideo }) {
               <button onClick={() => setPlay(true)} className="absolute inset-0 flex items-center justify-center bg-black/10 transition-colors hover:bg-black/20" aria-label="Play">
                 <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/95 shadow-lg"><Play className="ml-0.5 h-6 w-6 fill-[#0b1530] text-[#0b1530]" /></span>
               </button>
-            ) : !thumb && <div className="absolute inset-0 flex items-center justify-center text-white/50"><Play className="h-8 w-8" /></div>}
+            ) : !thumb && <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-subtle-foreground"><Play className="h-8 w-8" /></div>}
           </>
         )}
       </div>
@@ -203,7 +203,7 @@ export default function Today() {
         </div>
         <div className="min-w-0">
           <h1 className="text-xl font-semibold tracking-[-0.01em] text-foreground">{t("creator.hello", { name: first })} 👋</h1>
-          <p className="mt-0.5 text-sm text-muted-foreground">{t("creator.todayTitle")} · {doneToday}/{goal}</p>
+          <p className="mt-0.5 text-sm capitalize text-muted-foreground">{new Date().toLocaleDateString(lang, { weekday: "long", day: "numeric", month: "long" })}</p>
           {z && (
             <p className="mt-2 inline-flex flex-wrap items-center gap-1.5 rounded-full bg-tint-green px-2.5 py-1 text-xs font-medium text-[#0b7a3c]">
               <Sparkles className="h-3.5 w-3.5" />

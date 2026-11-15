@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useSearchParams } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Download, FileDown, LayoutGrid, Rows3, Search, SlidersHorizontal } from "lucide-react";
-import { Button, Dialog, Empty, Field, Input, PageHeader, Select, Spinner, useToast } from "@/components/ui";
+import { Calendar, ChevronLeft, ChevronRight, Download, FileDown, Film, Globe2, Heart, Languages, LayoutGrid, Layers, Rows3, Search, SlidersHorizontal, Tag, Trophy, X } from "lucide-react";
+import { Button, Dialog, Empty, Field, Input, PageHeader, Select, Spinner, Tabs, useToast } from "@/components/ui";
 import { callFn, supabase } from "@/lib/supabase";
 import { useApps, useCategories, useCompetitors, useCountries } from "@/lib/hooks";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
-import { VideoCard } from "./library/VideoCard";
+import { PlatformIcon, VideoCard } from "./library/VideoCard";
+import { FilterChip, Popover, SortMenu } from "./library/FilterChip";
 import { VideoDrawer } from "./library/VideoDrawer";
 import { VideoTable } from "./library/VideoTable";
 import { AssignBriefDialog } from "./library/AssignBriefDialog";
@@ -145,93 +146,135 @@ export default function Library({ adsOnly = false }: { adsOnly?: boolean }) {
   };
   const anyFilter = [...params.keys()].some((k) => !["sort", "dir", "view", "group", "size", "page"].includes(k));
 
+  const LANG_NAMES: Record<string, string> = { en: "Anglais", fr: "Français", es: "Espagnol", de: "Allemand", it: "Italien", pt: "Portugais", nl: "Néerlandais", pl: "Polonais", ro: "Roumain", cs: "Tchèque", sk: "Slovaque", hu: "Hongrois", el: "Grec", bg: "Bulgare", hr: "Croate", sl: "Slovène", sr: "Serbe", uk: "Ukrainien", tr: "Turc", ar: "Arabe", he: "Hébreu", ja: "Japonais", ko: "Coréen", sv: "Suédois", no: "Norvégien", da: "Danois", fi: "Finnois", et: "Estonien", lv: "Letton", lt: "Lituanien" };
+  const moreActive = ["minViews", "minScore", "collection", "app", "ads"].filter((k) => get(k)).length + (adsOnly && get("minDays") ? 1 : 0);
+  const resetAll = () => { setQ(""); setAuthor(""); const p = new URLSearchParams(); ["view", "sort"].forEach((k) => params.get(k) && p.set(k, params.get(k)!)); setParams(p, { replace: true }); };
+  const setSort = (v: Sort) => { const p = new URLSearchParams(params); p.set("sort", v); p.delete("dir"); p.delete("page"); setParams(p, { replace: true }); };
+  const shown = view === "table" ? (total.data ?? 0) : gridVideos.length;
+
   return (
     <div>
       <PageHeader
         title={adsOnly ? "Pubs gagnantes" : "Bibliothèque"}
         description={adsOnly
-          ? "Pubs vidéo des concurrents qui tournent depuis longtemps (une pub qui dure est une pub rentable). Recycle-les en brief organique."
-          : "Vidéos et pubs collectées par les agents : comptes officiels, UGC qui cite la marque et Ad Library. Survole une carte pour la lire, clique pour le détail."}
+          ? "Les pubs vidéo des concurrents qui tournent depuis longtemps : une pub qui dure est une pub rentable. Recycle-les en brief organique."
+          : "Toutes les vidéos de référence : comptes officiels, UGC qui cite une marque et pubs Meta. Survole une carte pour la lire, clique pour le détail."}
         actions={<>
-          <div className="inline-flex rounded-md border p-0.5">
-            <button onClick={() => set("view", "", false)} className={cn("flex items-center gap-1.5 rounded px-2.5 py-1 text-sm", view === "grid" ? "bg-muted font-medium" : "text-muted-foreground")}><LayoutGrid className="h-4 w-4" /> Grille</button>
-            <button onClick={() => set("view", "table", false)} className={cn("flex items-center gap-1.5 rounded px-2.5 py-1 text-sm", view === "table" ? "bg-muted font-medium" : "text-muted-foreground")}><Rows3 className="h-4 w-4" /> Tableau</button>
-          </div>
-          <Button variant="outline" onClick={doExport} loading={exporting}><FileDown className="h-4 w-4" /> Export CSV</Button>
-          {profile?.role === "admin" && !adsOnly && <Button variant="outline" onClick={() => setAdhoc(true)}><Download className="h-4 w-4" /> Collecter à la demande</Button>}
+          <Tabs value={view} onChange={(v) => set("view", v === "grid" ? "" : v, false)}
+            items={[{ value: "grid", label: <span className="inline-flex items-center gap-1.5"><LayoutGrid className="h-4 w-4" /> Grille</span> }, { value: "table", label: <span className="inline-flex items-center gap-1.5"><Rows3 className="h-4 w-4" /> Tableau</span> }]} />
+          <Button variant="secondary" onClick={doExport} loading={exporting}><FileDown className="h-4 w-4" /> Export CSV</Button>
+          {profile?.role === "admin" && !adsOnly && <Button onClick={() => setAdhoc(true)}><Download className="h-4 w-4" /> Collecter</Button>}
         </>}
       />
 
-      <div className="mb-6 space-y-3">
-        <div className="flex flex-wrap gap-2">
-          <div className="relative min-w-64 flex-1">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input className="pl-9" placeholder="Rechercher légende, #hashtag, @auteur…" value={q} onChange={(e) => setQ(e.target.value)} />
+      {/* Barre de recherche + filtres en puces */}
+      <div className="mb-8 space-y-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative min-w-[260px] flex-1">
+            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-subtle-foreground" />
+            <input className="h-10 w-full rounded-xl border border-border-strong bg-white pl-10 pr-9 text-sm outline-none transition placeholder:text-subtle-foreground hover:border-[#d5d9e2] focus:border-accent focus:ring-4 focus:ring-accent/10"
+              placeholder="Rechercher une légende, un #hashtag, un @créateur…" value={q} onChange={(e) => setQ(e.target.value)} />
+            {q && <button onClick={() => setQ("")} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-subtle-foreground hover:bg-muted" aria-label="Effacer"><X className="h-3.5 w-3.5" /></button>}
           </div>
-          <Select className="w-56" value={sort} onChange={(e) => { const p = new URLSearchParams(params); p.set("sort", e.target.value); p.delete("dir"); p.delete("page"); setParams(p, { replace: true }); }}>
-            {(adsOnly ? AD_SORTS : ORGANIC_SORTS).map((s) => <option key={s} value={s}>Trier : {SORT_LABEL[s]}</option>)}
-          </Select>
-          {view === "grid" && !adsOnly && (
-            <label className="flex items-center gap-2 rounded-md border px-3 text-sm"><input type="checkbox" checked={grouped} onChange={(e) => set("group", e.target.checked ? "1" : "", false)} /> Grouper par concurrent</label>
-          )}
+          <div className="relative w-48">
+            <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-subtle-foreground">@</span>
+            <input className="h-10 w-full rounded-xl border border-border-strong bg-white pl-8 pr-3 text-sm outline-none transition placeholder:text-subtle-foreground hover:border-[#d5d9e2] focus:border-accent focus:ring-4 focus:ring-accent/10"
+              placeholder="créateur" value={author} onChange={(e) => setAuthor(e.target.value)} />
+          </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-          <Select className="h-8 w-36 text-xs" value={get("app")} onChange={(e) => set("app", e.target.value)}><option value="">Toutes les apps</option>{(apps ?? []).map((a: any) => <option key={a.id} value={a.id}>{a.name}</option>)}</Select>
-          <Select className="h-8 w-40 text-xs" value={get("competitor")} onChange={(e) => set("competitor", e.target.value)}><option value="">Tous les concurrents</option>{(comps ?? []).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}</Select>
-          {!adsOnly && <Select className="h-8 w-32 text-xs" value={get("origin")} onChange={(e) => set("origin", e.target.value)}><option value="">Toutes origines</option><option value="official">Officiel</option><option value="ugc">UGC</option><option value="ad">Pub</option><option value="other">Autre</option></Select>}
-          {!adsOnly && <Select className="h-8 w-32 text-xs" value={get("platform")} onChange={(e) => set("platform", e.target.value)}><option value="">Plateformes</option><option value="tiktok">TikTok</option><option value="instagram">Instagram</option><option value="facebook_ads">Meta Ads</option></Select>}
-          <Input className="h-8 w-36 text-xs" placeholder="@créateur" value={author} onChange={(e) => setAuthor(e.target.value)} />
-          <Select className="h-8 w-28 text-xs" value={get("lang")} onChange={(e) => set("lang", e.target.value)}><option value="">Langues</option>{languages.map((l) => <option key={l} value={l}>{l}</option>)}</Select>
-          <Select className="h-8 w-32 text-xs" value={get("country")} onChange={(e) => set("country", e.target.value)}><option value="">Pays</option>{(countries ?? []).map((c: any) => <option key={c.code} value={c.code}>{c.name}</option>)}</Select>
-          <Select className="h-8 w-36 text-xs" value={get("category")} onChange={(e) => set("category", e.target.value)}><option value="">Formats</option>{(cats ?? []).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}</Select>
-          <Select className="h-8 w-32 text-xs" value={get("period", "all")} onChange={(e) => set("period", e.target.value === "all" ? "" : e.target.value)}>
-            <option value="all">Toute période</option><option value="7">7 jours</option><option value="30">30 jours</option><option value="90">90 jours</option><option value="365">1 an</option>
-          </Select>
-          {!adsOnly && <Input className="h-8 w-28 text-xs" type="number" placeholder="Vues min." value={get("minViews")} onChange={(e) => set("minViews", e.target.value)} />}
-          <Input className="h-8 w-24 text-xs" type="number" placeholder="Score min." value={get("minScore")} onChange={(e) => set("minScore", e.target.value)} />
-          {adsOnly && <Input className="h-8 w-36 text-xs" type="number" placeholder="Diffusion ≥ jours" value={get("minDays", "14")} onChange={(e) => set("minDays", e.target.value)} />}
-          {!adsOnly && <Select className="h-8 w-36 text-xs" value={get("ads", "all")} onChange={(e) => set("ads", e.target.value === "all" ? "" : e.target.value)}><option value="all">Organique + pubs</option><option value="organic">Organique</option><option value="ads">Pubs</option></Select>}
-          <Select className="h-8 w-36 text-xs" value={get("collection")} onChange={(e) => set("collection", e.target.value)}><option value="">Collections</option>{(collections ?? []).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}</Select>
-          <label className="flex items-center gap-1.5 text-xs"><input type="checkbox" checked={get("fav") === "1"} onChange={(e) => set("fav", e.target.checked ? "1" : "")} /> Favoris</label>
-          {anyFilter && <button className="text-xs text-muted-foreground underline" onClick={() => { setQ(""); setAuthor(""); const p = new URLSearchParams(); ["view", "sort"].forEach((k) => params.get(k) && p.set(k, params.get(k)!)); setParams(p, { replace: true }); }}>Réinitialiser les filtres</button>}
+          <FilterChip label="Concurrent" icon={<Trophy />} value={get("competitor")} onChange={(v) => set("competitor", v)}
+            options={(comps ?? []).map((c: any) => ({ value: c.id, label: c.name }))} />
+          {!adsOnly && <FilterChip label="Plateforme" icon={<Film />} value={get("platform")} onChange={(v) => set("platform", v)}
+            options={(["tiktok", "instagram", "facebook_ads"] as const).map((p) => ({ value: p, label: p === "facebook_ads" ? "Meta Ads" : p === "tiktok" ? "TikTok" : "Instagram", icon: <PlatformIcon p={p} /> }))} />}
+          {!adsOnly && <FilterChip label="Origine" icon={<Layers />} value={get("origin")} onChange={(v) => set("origin", v)}
+            options={[{ value: "ugc", label: "UGC", hint: "créateurs qui citent la marque" }, { value: "official", label: "Officiel", hint: "comptes des marques" }, { value: "ad", label: "Pub" }, { value: "other", label: "Autre" }]} />}
+          <FilterChip label="Langue" icon={<Languages />} value={get("lang")} onChange={(v) => set("lang", v)}
+            options={languages.map((l) => ({ value: l, label: LANG_NAMES[l] ?? l, hint: l }))} />
+          <FilterChip label="Pays" icon={<Globe2 />} value={get("country")} onChange={(v) => set("country", v)}
+            options={(countries ?? []).map((c: any) => ({ value: c.code, label: `${c.name}`, hint: c.code }))} />
+          <FilterChip label="Format" icon={<Tag />} value={get("category")} onChange={(v) => set("category", v)}
+            options={(cats ?? []).map((c: any) => ({ value: c.id, label: c.name }))} />
+          <FilterChip label="Période" icon={<Calendar />} value={get("period")} onChange={(v) => set("period", v)}
+            options={[{ value: "7", label: "7 derniers jours" }, { value: "30", label: "30 derniers jours" }, { value: "90", label: "90 derniers jours" }, { value: "365", label: "12 derniers mois" }]} />
+          <button type="button" onClick={() => set("fav", get("fav") === "1" ? "" : "1")}
+            className={cn("inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-[13px] transition-colors [&_svg]:h-3.5 [&_svg]:w-3.5",
+              get("fav") === "1" ? "border-[#ffd1d1] bg-tint-red text-[#c42a2d]" : "border-border-strong bg-white text-muted-foreground hover:border-[#d5d9e2] hover:text-foreground")}>
+            <Heart className={cn(get("fav") === "1" && "fill-current")} /> Favoris
+          </button>
+          <Popover width={300} trigger={(open, toggle) => (
+            <button type="button" onClick={toggle} className={cn("inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-[13px] transition-colors",
+              moreActive ? "border-[#cddcff] bg-accent-soft text-[#0040d6]" : open ? "border-[#d5d9e2] text-foreground" : "border-border-strong bg-white text-muted-foreground hover:text-foreground")}>
+              <SlidersHorizontal className="h-3.5 w-3.5" /> Plus de filtres{moreActive ? ` · ${moreActive}` : ""}
+            </button>
+          )}>
+            {() => (
+              <div className="space-y-3 p-2">
+                {!adsOnly && <Field label="Vues minimum"><Input type="number" placeholder="ex. 100 000" value={get("minViews")} onChange={(e) => set("minViews", e.target.value)} /></Field>}
+                <Field label="Score minimum (0–100)"><Input type="number" placeholder="ex. 60" value={get("minScore")} onChange={(e) => set("minScore", e.target.value)} /></Field>
+                {adsOnly && <Field label="Diffusée depuis au moins (jours)"><Input type="number" value={get("minDays", "14")} onChange={(e) => set("minDays", e.target.value)} /></Field>}
+                {!adsOnly && <Field label="Type"><Select value={get("ads", "all")} onChange={(e) => set("ads", e.target.value === "all" ? "" : e.target.value)}><option value="all">Organique + pubs</option><option value="organic">Organique seulement</option><option value="ads">Pubs seulement</option></Select></Field>}
+                <Field label="Collection"><Select value={get("collection")} onChange={(e) => set("collection", e.target.value)}><option value="">Toutes</option>{(collections ?? []).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}</Select></Field>
+                <Field label="App"><Select value={get("app")} onChange={(e) => set("app", e.target.value)}><option value="">Toutes les apps</option>{(apps ?? []).map((a: any) => <option key={a.id} value={a.id}>{a.name}</option>)}</Select></Field>
+              </div>
+            )}
+          </Popover>
+          {anyFilter && <button className="ml-1 text-[13px] font-medium text-accent hover:underline" onClick={resetAll}>Tout effacer</button>}
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-separator pt-4">
+          <p className="text-[13px] text-subtle-foreground">
+            {view === "table"
+              ? <><span className="tabular font-medium text-foreground">{new Intl.NumberFormat("fr").format(total.data ?? 0)}{(total.data ?? 0) >= 100000 ? "+" : ""}</span> {adsOnly ? "pubs" : "vidéos"}</>
+              : grouped ? "Regroupées par concurrent · 12 meilleures par groupe" : <><span className="tabular font-medium text-foreground">{shown}</span> {adsOnly ? "pubs affichées" : "vidéos affichées"}{infinite.hasNextPage ? " · défile pour en charger plus" : ""}</>}
+          </p>
+          <div className="flex items-center gap-1">
+            {view === "grid" && !adsOnly && (
+              <button type="button" onClick={() => set("group", grouped ? "" : "1", false)}
+                className={cn("inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[13px]", grouped ? "bg-accent-soft font-medium text-[#0040d6]" : "text-muted-foreground hover:bg-muted hover:text-foreground")}>
+                <Trophy className="h-3.5 w-3.5" /> Grouper par concurrent
+              </button>
+            )}
+            <SortMenu value={sort} onChange={setSort} options={(adsOnly ? AD_SORTS : ORGANIC_SORTS).map((x) => ({ value: x, label: SORT_LABEL[x] }))}
+              asc={view === "table" ? asc : undefined} onToggleDir={view === "table" ? () => set("dir", asc ? "" : "asc") : undefined} />
+          </div>
         </div>
       </div>
 
       {view === "table" ? (
-        table.isLoading ? <div className="flex justify-center py-20"><Spinner /></div>
+        table.isLoading ? <div className="flex justify-center py-24"><Spinner /></div>
           : table.error ? <Empty title="Erreur de chargement">{(table.error as Error).message}</Empty>
-          : (table.data ?? []).length === 0 ? <EmptyLibrary adsOnly={adsOnly} filtered={anyFilter} />
+          : (table.data ?? []).length === 0 ? <EmptyLibrary adsOnly={adsOnly} filtered={anyFilter} onReset={resetAll} />
           : (
-            <>
-              <VideoTable rows={table.data!} sort={sort} asc={asc} onSort={onSortColumn} onOpen={setOpen} competitorName={compName} categoryName={catName} adsOnly={adsOnly} />
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-sm">
-                <span className="text-muted-foreground">{new Intl.NumberFormat("fr").format(total.data ?? 0)}{(total.data ?? 0) >= 100000 ? "+" : ""} résultat(s) · page {page} / {pages}</span>
+            <VideoTable rows={table.data!} sort={sort} asc={asc} onSort={onSortColumn} onOpen={setOpen} competitorName={compName} categoryName={catName} adsOnly={adsOnly}
+              footer={<>
+                <span className="tabular text-[13px] text-muted-foreground">
+                  {new Intl.NumberFormat("fr").format((page - 1) * pageSize + 1)}–{new Intl.NumberFormat("fr").format(Math.min(page * pageSize, total.data ?? 0))} sur {new Intl.NumberFormat("fr").format(total.data ?? 0)}
+                </span>
                 <div className="flex items-center gap-2">
-                  <Select className="h-8 w-28 text-xs" value={String(pageSize)} onChange={(e) => set("size", e.target.value)}>
-                    {[50, 100, 200].map((n) => <option key={n} value={n}>{n} / page</option>)}
-                  </Select>
-                  <Button size="sm" variant="outline" disabled={page <= 1} onClick={() => set("page", String(page - 1), false)}><ChevronLeft className="h-4 w-4" /></Button>
-                  <Button size="sm" variant="outline" disabled={page >= pages} onClick={() => set("page", String(page + 1), false)}><ChevronRight className="h-4 w-4" /></Button>
+                  <select className="h-8 rounded-lg border border-border-strong bg-white px-2 text-[13px] text-muted-foreground outline-none" value={String(pageSize)} onChange={(e) => set("size", e.target.value)}>
+                    {[50, 100, 200].map((n) => <option key={n} value={n}>{n} par page</option>)}
+                  </select>
+                  <span className="tabular px-1 text-[13px] text-muted-foreground">Page {page} / {pages}</span>
+                  <Button size="icon" variant="secondary" className="h-8 w-8" disabled={page <= 1} onClick={() => set("page", String(page - 1), false)} aria-label="Page précédente"><ChevronLeft className="h-4 w-4" /></Button>
+                  <Button size="icon" variant="secondary" className="h-8 w-8" disabled={page >= pages} onClick={() => set("page", String(page + 1), false)} aria-label="Page suivante"><ChevronRight className="h-4 w-4" /></Button>
                 </div>
-              </div>
-            </>
+              </>} />
           )
       ) : grouped ? (
-        <div className="space-y-10">
-          {[...(comps ?? []), { id: null, name: "Sans concurrent" }].map((c: any) => (
+        <div className="space-y-12">
+          {[...(comps ?? []), { id: null, name: "Hors concurrents" }].map((c: any) => (
             <GroupSection key={c.id ?? "none"} competitor={c} filters={filters} favs={favs} onOpen={setOpen} onFav={toggleFav} catName={catName} />
           ))}
         </div>
-      ) : infinite.isLoading ? <div className="flex justify-center py-20"><Spinner /></div>
+      ) : infinite.isLoading ? <div className="flex justify-center py-24"><Spinner /></div>
         : infinite.error ? <Empty title="Erreur de chargement">{(infinite.error as Error).message}</Empty>
-        : gridVideos.length === 0 ? <EmptyLibrary adsOnly={adsOnly} filtered={anyFilter} />
+        : gridVideos.length === 0 ? <EmptyLibrary adsOnly={adsOnly} filtered={anyFilter} onReset={resetAll} />
         : (
-          <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-            {gridVideos.map((v) => <VideoCard key={v.id} v={v} fav={!!favs?.has(v.id)} onOpen={() => setOpen(v)} onFav={() => toggleFav(v)} categoryName={catName(v.category_id)} />)}
+          <div className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {gridVideos.map((v) => <VideoCard key={v.id} v={v} fav={!!favs?.has(v.id)} onOpen={() => setOpen(v)} onFav={() => toggleFav(v)} categoryName={catName(v.category_id)} competitorName={v.competitor_id ? compName(v.competitor_id) : undefined} />)}
           </div>
         )}
-      {view === "grid" && !grouped && <div ref={sentinel} className="flex justify-center py-8">{infinite.isFetchingNextPage && <Spinner />}</div>}
+      {view === "grid" && !grouped && <div ref={sentinel} className="flex justify-center py-10">{infinite.isFetchingNextPage && <Spinner />}</div>}
 
       <VideoDrawer video={open} onClose={() => setOpen(null)} fav={!!(open && favs?.has(open.id))} onFav={() => open && toggleFav(open)} onAssign={() => setAssign(open)} />
       <AssignBriefDialog video={assign} open={!!assign} onClose={() => setAssign(null)} origin={assign?.is_ad ? "ad" : "library"} />
@@ -240,10 +283,10 @@ export default function Library({ adsOnly = false }: { adsOnly?: boolean }) {
   );
 }
 
-function EmptyLibrary({ adsOnly, filtered }: { adsOnly: boolean; filtered: boolean }) {
-  if (filtered) return <Empty title="Aucun résultat pour ces filtres">Élargis la période, retire un filtre ou clique sur « Réinitialiser les filtres ».</Empty>;
+function EmptyLibrary({ adsOnly, filtered, onReset }: { adsOnly: boolean; filtered: boolean; onReset: () => void }) {
+  if (filtered) return <Empty title="Aucun résultat pour ces filtres" icon={<Search className="h-5 w-5" />} action={<Button variant="secondary" onClick={onReset}>Effacer les filtres</Button>}>Élargis la période ou retire un filtre.</Empty>;
   return (
-    <Empty title={adsOnly ? "Aucune pub qui tourne depuis assez longtemps" : "La bibliothèque est vide"}>
+    <Empty title={adsOnly ? "Aucune pub qui tourne depuis assez longtemps" : "La bibliothèque est vide"} icon={<Film className="h-5 w-5" />}>
       {adsOnly
         ? "Baisse la durée minimale de diffusion, ou lance un agent « Meta Ad Library » dans Agents de collecte."
         : <>Lance un agent ou un backfill dans <Link to="/admin/agents" className="underline">Agents de collecte</Link>, ou utilise « Collecter à la demande ».</>}
@@ -272,12 +315,18 @@ function GroupSection({ competitor, filters, favs, onOpen, onFav, catName }: {
   if (!data?.length) return null;
   return (
     <section>
-      <div className="mb-3 flex items-baseline justify-between">
-        <h2 className="text-lg font-semibold">{competitor.name}</h2>
-        {competitor.id && <button className="text-sm text-accent hover:underline" onClick={() => setParams((p) => { const n = new URLSearchParams(p); n.delete("group"); n.set("competitor", competitor.id!); return n; }, { replace: true })}>Voir tout →</button>}
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-tint-blue text-sm font-semibold text-accent">{competitor.name.charAt(0)}</span>
+          <div>
+            <h2 className="text-[15px] font-semibold text-foreground">{competitor.name}</h2>
+            <p className="text-xs text-subtle-foreground">{data.length} meilleures vidéos</p>
+          </div>
+        </div>
+        {competitor.id && <button className="text-[13px] font-medium text-accent hover:underline" onClick={() => setParams((p) => { const n = new URLSearchParams(p); n.delete("group"); n.set("competitor", competitor.id!); return n; }, { replace: true })}>Tout voir →</button>}
       </div>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-        {data.map((v) => <VideoCard key={v.id} v={v} fav={!!favs?.has(v.id)} onOpen={() => onOpen(v)} onFav={() => onFav(v)} categoryName={catName(v.category_id)} />)}
+      <div className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+        {data.map((v) => <VideoCard key={v.id} v={v} fav={!!favs?.has(v.id)} onOpen={() => onOpen(v)} onFav={() => onFav(v)} categoryName={catName(v.category_id)} competitorName={competitor.id ? competitor.name : undefined} />)}
       </div>
     </section>
   );

@@ -5,7 +5,7 @@ import { supabase, callFn, publicUrl } from "@/lib/supabase";
 import { useCountries, useZones } from "@/lib/hooks";
 import { formatMoney } from "@shared/zones.ts";
 import { creativeCopy, CREATIVE_LANGS, HOOKS, RTL_LANGS, type Hook } from "@shared/creativeCopy.ts";
-import { Badge, Button, Card, Empty, Field, PageHeader, Select, Spinner, useToast } from "@/components/ui";
+import { Badge, Button, Card, Empty, Field, PageHeader, Select, Spinner, useToast, Chip, Section } from "@/components/ui";
 import { flag } from "@/lib/utils";
 
 const FORMATS: Record<string, [number, number]> = { "1:1": [1080, 1080], "4:5": [1080, 1350], "9:16": [1080, 1920] };
@@ -255,88 +255,87 @@ export default function Creatives() {
   return (
     <div>
       <PageHeader title="Créas de recrutement" description={`Visuels statiques dans la langue de chaque pays (${CREATIVE_LANGS.length} langues). L'accroche est posée par template : toujours lisible et juste.`} />
-      <Card className="mb-8 space-y-5">
-        <div className="grid gap-5 md:grid-cols-2">
-          <Field label={`Pays (${sel.length}) · ${langsSelected.length} langue(s)`}>
-            <div className="mb-2 flex flex-wrap gap-1.5">
-              <Button size="sm" variant="outline" onClick={() => setSel(openCountries.map((c: any) => c.code))}>Tous</Button>
-              {["A", "B", "C"].map((z) => <Button key={z} size="sm" variant="outline" onClick={() => selectZone(z)}>+ Zone {z}</Button>)}
-              <Button size="sm" variant="ghost" onClick={() => setSel([])}>Aucun</Button>
+      <Section className="mb-8" title="Générer en lot" description="1 · Choisis les pays (ou une zone) · 2 · une accroche et des formats · 3 · « Générer ». Le prix affiché est le tarif de la zone du pays."
+        actions={<Button loading={busy === "gen"} onClick={generate} disabled={!total}><ImagePlus className="h-4 w-4" /> Générer {total || ""} créas</Button>}>
+        <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
+          <Field label={`1 · Pays (${sel.length}) · ${langsSelected.length} langue(s)`}>
+            <div className="mb-3 flex flex-wrap gap-2">
+              <Chip active={sel.length === openCountries.length && sel.length > 0} onClick={() => setSel(openCountries.map((c: any) => c.code))}>Tous</Chip>
+              {["A", "B", "C"].map((z) => <Chip key={z} onClick={() => selectZone(z)}>+ Zone {z}</Chip>)}
+              {sel.length > 0 && <Chip onClick={() => setSel([])}>Aucun</Chip>}
             </div>
-            <div className="grid max-h-56 grid-cols-2 gap-1 overflow-y-auto rounded-md border p-2 text-sm">
+            <div className="grid max-h-64 grid-cols-1 gap-0.5 overflow-y-auto rounded-xl border p-2 text-sm sm:grid-cols-2">
               {openCountries.map((c: any) => (
-                <label key={c.code} className="flex items-center gap-2 rounded px-1 py-0.5 hover:bg-muted">
-                  <input type="checkbox" checked={sel.includes(c.code)} onChange={(e) => setSel(e.target.checked ? [...sel, c.code] : sel.filter((x) => x !== c.code))} />
-                  {flag(c.code)} {c.name} <span className="text-xs text-muted-foreground">{c.language} · {priceFor(c.code)}</span>
+                <label key={c.code} className={`flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-muted ${sel.includes(c.code) ? "bg-accent-soft" : ""}`}>
+                  <input type="checkbox" className="accent-[#004dff]" checked={sel.includes(c.code)} onChange={(e) => setSel(e.target.checked ? [...sel, c.code] : sel.filter((x) => x !== c.code))} />
+                  <span className="truncate">{flag(c.code)} {c.name}</span> <span className="ml-auto text-xs text-subtle-foreground">{c.language} · {priceFor(c.code)}</span>
                 </label>
               ))}
             </div>
           </Field>
-          <div className="space-y-4">
-            <Field label="Accroche">
+          <div className="space-y-5">
+            <Field label="2 · Accroche">
               <Select value={hook} onChange={(e) => setHook(e.target.value as Hook)}>{HOOKS.map((h) => <option key={h.value} value={h.value}>{h.label}</option>)}</Select>
             </Field>
             <Field label="Formats">
-              <div className="flex gap-4 text-sm">
+              <div className="flex flex-wrap gap-2">
                 {Object.entries(FORMATS).map(([fmt, [w, h]]) => (
-                  <label key={fmt} className="flex items-center gap-2">
-                    <input type="checkbox" checked={formats.includes(fmt)} onChange={(e) => setFormats(e.target.checked ? [...formats, fmt] : formats.filter((x) => x !== fmt))} />
-                    {fmt} <span className="text-xs text-muted-foreground">{w}×{h}</span>
-                  </label>
+                  <Chip key={fmt} active={formats.includes(fmt)} onClick={() => setFormats(formats.includes(fmt) ? formats.filter((x) => x !== fmt) : [...formats, fmt])}>
+                    {fmt} <span className="text-[11px] opacity-70">{w}×{h}</span>
+                  </Chip>
                 ))}
               </div>
             </Field>
-            <div className="rounded-lg bg-muted p-3 text-sm">
-              <p className="text-xs uppercase text-muted-foreground">Aperçu ({sel[0] ? `${flag(sel[0])} ${langName(langOf(sel[0]))}` : "fr"})</p>
-              <p className="mt-1 font-semibold">{sample.headline}</p>
+            <div className="rounded-xl border border-[#d8e3ff] bg-tint-blue p-4 text-sm">
+              <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-subtle-foreground">Aperçu · {sel[0] ? `${flag(sel[0])} ${langName(langOf(sel[0]))}` : "fr"}</p>
+              <p className="mt-1.5 text-[15px] font-semibold text-foreground">{sample.headline}</p>
               <p className="text-muted-foreground">{sample.subline}</p>
-              <p className="mt-1 text-xs">Bouton : {sample.cta}</p>
+              <span className="mt-2 inline-block rounded-full bg-accent px-3 py-1 text-xs font-medium text-white">{sample.cta}</span>
             </div>
-            <p className="text-xs text-muted-foreground">Textes par langue dans <code>_shared/logic/creativeCopy.ts</code> (traductions du build, à faire relire par un natif avant gros budget). Le prix = tarif de la zone du pays.</p>
+            <p className="text-xs text-subtle-foreground">Textes par langue dans <code>_shared/logic/creativeCopy.ts</code> : traductions du build, à faire relire par un natif avant gros budget.</p>
           </div>
         </div>
         {progress && (
-          <div>
-            <div className="mb-1 flex justify-between text-xs text-muted-foreground"><span>Rendu et envoi…</span><span>{progress.done} / {progress.total}</span></div>
-            <div className="h-2 overflow-hidden rounded-full bg-muted"><div className="h-full bg-accent transition-all" style={{ width: `${(progress.done / progress.total) * 100}%` }} /></div>
+          <div className="mt-6">
+            <div className="mb-1.5 flex justify-between text-xs text-muted-foreground"><span>Rendu et envoi…</span><span className="tabular">{progress.done} / {progress.total}</span></div>
+            <div className="h-1.5 overflow-hidden rounded-full bg-[#f1f3f7]"><div className="h-full rounded-full bg-accent transition-all" style={{ width: `${(progress.done / progress.total) * 100}%` }} /></div>
           </div>
         )}
-        <div className="flex justify-end"><Button loading={busy === "gen"} onClick={generate} disabled={!total}><ImagePlus className="h-4 w-4" /> Générer {total || ""} créas</Button></div>
-      </Card>
+      </Section>
 
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <Select className="w-44" value={f.country} onChange={(e) => setF({ ...f, country: e.target.value })}>
+      <div className="mb-5 flex flex-wrap items-center gap-2">
+        <h2 className="mr-2 text-[15px] font-semibold">Galerie</h2>
+        {[["", "Tous"], ["draft", "Brouillons"], ["approved", "Validées"], ["rejected", "Refusées"], ["sent_to_meta", "Envoyées à Meta"]].map(([v, l]) => (
+          <Chip key={v} active={f.status === v} onClick={() => setF({ ...f, status: v })}>{l}</Chip>
+        ))}
+        <Select className="h-8 py-0 w-40 rounded-full text-[13px]" value={f.country} onChange={(e) => setF({ ...f, country: e.target.value })} aria-label="Pays">
           <option value="">Tous les pays</option>
           {openCountries.map((c: any) => <option key={c.code} value={c.code}>{flag(c.code)} {c.name}</option>)}
         </Select>
-        <Select className="w-40" value={f.language} onChange={(e) => setF({ ...f, language: e.target.value })}>
+        <Select className="h-8 py-0 w-40 rounded-full text-[13px]" value={f.language} onChange={(e) => setF({ ...f, language: e.target.value })} aria-label="Langue">
           <option value="">Toutes les langues</option>
           {(galleryLangs.length ? galleryLangs : CREATIVE_LANGS).map((l: string) => <option key={l} value={l}>{langName(l)}</option>)}
         </Select>
-        <Select className="w-32" value={f.format} onChange={(e) => setF({ ...f, format: e.target.value })}>
+        <Select className="h-8 py-0 w-28 rounded-full text-[13px]" value={f.format} onChange={(e) => setF({ ...f, format: e.target.value })} aria-label="Format">
           <option value="">Formats</option>
           {Object.keys(FORMATS).map((x) => <option key={x} value={x}>{x}</option>)}
         </Select>
-        <Select className="w-40" value={f.status} onChange={(e) => setF({ ...f, status: e.target.value })}>
-          <option value="">Tous les statuts</option>
-          {[["draft", "Brouillon"], ["approved", "Validée"], ["rejected", "Refusée"], ["sent_to_meta", "Envoyée à Meta"]].map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-        </Select>
-        <span className="text-xs text-muted-foreground">{list.data?.length ?? 0} créa(s)</span>
-        <Button size="sm" variant="outline" className="ml-auto" onClick={bulkApprove}><Check className="h-3.5 w-3.5" /> Valider les brouillons affichés</Button>
+        <span className="text-xs text-subtle-foreground">{list.data?.length ?? 0} créa(s)</span>
+        <Button size="sm" variant="secondary" className="ml-auto" onClick={bulkApprove}><Check className="h-3.5 w-3.5" /> Valider les brouillons affichés</Button>
       </div>
-      {list.isLoading ? <Spinner /> : (list.data ?? []).length === 0 ? <Empty title="Aucune créa">Choisis des pays (ou une zone), une accroche et des formats, puis « Générer ». Les créas validées peuvent ensuite être poussées vers Meta depuis Campagnes Meta.</Empty> : (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
+      {list.isLoading ? <Spinner /> : (list.data ?? []).length === 0 ? <Empty title="Aucune créa" icon={<ImagePlus className="h-5 w-5" />}>Choisis des pays (ou une zone), une accroche et des formats, puis « Générer ». Les créas validées peuvent ensuite être poussées vers Meta depuis Campagnes Meta.</Empty> : (
+        <div className="grid grid-cols-2 gap-5 md:grid-cols-3 xl:grid-cols-5">
           {(list.data ?? []).map((cr: any) => (
-            <Card key={cr.id} className="overflow-hidden p-0">
-              <div className="flex aspect-[4/5] items-center justify-center bg-muted">
-                {cr.image_path ? <img src={`${publicUrl("creatives", cr.image_path)}?t=${stamp}`} className="max-h-full max-w-full object-contain" /> : <Spinner />}
+            <Card key={cr.id} className="group overflow-hidden p-0 transition-shadow hover:shadow-card">
+              <div className="flex aspect-[4/5] items-center justify-center bg-[#f7f8fb] p-3">
+                {cr.image_path ? <img src={`${publicUrl("creatives", cr.image_path)}?t=${stamp}`} className="max-h-full max-w-full rounded-lg object-contain shadow-xs" /> : <Spinner />}
               </div>
               <div className="space-y-2 p-3">
                 <div className="flex items-center justify-between gap-1 text-xs">
-                  <span className="truncate">{flag(cr.country)} {cr.country} · {cr.format} · {cr.language}</span>
-                  <Badge tone={cr.status === "approved" ? "success" : cr.status === "rejected" ? "danger" : cr.status === "sent_to_meta" ? "accent" : "default"}>{cr.status}</Badge>
+                  <span className="truncate text-muted-foreground">{flag(cr.country)} {cr.country} · {cr.format} · {cr.language}</span>
+                  <Badge tone={cr.status === "approved" ? "success" : cr.status === "rejected" ? "danger" : cr.status === "sent_to_meta" ? "accent" : "default"}>{({ draft: "Brouillon", approved: "Validée", rejected: "Refusée", sent_to_meta: "Meta" } as Record<string, string>)[cr.status] ?? cr.status}</Badge>
                 </div>
-                <div className="flex flex-wrap gap-1">
+                <div className="flex flex-wrap gap-0.5 border-t border-separator pt-2">
                   <Button size="icon" variant="ghost" title="Valider" onClick={() => setStatus(cr, "approved")}><Check className="h-4 w-4" /></Button>
                   <Button size="icon" variant="ghost" title="Refuser" onClick={() => setStatus(cr, "rejected")}><X className="h-4 w-4" /></Button>
                   <Button size="icon" variant="ghost" title="Fond IA (ElevenLabs, plan Pro)" loading={busy === cr.id} onClick={() => aiBackground(cr)}>{busy !== cr.id && <Sparkles className="h-4 w-4" />}</Button>

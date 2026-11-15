@@ -4,7 +4,7 @@ import { AlertTriangle, RefreshCw, ShieldCheck } from "lucide-react";
 import { callFn, supabase } from "@/lib/supabase";
 import { saveSetting, useSetting } from "@/lib/hooks";
 import { dateFr } from "@/lib/utils";
-import { Badge, Button, Card, Dialog, Field, Input, PageHeader, Select, Spinner, Switch, Table, Tabs, Td, Textarea, Th, useToast } from "@/components/ui";
+import { Badge, Button, Card, Dialog, Field, IconTile, Input, PageHeader, Section, Select, Spinner, Switch, Table, Tabs, Td, Textarea, Th, useToast } from "@/components/ui";
 
 interface EmailCfg { test_mode: boolean; test_recipient: string; sender_name: string; sender_email: string; reply_to: string; send_rejection_emails: boolean; rejection_delay_hours: number }
 const STATUS_TONE: Record<string, any> = { queued: "accent", held: "warning", sent: "success", failed: "danger", cancelled: "default" };
@@ -58,43 +58,48 @@ function SettingsTab() {
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
       <div className="space-y-6">
-        <Card className={cfg.test_mode ? "border-warning/50" : "border-danger/50"}>
-          <div className="mb-4 flex items-center gap-3">
-            {cfg.test_mode ? <ShieldCheck className="h-5 w-5 text-success" /> : <AlertTriangle className="h-5 w-5 text-danger" />}
+        <div className={`rounded-xl border p-6 ${cfg.test_mode ? "border-[#cdeedb] bg-tint-green" : "border-[#ffd2d2] bg-tint-red"}`}>
+          <div className="mb-5 flex items-start gap-4">
+            <IconTile icon={cfg.test_mode ? <ShieldCheck /> : <AlertTriangle />} tint={cfg.test_mode ? "green" : "red"} className="bg-white" />
             <div className="flex-1">
-              <p className="font-semibold">Mode test {cfg.test_mode ? "activé" : "DÉSACTIVÉ"}</p>
-              <p className="text-sm text-muted-foreground">{cfg.test_mode ? "Tous les emails sont redirigés vers l'email admin de test (objet préfixé « [TEST → destinataire] »)." : "Les emails partent aux vrais destinataires."}</p>
+              <p className="text-[15px] font-semibold text-foreground">Mode test {cfg.test_mode ? "activé" : "désactivé"}</p>
+              <p className="mt-0.5 text-[13px] leading-relaxed text-muted-foreground">{cfg.test_mode ? "Tous les emails sont redirigés vers l'email admin de test (objet préfixé « [TEST → destinataire] »)." : "Attention : les emails partent aux vrais destinataires (candidats, posteurs)."}</p>
             </div>
             <Switch checked={cfg.test_mode} onChange={(v) => set("test_mode", v)} label="Mode test" />
           </div>
-          <Field label="Email admin de test" hint={blocked ? <span className="font-medium text-warning">Tant que l'email de test est vide, aucun email ne part : ils restent dans la boîte d'envoi.</span> : "Reçoit tous les emails tant que le mode test est actif."}>
+          <Field label="Email admin de test" hint={blocked ? <span className="font-medium text-[#8a5a00]">Tant que l'email de test est vide, aucun email ne part : ils restent dans la boîte d'envoi.</span> : "Reçoit tous les emails tant que le mode test est actif."}>
             <Input type="email" value={cfg.test_recipient} onChange={(e) => set("test_recipient", e.target.value)} placeholder="max@…" />
           </Field>
-        </Card>
-        <Card className="grid gap-4 sm:grid-cols-2">
-          <Field label="Nom de l'expéditeur"><Input value={cfg.sender_name} onChange={(e) => set("sender_name", e.target.value)} /></Field>
-          <Field label="Email de l'expéditeur" hint="Doit être un expéditeur validé dans Brevo (cliquer à droite). Vide = aucun envoi."><Input type="email" value={cfg.sender_email} onChange={(e) => set("sender_email", e.target.value)} /></Field>
-          <Field label="Reply-to (optionnel)"><Input type="email" value={cfg.reply_to} onChange={(e) => set("reply_to", e.target.value)} /></Field>
-          <div />
-          <label className="flex items-center gap-3 text-sm"><Switch checked={cfg.send_rejection_emails} onChange={(v) => set("send_rejection_emails", v)} /> Envoyer un email poli aux candidats refusés</label>
-          <Field label="Délai avant l'email de refus (heures)"><Input type="number" min={0} value={cfg.rejection_delay_hours} onChange={(e) => set("rejection_delay_hours", e.target.value)} /></Field>
-        </Card>
+        </div>
+        <Section title="Expéditeur" description="Nom et adresse visibles par les créateurs. L'adresse doit être validée dans Brevo (clique un expéditeur à droite).">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Nom de l'expéditeur"><Input value={cfg.sender_name} onChange={(e) => set("sender_name", e.target.value)} /></Field>
+            <Field label="Email de l'expéditeur" hint="Vide = aucun envoi."><Input type="email" value={cfg.sender_email} onChange={(e) => set("sender_email", e.target.value)} /></Field>
+            <Field label="Reply-to (optionnel)"><Input type="email" value={cfg.reply_to} onChange={(e) => set("reply_to", e.target.value)} /></Field>
+          </div>
+        </Section>
+        <Section title="Refus" description="Email poli envoyé aux candidats refusés, après un délai.">
+          <div className="grid items-end gap-5 sm:grid-cols-2">
+            <label className="flex items-center gap-3 text-sm"><Switch checked={cfg.send_rejection_emails} onChange={(v) => set("send_rejection_emails", v)} /> Envoyer l'email de refus</label>
+            <Field label="Délai avant l'email (heures)"><Input type="number" min={0} value={cfg.rejection_delay_hours} onChange={(e) => set("rejection_delay_hours", e.target.value)} /></Field>
+          </div>
+        </Section>
         <Button onClick={save} loading={busy}>Enregistrer</Button>
       </div>
-      <Card>
-        <div className="mb-3 flex items-center justify-between"><p className="font-semibold">Brevo</p><Button size="sm" variant="ghost" onClick={() => brevo.refetch()}><RefreshCw className="h-3.5 w-3.5" /></Button></div>
+      <Card className="h-fit">
+        <div className="mb-4 flex items-center justify-between"><p className="text-[15px] font-semibold">Brevo</p><Button size="sm" variant="ghost" onClick={() => brevo.refetch()} aria-label="Rafraîchir"><RefreshCw className="h-3.5 w-3.5" /></Button></div>
         {brevo.isLoading ? <Spinner /> : brevo.error ? <p className="text-sm text-danger">{(brevo.error as Error).message}</p> : (
           <div className="space-y-4 text-sm">
-            <div><p className="text-xs uppercase text-muted-foreground">Compte</p><p>{brevo.data?.account?.company ?? "—"} · {brevo.data?.account?.email ?? brevo.data?.account?.error}</p>
+            <div><p className="text-[11px] font-medium uppercase tracking-[0.06em] text-subtle-foreground">Compte</p><p>{brevo.data?.account?.company ?? "—"} · {brevo.data?.account?.email ?? brevo.data?.account?.error}</p>
               {(brevo.data?.account?.plan ?? []).map((p: any, i: number) => <p key={i} className="text-xs text-muted-foreground">{p.type} : {p.credits} crédits</p>)}</div>
-            <div><p className="mb-1 text-xs uppercase text-muted-foreground">Expéditeurs</p>
+            <div><p className="mb-1.5 text-[11px] font-medium uppercase tracking-[0.06em] text-subtle-foreground">Expéditeurs</p>
               {(brevo.data?.senders ?? []).length === 0 && <p className="text-muted-foreground">Aucun expéditeur.</p>}
               {(brevo.data?.senders ?? []).map((s: any) => (
                 <button key={s.id} disabled={!s.active} onClick={() => setCfg({ ...cfg, sender_email: s.email, sender_name: cfg.sender_name || s.name })}
-                  className="flex w-full items-center justify-between rounded px-2 py-1.5 text-left hover:bg-muted disabled:opacity-50">
+                  className="flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-left hover:bg-muted disabled:opacity-50">
                   <span>{s.name} &lt;{s.email}&gt;</span>{s.active ? <Badge tone="success">validé</Badge> : <Badge>non validé</Badge>}
                 </button>))}</div>
-            <div><p className="mb-1 text-xs uppercase text-muted-foreground">Templates Brevo</p>
+            <div><p className="mb-1.5 text-[11px] font-medium uppercase tracking-[0.06em] text-subtle-foreground">Templates Brevo</p>
               {(brevo.data?.templates ?? []).length === 0 ? <p className="text-muted-foreground">Aucun (on utilise nos modèles internes).</p> : (brevo.data?.templates ?? []).map((t: any) => <p key={t.id} className="text-xs">#{t.id} {t.name}</p>)}</div>
           </div>
         )}

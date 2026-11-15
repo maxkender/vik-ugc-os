@@ -54,7 +54,9 @@ export const VideoCard = memo(function VideoCard({ v, fav, onOpen, onFav, catego
         <div className="absolute left-2.5 right-2.5 top-2.5 flex items-start justify-between gap-1">
           <div className="flex flex-wrap gap-1">
             <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-foreground shadow-xs" title={PLATFORM_LABEL[v.platform]}><PlatformIcon p={v.platform} className="h-3.5 w-3.5" /></span>
-            {v.origin && v.origin !== "other" && <span className={cn("inline-flex h-6 items-center rounded-full px-2 text-[11px] font-semibold shadow-xs", ORIGIN_TONE[v.origin])}>{ORIGIN_LABEL[v.origin]}</span>}
+            {v.is_ad
+              ? <span className="tabular inline-flex h-6 items-center gap-1 rounded-full bg-[#fff6e5] px-2 text-[11px] font-bold text-[#8a5a00] shadow-xs" title="Durée de diffusion">{v.ad_days ?? "?"} j de diffusion</span>
+              : v.origin && v.origin !== "other" && <span className={cn("inline-flex h-6 items-center rounded-full px-2 text-[11px] font-semibold shadow-xs", ORIGIN_TONE[v.origin])}>{ORIGIN_LABEL[v.origin]}</span>}
           </div>
           <span className={cn("tabular inline-flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-[11px] font-bold shadow-xs", scoreTone)} title="Score de performance">{Math.round(v.score)}</span>
         </div>
@@ -66,7 +68,10 @@ export const VideoCard = memo(function VideoCard({ v, fav, onOpen, onFav, catego
 
         <div className="absolute inset-x-0 bottom-0 flex flex-wrap gap-1 bg-gradient-to-t from-black/65 via-black/25 to-transparent p-2.5 pt-12">
           {v.is_ad ? (
-            <MetricPill tone="dark" icon={<Megaphone />}>Diffusée depuis {v.ad_days ?? "?"} j{v.ad_active ? " · active" : ""}</MetricPill>
+            <>
+              <MetricPill tone="dark" icon={<Megaphone />}>{v.ad_started_at ? `Depuis le ${new Date(v.ad_started_at).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}` : "Pub Meta"}</MetricPill>
+              {v.ad_active ? <MetricPill tone="dark"><span className="mr-0.5 inline-block h-1.5 w-1.5 rounded-full bg-[#3ddc84]" />Active</MetricPill> : <MetricPill tone="dark">Arrêtée</MetricPill>}
+            </>
           ) : (
             <>
               <MetricPill tone="dark" icon={<Eye />}>{compact(v.views)}</MetricPill>

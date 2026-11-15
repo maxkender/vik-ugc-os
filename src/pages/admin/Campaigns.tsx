@@ -1,13 +1,14 @@
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pause, Play, Plus, RefreshCw, ShieldAlert, Upload } from "lucide-react";
+import { BarChart3, Megaphone, Pause, Play, Plus, RefreshCw, ShieldCheck, Upload, Wallet } from "lucide-react";
 import { supabase, callFn } from "@/lib/supabase";
 import { useCountries, useSetting } from "@/lib/hooks";
 import { costPer } from "@shared/meta.ts";
-import { Badge, Button, Card, Dialog, Empty, Field, Input, PageHeader, Spinner, Table, Td, Th, useToast } from "@/components/ui";
+import { Badge, Button, Card, CardTitle, Dialog, Empty, Field, IconTile, Input, PageHeader, Spinner, Table, Td, Th, useToast } from "@/components/ui";
 import { dateFr, flag } from "@/lib/utils";
 
 const statusTone = (s: string) => (s === "ACTIVE" ? "success" : s === "PAUSED" ? "warning" : "default") as any;
+const StatusBadge = ({ s }: { s: string }) => <Badge tone={statusTone(s)}><span className="h-1.5 w-1.5 rounded-full bg-current" />{s === "ACTIVE" ? "Active" : s === "PAUSED" ? "En pause" : s}</Badge>;
 
 export default function Campaigns() {
   const qc = useQueryClient();
@@ -115,94 +116,114 @@ export default function Campaigns() {
         title="Campagnes Meta"
         description="Campagnes de recrutement (Marketing API), catégorie spéciale Emploi."
         actions={<>
-          <Button variant="outline" loading={busy === "sync"} onClick={() => act("sync", () => callFn("meta", { action: "sync_insights" }), "Métriques synchronisées")}><RefreshCw className="h-4 w-4" /> Synchroniser les métriques</Button>
+          <Button variant="secondary" loading={busy === "sync"} onClick={() => act("sync", () => callFn("meta", { action: "sync_insights" }), "Métriques synchronisées")}><RefreshCw className="h-4 w-4" /> Synchroniser les métriques</Button>
           <Button onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> Nouvelle campagne</Button>
         </>}
       />
-      <div className="mb-6 flex items-start gap-3 rounded-lg border border-warning/50 bg-warning/10 p-4 text-sm">
-        <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0" />
-        <div>
-          <p className="font-semibold">Tout est créé en PAUSED. Activation et budgets : clic admin uniquement. Plafond {cap} €/jour par ad set, {globalCap} €/jour au total.</p>
-          <p className="text-muted-foreground">Aucune campagne, ad set ou pub n'est jamais activé automatiquement. Les plafonds se règlent dans Réglages → Intégrations → Meta.</p>
-          <div className="mt-3 max-w-xl">
-            <div className="mb-1 flex justify-between text-xs"><span>Budgets engagés (ad sets actifs + en pause) : <b>{committed} €</b> / {globalCap} €/jour</span><span className="text-muted-foreground">dont actifs : {activeBudget} €</span></div>
-            <div className="h-2 overflow-hidden rounded-full bg-background">
-              <div className={`h-full ${committed > globalCap * 0.9 ? "bg-danger" : "bg-accent"}`} style={{ width: `${Math.min(100, (committed / Math.max(globalCap, 1)) * 100)}%` }} />
-            </div>
+      <div className="mb-8 grid gap-4 lg:grid-cols-3">
+        <div className="flex items-start gap-4 rounded-xl border border-[#ffe3b0] bg-tint-yellow p-5 lg:col-span-2">
+          <IconTile icon={<ShieldCheck />} tint="yellow" className="bg-white" />
+          <div className="min-w-0">
+            <p className="text-[15px] font-semibold text-foreground">Tout est créé en PAUSED</p>
+            <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">
+              Activation et budgets : clic admin uniquement, jamais automatique. Plafond <b className="text-foreground">{cap} €/jour</b> par ad set,
+              <b className="text-foreground"> {globalCap} €/jour</b> au total (Réglages → Intégrations → Meta).
+            </p>
           </div>
         </div>
+        <Card className="p-5">
+          <div className="flex items-center gap-3">
+            <IconTile icon={<Wallet />} tint={committed > globalCap * 0.9 ? "red" : "blue"} />
+            <div>
+              <p className="text-[13px] font-medium text-muted-foreground">Budgets engagés / jour</p>
+              <p className="tabular text-[22px] font-semibold leading-tight">{committed} € <span className="text-sm font-normal text-subtle-foreground">/ {globalCap} €</span></p>
+            </div>
+          </div>
+          <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-[#f1f3f7]">
+            <div className="h-full rounded-full" style={{ width: `${Math.max(2, Math.min(100, (committed / Math.max(globalCap, 1)) * 100))}%`, background: committed > globalCap * 0.9 ? "#fe504f" : "#004dff" }} />
+          </div>
+          <p className="mt-2 text-xs text-subtle-foreground">Actifs + en pause · dont actifs : {activeBudget} €</p>
+        </Card>
       </div>
 
       {camps.isLoading ? <Spinner /> : (camps.data ?? []).length === 0 ? (
-        <Empty title="Aucune campagne">Crée une campagne : un ad set par pays (ou par zone A/B/C), budget réglable, tout en PAUSED. Génère d'abord des créas dans Recrutement → Créas, puis « Pousser les créas ».</Empty>
+        <Empty title="Aucune campagne" icon={<Megaphone className="h-5 w-5" />} action={<Button onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> Nouvelle campagne</Button>}>Crée une campagne : un ad set par pays (ou par zone A/B/C), budget réglable, tout en PAUSED. Génère d'abord des créas dans Recrutement → Créas, puis « Pousser les créas ».</Empty>
       ) : (
         <div className="space-y-4">
           {(camps.data ?? []).map((c: any) => {
             const total = (c.meta_adsets ?? []).reduce((s: number, a: any) => s + Number(a.daily_budget), 0);
             return (
-              <Card key={c.id}>
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-2"><h3 className="font-semibold">{c.name}</h3><Badge tone={statusTone(c.status)}>{c.status}</Badge></div>
-                    <p className="text-xs text-muted-foreground">Meta {c.meta_id} · créée {dateFr(c.created_at)} · {c.countries.map(flag).join(" ")} · budget total {total} €/j</p>
+              <Card key={c.id} className="p-0">
+                <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-5">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <IconTile icon={<Megaphone />} tint="blue" />
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2"><h3 className="truncate text-[15px] font-semibold">{c.name}</h3><StatusBadge s={c.status} /></div>
+                      <p className="mt-0.5 text-xs text-subtle-foreground">Meta {c.meta_id} · créée {dateFr(c.created_at)} · {c.countries.map(flag).join(" ")} · <span className="tabular">{total} €/j</span></p>
+                    </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" loading={busy === `push-${c.id}`} onClick={() => pushCreatives(c)}><Upload className="h-3.5 w-3.5" /> Pousser les créas</Button>
+                    <Button size="sm" variant="secondary" loading={busy === `push-${c.id}`} onClick={() => pushCreatives(c)}><Upload className="h-3.5 w-3.5" /> Pousser les créas</Button>
                     {c.status === "ACTIVE"
-                      ? <Button size="sm" variant="outline" loading={busy === `pause-${c.id}`} onClick={() => pause("campaign", c)}><Pause className="h-3.5 w-3.5" /> Pause</Button>
-                      : <Button size="sm" variant="outline" loading={busy === `act-${c.id}`} onClick={() => activate("campaign", c, total)}><Play className="h-3.5 w-3.5" /> Activer</Button>}
+                      ? <Button size="sm" variant="secondary" loading={busy === `pause-${c.id}`} onClick={() => pause("campaign", c)}><Pause className="h-3.5 w-3.5" /> Pause</Button>
+                      : <Button size="sm" variant="secondary" loading={busy === `act-${c.id}`} onClick={() => activate("campaign", c, total)}><Play className="h-3.5 w-3.5" /> Activer</Button>}
                   </div>
                 </div>
-                <div className="mt-4 space-y-2">
-                  {(c.meta_adsets ?? []).map((a: any) => (
-                    <div key={a.id} className="rounded-md border p-3">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div className="text-sm"><span className="mr-1">{a.country ? flag(a.country) : adsetCountries(a).map(flag).join("")}</span><span className="font-medium">{a.name}</span> <Badge tone={statusTone(a.status)}>{a.status}</Badge> <span className="text-muted-foreground">· zone {a.zone_code ?? "?"}</span></div>
-                        <div className="flex flex-wrap items-center gap-2">
-                          <BudgetEditor value={Number(a.daily_budget)} max={cap} busy={busy === `budget-${a.id}`} onApply={(v) => setBudget(a, v)} />
-                          <Button size="sm" variant="ghost" onClick={() => setAdFor(a)}><Plus className="h-3.5 w-3.5" /> Ajouter une pub</Button>
+                <Table className="rounded-none rounded-b-xl border-x-0 border-b-0 shadow-none">
+                  <thead><tr><Th>Ad set</Th><Th>Statut</Th><Th>Zone</Th><Th>Budget / jour</Th><Th>Pubs</Th><Th /></tr></thead>
+                  <tbody>
+                    {(c.meta_adsets ?? []).map((a: any) => (
+                      <tr key={a.id}>
+                        <Td><span className="mr-1.5">{a.country ? flag(a.country) : adsetCountries(a).map(flag).join("")}</span><span className="font-medium">{a.name}</span></Td>
+                        <Td><StatusBadge s={a.status} /></Td>
+                        <Td className="text-muted-foreground">{a.zone_code ?? "—"}</Td>
+                        <Td><BudgetEditor value={Number(a.daily_budget)} max={cap} busy={busy === `budget-${a.id}`} onApply={(v) => setBudget(a, v)} /></Td>
+                        <Td>
+                          {(a.meta_ads ?? []).length === 0 ? <span className="text-xs text-subtle-foreground">Aucune</span> : (
+                            <div className="space-y-1">
+                              {a.meta_ads.map((ad: any) => (
+                                <div key={ad.id} className="flex items-center gap-2 text-xs">
+                                  <span className="max-w-56 truncate">{ad.name}</span><StatusBadge s={ad.status} />
+                                  {ad.status === "ACTIVE"
+                                    ? <button className="text-accent hover:underline" onClick={() => pause("ad", ad)}>Pause</button>
+                                    : <button className="text-accent hover:underline" onClick={() => activate("ad", ad, Number(a.daily_budget))}>Activer</button>}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </Td>
+                        <Td className="whitespace-nowrap text-right">
+                          <Button size="sm" variant="ghost" onClick={() => setAdFor(a)}><Plus className="h-3.5 w-3.5" /> Pub</Button>{" "}
                           {a.status === "ACTIVE"
-                            ? <Button size="sm" variant="outline" loading={busy === `pause-${a.id}`} onClick={() => pause("adset", a)}>Pause</Button>
-                            : <Button size="sm" variant="outline" loading={busy === `act-${a.id}`} onClick={() => activate("adset", a, Number(a.daily_budget))}>Activer</Button>}
-                        </div>
-                      </div>
-                      {(a.meta_ads ?? []).length > 0 && (
-                        <ul className="mt-2 space-y-1 pl-6 text-sm">
-                          {a.meta_ads.map((ad: any) => (
-                            <li key={ad.id} className="flex items-center justify-between gap-2">
-                              <span className="truncate">{ad.name} <Badge tone={statusTone(ad.status)}>{ad.status}</Badge></span>
-                              {ad.status === "ACTIVE"
-                                ? <Button size="sm" variant="ghost" onClick={() => pause("ad", ad)}>Pause</Button>
-                                : <Button size="sm" variant="ghost" onClick={() => activate("ad", ad, Number(a.daily_budget))}>Activer</Button>}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                            ? <Button size="sm" variant="secondary" loading={busy === `pause-${a.id}`} onClick={() => pause("adset", a)}>Pause</Button>
+                            : <Button size="sm" variant="secondary" loading={busy === `act-${a.id}`} onClick={() => activate("adset", a, Number(a.daily_budget))}>Activer</Button>}
+                        </Td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
               </Card>
             );
           })}
         </div>
       )}
 
-      <h2 className="mb-3 mt-10 text-lg font-semibold">Métriques par pays (7 derniers jours)</h2>
-      <Table>
-        <thead><tr><Th>Pays / zone</Th><Th>Dépense</Th><Th>Impressions</Th><Th>Clics</Th><Th>CPC</Th><Th>Candidatures</Th><Th>dont Meta (UTM)</Th><Th>Signés</Th><Th>CPL</Th><Th>Coût / signé</Th></tr></thead>
-        <tbody>
-          {metrics.length === 0 ? <tr><Td colSpan={10} className="text-center text-muted-foreground">Pas encore de métriques. Synchronise après diffusion.</Td></tr> : metrics.map(([c, m]) => (
-            <tr key={c}>
-              <Td>{/^[A-Z]{2}$/.test(c) ? `${flag(c)} ${c}` : c}</Td><Td>{m.spend.toFixed(2)} €</Td><Td>{m.impressions}</Td><Td>{m.clicks}</Td>
-              <Td>{m.clicks ? (m.spend / m.clicks).toFixed(2) + " €" : "—"}</Td><Td>{m.apps}</Td><Td>{m.metaApps}</Td><Td>{m.signed}</Td>
-              <Td>{costPer(m.spend, m.metaApps || m.apps) ?? "—"}{costPer(m.spend, m.metaApps || m.apps) !== null && " €"}</Td>
-              <Td>{costPer(m.spend, m.signed) ?? "—"}{costPer(m.spend, m.signed) !== null && " €"}</Td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-
-      <p className="mt-2 text-xs text-muted-foreground">CPL = dépense / candidatures venues de Meta (UTM utm_source=meta), ou toutes les candidatures du pays si aucune UTM. Coût / signé = dépense / créateurs signés.</p>
+      <Card className="mt-8 p-0">
+        <div className="px-6 pt-5"><CardTitle title="Métriques par pays" description="7 derniers jours · CPL = dépense / candidatures venues de Meta (UTM), sinon toutes les candidatures du pays · coût / signé = dépense / créateurs signés" /></div>
+        <Table className="rounded-none rounded-b-xl border-x-0 border-b-0 shadow-none">
+          <thead><tr><Th>Pays / zone</Th><Th num>Dépense</Th><Th num>Impressions</Th><Th num>Clics</Th><Th num>CPC</Th><Th num>Candidatures</Th><Th num>dont Meta</Th><Th num>Signés</Th><Th num>CPL</Th><Th num>Coût / signé</Th></tr></thead>
+          <tbody>
+            {metrics.length === 0 ? <tr><Td colSpan={10} className="text-center text-muted-foreground"><span className="inline-flex items-center gap-2 py-4"><BarChart3 className="h-4 w-4" /> Pas encore de métriques. Synchronise après diffusion.</span></Td></tr> : metrics.map(([c, m]) => (
+              <tr key={c}>
+                <Td className="font-medium">{/^[A-Z]{2}$/.test(c) ? `${flag(c)} ${c}` : c}</Td><Td num>{m.spend.toFixed(2)} €</Td><Td num>{m.impressions}</Td><Td num>{m.clicks}</Td>
+                <Td num>{m.clicks ? (m.spend / m.clicks).toFixed(2) + " €" : "—"}</Td><Td num>{m.apps}</Td><Td num>{m.metaApps}</Td><Td num>{m.signed}</Td>
+                <Td num>{costPer(m.spend, m.metaApps || m.apps) ?? "—"}{costPer(m.spend, m.metaApps || m.apps) !== null && " €"}</Td>
+                <Td num>{costPer(m.spend, m.signed) ?? "—"}{costPer(m.spend, m.signed) !== null && " €"}</Td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </Card>
 
       <NewCampaignDialog open={open} onClose={() => setOpen(false)} cap={cap} countries={(countries.data ?? []).filter((c: any) => c.open)}
         defaultLanding={landing.data?.base_url || location.origin}
@@ -216,9 +237,9 @@ function BudgetEditor({ value, max, busy, onApply }: { value: number; max: numbe
   const [v, setV] = useState(value);
   return (
     <span className="flex items-center gap-1">
-      <Input type="number" min={1} max={max} step="0.5" className="h-8 w-20 text-xs" value={v} onChange={(e) => setV(Number(e.target.value))} />
-      <span className="text-xs text-muted-foreground">€/j</span>
-      <Button size="sm" variant="outline" disabled={v === value || v <= 0 || v > max} loading={busy} onClick={() => onApply(v)}>Appliquer</Button>
+      <Input type="number" min={1} max={max} step="0.5" className="tabular h-8 w-20 text-right text-[13px]" value={v} onChange={(e) => setV(Number(e.target.value))} />
+      <span className="text-xs text-subtle-foreground">€/j</span>
+      <Button size="sm" variant={v === value ? "ghost" : "default"} disabled={v === value || v <= 0 || v > max} loading={busy} onClick={() => onApply(v)}>Appliquer</Button>
     </span>
   );
 }
@@ -275,7 +296,7 @@ function NewCampaignDialog({ open, onClose, cap, countries, defaultLanding, onCr
               <Button size="sm" variant="ghost" onClick={() => setSel([])}>Aucun</Button>
             </div>
             <Input placeholder="Filtrer…" value={q} onChange={(e) => setQ(e.target.value)} className="mb-2" />
-            <div className="grid max-h-48 grid-cols-2 gap-1 overflow-y-auto rounded-md border p-2 text-sm">
+            <div className="grid max-h-48 grid-cols-2 gap-1 overflow-y-auto rounded-xl border p-2 text-sm">
               {shown.map((c) => (
                 <label key={c.code} className="flex items-center gap-2 rounded px-1 py-0.5 hover:bg-muted">
                   <input type="checkbox" checked={sel.includes(c.code)} onChange={(e) => setSel(e.target.checked ? [...sel, c.code] : sel.filter((x) => x !== c.code))} />
@@ -289,7 +310,7 @@ function NewCampaignDialog({ open, onClose, cap, countries, defaultLanding, onCr
           <Field label="Budget par défaut (€/jour par ad set)" hint={`Plafond : ${cap} € par ad set`}><Input type="number" min={1} max={cap} step="0.5" value={budget} onChange={(e) => setBudget(Number(e.target.value))} /></Field>
           <Field label={`Budget par ${mode === "zone" ? "zone" : "pays"}`}>
             {groups.length === 0 ? <p className="text-xs text-muted-foreground">Choisis des pays.</p> : (
-              <div className="max-h-56 space-y-1 overflow-y-auto rounded-md border p-2">
+              <div className="max-h-56 space-y-1 overflow-y-auto rounded-xl border p-2">
                 {groups.map((k) => (
                   <div key={k} className="flex items-center justify-between gap-2 text-sm">
                     <span>{mode === "zone" ? `Zone ${k} (${sel.filter((x) => zoneOf(x) === k).length} pays)` : `${flag(k)} ${k}`}</span>
@@ -337,7 +358,7 @@ function AddAdDialog({ adset, onClose, onCreated }: { adset: any | null; onClose
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {(creatives.data ?? []).map((cr: any) => (
-            <button key={cr.id} disabled={!!busy} onClick={() => pick(cr)} className="overflow-hidden rounded-lg border text-left hover:ring-2 hover:ring-ring">
+            <button key={cr.id} disabled={!!busy} onClick={() => pick(cr)} className="overflow-hidden rounded-xl border text-left transition-shadow hover:ring-2 hover:ring-accent/40">
               {cr.image_path ? <img src={supabase.storage.from("creatives").getPublicUrl(cr.image_path).data.publicUrl} className="aspect-square w-full object-cover" /> : <div className="aspect-square bg-muted" />}
               <div className="p-2 text-xs">{cr.format} · {cr.headline}{busy === cr.id && " …"}</div>
             </button>

@@ -2,12 +2,12 @@ import { useEffect, useMemo } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, ClipboardList, Globe2, Heart, MessageCircle, PenLine, Plus, Share2, TrendingUp, Video, Wallet } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { Badge, Button, Select, Spinner } from "@/components/ui";
+import { Button, IconTile, Select, Spinner, type Tint } from "@/components/ui";
 import { LANGS, uiLangForCountry } from "@/i18n";
-import { formatMoney, monthlyEstimate, rpmLabel, type ZoneRow } from "@shared/zones.ts";
-import { flag } from "@/lib/utils";
+import { formatMoney, monthlyEstimate, type ZoneRow } from "@shared/zones.ts";
+import { cn, flag } from "@/lib/utils";
 import { Logo } from "@/components/brand/Logo";
 
 interface CountryWithZone {
@@ -43,7 +43,7 @@ export function LangSwitcher() {
   const { i18n } = useTranslation();
   return (
     <select aria-label="Language" value={i18n.resolvedLanguage} onChange={(e) => i18n.changeLanguage(e.target.value)}
-      className="h-8 rounded-md border bg-card px-2 text-xs">
+      className="h-8 cursor-pointer rounded-full border border-border-strong bg-white px-3 text-xs font-medium text-muted-foreground hover:text-foreground focus:outline-none">
       {LANGS.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
     </select>
   );
@@ -75,109 +75,170 @@ export default function Landing() {
   const applyHref = `/apply/${code.toLowerCase()}${kept}`;
 
   const selector = (
-    <Select aria-label={t("landing.country")} value={code} className="w-auto min-w-48"
+    <Select aria-label={t("landing.country")} value={code} className="h-12 w-full rounded-lg sm:w-auto sm:min-w-52"
       onChange={(e) => nav(`/join/${e.target.value.toLowerCase()}${kept}`)}>
       <option value="" disabled>{t("landing.country")}</option>
       {openCountries.map((c) => <option key={c.code} value={c.code}>{flag(c.code)} {c.name}</option>)}
     </Select>
   );
 
+  const stepIcons = [ClipboardList, PenLine, Video, Wallet];
+  const stepTints = ["blue", "violet", "cyan", "green"] as const;
+  const rpm = formatMoney(Number(zone?.rpm ?? 0), zone?.currency ?? "USD", lang);
+
   return (
-    <div className="min-h-full bg-background">
-      <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
-        <Logo className="h-7" />
-        <div className="flex items-center gap-2"><LangSwitcher /></div>
+    <div className="min-h-full bg-white">
+      <header className="sticky top-0 z-30 border-b border-transparent bg-white/85 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
+          <Logo className="h-[22px] sm:h-6" />
+          <div className="flex items-center gap-2">
+            <LangSwitcher />
+            {open && <Link to={applyHref} className="hidden sm:block"><Button size="sm">{t("landing.cta")}</Button></Link>}
+          </div>
+        </div>
       </header>
 
       {isLoading ? (
         <div className="flex justify-center py-32"><Spinner /></div>
       ) : !open ? (
         <section className="mx-auto max-w-xl px-6 py-24 text-center">
-          <h1 className="text-3xl font-semibold tracking-tight">{t("landing.badge")}</h1>
-          <p className="mt-4 text-muted-foreground">{code ? t("landing.closed") : t("landing.country")}</p>
+          <span className="mx-auto mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-tint-blue text-accent"><Globe2 className="h-6 w-6" /></span>
+          <h1 className="text-3xl font-semibold tracking-[-0.02em] text-foreground">{t("landing.badge")}</h1>
+          <p className="mt-3 text-muted-foreground">{code ? t("landing.closed") : t("landing.country")}</p>
           <div className="mt-8 flex justify-center">{selector}</div>
         </section>
       ) : (
         <>
-          <section className="mx-auto max-w-5xl px-6 pb-20 pt-10 sm:pt-20">
-            <Badge tone="accent">{t("landing.badge")} · {flag(country!.code)} {country!.name}</Badge>
-            <h1 className="mt-6 max-w-3xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">{t("landing.title", { brand: BRAND })}</h1>
-            <p className="mt-6 max-w-2xl text-lg text-muted-foreground">{t("landing.subtitle", { price })}</p>
-            <div className="mt-10 flex flex-wrap items-center gap-3">
-              <Link to={applyHref}><Button size="lg">{t("landing.cta")} <ArrowRight className="h-4 w-4" /></Button></Link>
-              {selector}
-            </div>
-            <div className="mt-14 grid gap-4 sm:grid-cols-3">
-              <div className="rounded-xl border bg-card p-6">
-                <p className="text-3xl font-semibold">{price}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{t("landing.perVideo")}</p>
+          {/* Hero */}
+          <section className="relative overflow-hidden">
+            <div className="pointer-events-none absolute -right-40 -top-40 h-[520px] w-[520px] rounded-full bg-[radial-gradient(closest-side,#eef3ff,transparent)]" />
+            <div className="pointer-events-none absolute -left-32 top-64 h-[380px] w-[380px] rounded-full bg-[radial-gradient(closest-side,#f3edff,transparent)]" />
+            <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 pb-16 pt-10 sm:px-8 sm:pt-16 lg:grid-cols-[1.15fr_0.85fr] lg:pb-24">
+              <div>
+                <span className="inline-flex items-center gap-2 rounded-full border border-[#dbe5ff] bg-white px-3 py-1 text-xs font-medium text-[#0040d6] shadow-xs">
+                  <span className="h-1.5 w-1.5 rounded-full bg-success" /> {t("landing.badge")} · {flag(country!.code)} {country!.name}
+                </span>
+                <h1 className="mt-6 text-[34px] font-semibold leading-[1.1] tracking-[-0.03em] text-foreground sm:text-5xl lg:text-[56px]">{t("landing.title", { brand: BRAND })}</h1>
+                <p className="mt-5 max-w-xl text-[17px] leading-relaxed text-muted-foreground">{t("landing.subtitle", { price })}</p>
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <Link to={applyHref}><Button size="lg" className="h-12 w-full px-7 text-[15px] sm:w-auto">{t("landing.cta")} <ArrowRight className="h-4 w-4" /></Button></Link>
+                  {selector}
+                </div>
+                <div className="mt-10 grid grid-cols-3 gap-3 sm:max-w-xl">
+                  <PriceCard tint="blue" icon={<Video />} value={price} label={t("landing.perVideo")} />
+                  <PriceCard tint="violet" icon={<TrendingUp />} value={`+${rpm}`} label={t("landing.bonusDetail", { rpm, views: new Intl.NumberFormat(lang).format(zone!.rpm_views) })} />
+                  <PriceCard tint="green" icon={<Wallet />} value={formatMoney(monthlyEstimate({ ...zone!, price_per_video: Number(zone!.price_per_video) }), zone!.currency, lang)}
+                    label={t("landing.monthlyHint")} />
+                </div>
               </div>
-              <div className="rounded-xl border bg-card p-6">
-                <p className="text-3xl font-semibold">+{rpmLabel(zone!, lang).split(" / ")[0]}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{t("landing.bonus")} · {t("landing.bonusDetail", { rpm: formatMoney(Number(zone!.rpm), zone!.currency, lang), views: new Intl.NumberFormat(lang).format(zone!.rpm_views) })}</p>
-              </div>
-              <div className="rounded-xl border bg-card p-6">
-                <p className="text-3xl font-semibold">{t("landing.monthly", { amount: formatMoney(monthlyEstimate({ ...zone!, price_per_video: Number(zone!.price_per_video) }), zone!.currency, lang) })}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{t("landing.monthlyHint")}</p>
+              <div className="relative hidden h-[520px] lg:block">
+                <Phone className="absolute left-4 top-12 rotate-[-5deg]" grad="from-[#8c43ff] to-[#1fafff]" tag="POV" caption="POV: you studied 2h instead of 6h" />
+                <Phone className="absolute right-4 top-0 z-10 rotate-[4deg]" grad="from-[#004dff] to-[#1fafff]" tag="Tuto" caption="3 study hacks I wish I knew" />
+                <div className="absolute bottom-10 left-1/2 z-20 flex -translate-x-1/2 items-center gap-3 rounded-2xl border bg-white px-4 py-3 shadow-[0_16px_40px_-12px_rgba(16,24,40,0.25)]">
+                  <IconTile icon={<Wallet />} tint="green" className="h-10 w-10 rounded-xl" />
+                  <div>
+                    <p className="tabular text-lg font-semibold leading-tight text-foreground">+{formatMoney(Number(zone!.price_per_video) * 2, zone!.currency, lang)}</p>
+                    <p className="text-xs text-muted-foreground">2 × {t("landing.perVideo")}</p>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
 
-          <section className="border-t bg-muted/40">
-            <div className="mx-auto max-w-5xl px-6 py-20">
-              <h2 className="text-2xl font-semibold tracking-tight">{t("landing.how")}</h2>
-              <ol className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-                {steps.map(([title, text], i) => (
-                  <li key={i}>
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground">{i + 1}</span>
-                    <p className="mt-4 font-medium">{title}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">{text}</p>
-                  </li>
-                ))}
+          {/* Étapes */}
+          <section className="border-t border-separator">
+            <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
+              <h2 className="text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">{t("landing.how")}</h2>
+              <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {steps.map(([title, text], i) => {
+                  const Icon = stepIcons[i] ?? Check;
+                  return (
+                    <li key={i} className="rounded-2xl border bg-white p-6 shadow-xs">
+                      <div className="flex items-center justify-between">
+                        <IconTile icon={<Icon />} tint={stepTints[i] ?? "blue"} className="h-10 w-10 rounded-xl" />
+                        <span className="tabular text-xs font-semibold text-subtle-foreground">0{i + 1}</span>
+                      </div>
+                      <p className="mt-5 text-[15px] font-semibold text-foreground">{title}</p>
+                      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{text}</p>
+                    </li>
+                  );
+                })}
               </ol>
             </div>
           </section>
 
-          <section className="mx-auto max-w-5xl px-6 py-20">
-            <h2 className="text-2xl font-semibold tracking-tight">{t("landing.examples")}</h2>
-            <div className="mt-10 grid grid-cols-3 gap-4 sm:gap-8">
-              {[
-                ["POV", "POV: you studied 2h instead of 6h", "from-violet-500/80 to-fuchsia-400/70"],
-                ["Tuto", "3 study hacks I wish I knew", "from-sky-500/80 to-emerald-400/70"],
-                ["Face cam", "Okay this app saved my exam…", "from-amber-500/80 to-rose-400/70"],
-              ].map(([tag, caption, grad]) => (
-                <div key={tag} className="mx-auto w-full max-w-[220px]">
-                  <div className={`relative aspect-[9/16] overflow-hidden rounded-[1.6rem] border-4 border-foreground/80 bg-gradient-to-br ${grad} shadow-lg`}>
-                    <span className="absolute left-3 top-3 rounded-full bg-black/40 px-2 py-0.5 text-[10px] font-medium text-white">{tag}</span>
-                    <p className="absolute inset-x-3 bottom-4 text-xs font-semibold leading-snug text-white drop-shadow sm:text-sm">{caption}</p>
-                  </div>
-                </div>
-              ))}
+          {/* Exemples */}
+          <section className="border-t border-separator">
+            <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
+              <h2 className="text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">{t("landing.examples")}</h2>
+              <div className="mt-10 grid grid-cols-3 gap-3 sm:gap-8">
+                <Phone grad="from-[#8c43ff] to-[#1fafff]" tag="POV" caption="POV: you studied 2h instead of 6h" fluid />
+                <Phone grad="from-[#004dff] to-[#1fafff]" tag="Tuto" caption="3 study hacks I wish I knew" fluid />
+                <Phone grad="from-[#ffbb43] to-[#fe504f]" tag="Face cam" caption="Okay this app saved my exam…" fluid />
+              </div>
             </div>
           </section>
 
-          <section className="border-t">
-            <div className="mx-auto max-w-3xl px-6 py-20">
-              <h2 className="text-2xl font-semibold tracking-tight">{t("landing.faq")}</h2>
-              <div className="mt-8 divide-y rounded-xl border bg-card">
+          {/* FAQ */}
+          <section className="border-t border-separator">
+            <div className="mx-auto max-w-3xl px-5 py-16 sm:px-8 sm:py-24">
+              <h2 className="text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">{t("landing.faq")}</h2>
+              <div className="mt-8 divide-y divide-separator rounded-2xl border bg-white shadow-xs">
                 {faqs.map(([q, a], i) => (
-                  <details key={i} className="group px-5 py-4">
-                    <summary className="flex cursor-pointer list-none items-center justify-between font-medium">
-                      {q}<span className="text-muted-foreground transition-transform group-open:rotate-45">+</span>
+                  <details key={i} className="group px-5 py-4 sm:px-6">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[15px] font-medium text-foreground">
+                      {q}<span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#f1f3f7] text-muted-foreground transition-transform group-open:rotate-45"><Plus className="h-3.5 w-3.5" /></span>
                     </summary>
-                    <p className="mt-2 text-sm text-muted-foreground">{a}</p>
+                    <p className="mt-2 pr-8 text-sm leading-relaxed text-muted-foreground">{a}</p>
                   </details>
                 ))}
               </div>
-              <div className="mt-12 flex flex-col items-center gap-3 text-center">
-                <p className="flex items-center gap-2 text-sm text-muted-foreground"><Check className="h-4 w-4 text-success" /> {t("landing.subtitle", { price })}</p>
-                <Link to={applyHref}><Button size="lg">{t("landing.cta")} <ArrowRight className="h-4 w-4" /></Button></Link>
-              </div>
+            </div>
+          </section>
+
+          {/* CTA final */}
+          <section className="px-5 pb-16 sm:px-8 sm:pb-24">
+            <div className="mx-auto flex max-w-6xl flex-col items-center gap-5 rounded-3xl bg-tint-blue px-6 py-12 text-center sm:py-16">
+              <h2 className="max-w-2xl text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">{t("landing.title", { brand: BRAND })}</h2>
+              <p className="max-w-xl text-muted-foreground">{t("landing.subtitle", { price })}</p>
+              <Link to={applyHref}><Button size="lg" className="h-12 px-7 text-[15px]">{t("landing.cta")} <ArrowRight className="h-4 w-4" /></Button></Link>
             </div>
           </section>
         </>
       )}
-      <footer className="border-t py-8 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} {BRAND}</footer>
+      <footer className="border-t border-separator py-8 text-center text-xs text-subtle-foreground">© {new Date().getFullYear()} {BRAND}</footer>
+
+      {/* CTA collant mobile */}
+      {open && (
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-white/95 p-3 pb-[calc(env(safe-area-inset-bottom)+12px)] backdrop-blur-md sm:hidden">
+          <Link to={applyHref}><Button size="lg" className="h-12 w-full text-[15px]">{t("landing.cta")} · {price} / {t("landing.perVideo")}</Button></Link>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PriceCard({ tint, icon, value, label }: { tint: Tint; icon: React.ReactNode; value: string; label: string }) {
+  return (
+    <div className="rounded-2xl border bg-white p-3.5 shadow-xs sm:p-4">
+      <IconTile icon={icon} tint={tint} className="h-8 w-8" />
+      <p className="tabular mt-3 text-lg font-semibold tracking-[-0.02em] text-foreground sm:text-2xl">{value}</p>
+      <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground sm:text-xs">{label}</p>
+    </div>
+  );
+}
+
+function Phone({ grad, tag, caption, className, small, fluid }: { grad: string; tag: string; caption: string; className?: string; small?: boolean; fluid?: boolean }) {
+  return (
+    <div className={cn(fluid ? "mx-auto w-full max-w-[230px]" : small ? "w-[190px]" : "w-[230px]", className)}>
+      <div className={`relative aspect-[9/16] overflow-hidden rounded-[1.75rem] bg-gradient-to-br ${grad} p-1.5 shadow-[0_24px_48px_-16px_rgba(16,24,40,0.28)] ring-1 ring-black/5`}>
+        <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent" />
+        <span className="absolute left-3 top-3 rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm sm:left-4 sm:top-4">{tag}</span>
+        <div className="absolute bottom-3 right-3 flex flex-col items-center gap-2 text-white/90 sm:bottom-14 sm:right-3.5">
+          <Heart className="hidden h-5 w-5 fill-white/90 sm:block" /><MessageCircle className="hidden h-5 w-5 sm:block" /><Share2 className="hidden h-5 w-5 sm:block" />
+        </div>
+        <p className="absolute inset-x-3 bottom-3 pr-6 text-[11px] font-semibold leading-snug text-white drop-shadow sm:inset-x-4 sm:bottom-4 sm:text-sm sm:pr-10">{caption}</p>
+      </div>
     </div>
   );
 }

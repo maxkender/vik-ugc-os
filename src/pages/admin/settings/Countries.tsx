@@ -88,7 +88,7 @@ export default function Countries() {
         <h2 className="font-semibold">Pays ({countries?.length ?? 0})</h2>
         <div className="flex flex-wrap gap-2">
           <Input placeholder="Rechercher…" value={q} onChange={(e) => setQ(e.target.value)} className="w-48" />
-          <Select value={zoneFilter} onChange={(e) => setZoneFilter(e.target.value)} className="w-40">
+          <Select value={zoneFilter} onChange={(e) => setZoneFilter(e.target.value)} className="w-52">
             <option value="">Toutes les zones</option>
             {zones?.map((z: any) => <option key={z.code} value={z.code}>Zone {z.code} ({counts[z.code] ?? 0})</option>)}
             {counts["—"] ? <option value="—">Sans zone ({counts["—"]})</option> : null}

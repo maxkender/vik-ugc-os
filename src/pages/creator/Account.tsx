@@ -118,7 +118,7 @@ export default function Account() {
               return (
                 <div key={s.handle} className={`flex items-center gap-3 rounded-xl border px-4 py-3 transition-colors ${chosen ? "border-[#cddcff] bg-accent-soft" : "border-border-strong bg-white hover:bg-muted"}`}>
                   <button className="min-w-0 flex-1 text-left" onClick={() => { setTiktok(s.handle); if (!instagram) setInstagram(s.handle); }}>
-                    <p className="truncate font-mono text-[15px] font-semibold text-foreground">@{s.handle}</p>
+                    <p className="truncate text-[15px] font-semibold tracking-[-0.01em] text-foreground">@{s.handle}</p>
                     <p className="mt-1 flex flex-wrap gap-1.5">{availPill("TikTok", s.tiktok)}{availPill("Instagram", s.instagram)}</p>
                   </button>
                   <CopyButton text={s.handle} />
@@ -191,17 +191,17 @@ function Step({ n, title, hint, done, action, children }: { n: number; title: st
   const label = title.replace(/^\d+\.\s*/, "");
   return (
     <section className="rounded-2xl border bg-white p-5 shadow-xs sm:p-6">
-      <div className="mb-4 flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3">
-          <span className={`tabular inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${done ? "bg-tint-green text-success" : "bg-accent-soft text-accent"}`}>
-            {done ? <Check className="h-4 w-4" /> : n}
-          </span>
-          <div>
-            <h2 className="text-[15px] font-semibold leading-8 text-foreground">{label}</h2>
-            {hint && <p className="text-[13px] text-muted-foreground">{hint}</p>}
+      <div className="mb-4">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className={`tabular inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${done ? "bg-tint-green text-success" : "bg-accent-soft text-accent"}`}>
+              {done ? <Check className="h-4 w-4" /> : n}
+            </span>
+            <h2 className="text-[15px] font-semibold text-foreground">{label}</h2>
           </div>
+          {action}
         </div>
-        {action}
+        {hint && <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground sm:ml-11">{hint}</p>}
       </div>
       {children}
     </section>

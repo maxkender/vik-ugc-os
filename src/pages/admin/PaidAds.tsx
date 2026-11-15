@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ExternalLink, Info } from "lucide-react";
+import { ExternalLink, Info, Megaphone } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { Badge, Button, Empty, Input, PageHeader, Select, Spinner, Switch, Table, Td, Th, useToast } from "@/components/ui";
+import { Badge, Button, Empty, IconTile, Input, PageHeader, Select, Spinner, Switch, Table, Td, Th, useToast } from "@/components/ui";
 import { compact, dateFr, flag } from "@/lib/utils";
 
 export default function PaidAds() {
@@ -34,13 +34,13 @@ export default function PaidAds() {
   return (
     <div>
       <PageHeader title="Paid Ads" description="Les vidéos organiques de nos posteurs qui percent, à pousser en pub." />
-      <div className="mb-6 flex items-start gap-3 rounded-lg border bg-muted/40 p-4 text-sm">
-        <Info className="mt-0.5 h-4 w-4 shrink-0" />
-        <p>Squelette : pas d'intégration TikTok Ads pour l'instant. On garde les candidates, le code Spark Ads et un statut ; la création de pub Meta (toujours en PAUSED) viendra ensuite.</p>
+      <div className="mb-8 flex items-start gap-4 rounded-xl border border-[#d8e3ff] bg-tint-blue p-5 text-[13px] leading-relaxed text-muted-foreground">
+        <IconTile icon={<Info />} tint="blue" className="bg-white" />
+        <p><b className="text-foreground">Squelette.</b> Pas d'intégration TikTok Ads pour l'instant. On garde les candidates, le code Spark Ads et un statut ; la création de pub Meta (toujours en PAUSED) viendra ensuite.</p>
       </div>
-      {list.isLoading ? <Spinner /> : (list.data ?? []).length === 0 ? <Empty title="Aucune vidéo postée pour l'instant" /> : (
+      {list.isLoading ? <Spinner /> : (list.data ?? []).length === 0 ? <Empty title="Aucune vidéo postée pour l'instant" icon={<Megaphone className="h-5 w-5" />}>Les vidéos publiées par les posteurs apparaissent ici, triées par vues : marque les meilleures comme candidates.</Empty> : (
         <Table>
-          <thead><tr><Th>Vidéo</Th><Th>Posteur</Th><Th>Vues</Th><Th>Candidate</Th><Th>Code Spark Ads</Th><Th>Statut</Th><Th /></tr></thead>
+          <thead><tr><Th>Vidéo</Th><Th>Posteur</Th><Th num>Vues</Th><Th>Candidate</Th><Th>Code Spark Ads</Th><Th>Statut</Th><Th /></tr></thead>
           <tbody>
             {(list.data ?? []).map((a: any) => {
               const c = cand(a);
@@ -49,19 +49,19 @@ export default function PaidAds() {
                   <Td>
                     <div className="font-medium">{a.briefs?.title}</div>
                     <a href={a.posted_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-accent hover:underline">{a.posted_platform} <ExternalLink className="h-3 w-3" /></a>
-                    <span className="ml-2 text-xs text-muted-foreground">{dateFr(a.posted_at)}</span>
+                    <span className="ml-2 text-xs text-subtle-foreground">{dateFr(a.posted_at)}</span>
                   </Td>
                   <Td>{flag(a.posters?.country)} {a.posters?.display_name}</Td>
-                  <Td><div className="font-semibold">{compact(a.views_d7 ?? a.last_views ?? a.views_d2)}</div><div className="text-xs text-muted-foreground">{a.views_d7 !== null ? "J+7" : a.views_d2 !== null ? "J+2" : "dernier relevé"}</div></Td>
+                  <Td num><div className="font-semibold">{compact(a.views_d7 ?? a.last_views ?? a.views_d2)}</div><div className="text-xs text-subtle-foreground">{a.views_d7 !== null ? "J+7" : a.views_d2 !== null ? "J+2" : "dernier relevé"}</div></Td>
                   <Td><Switch checked={!!c} onChange={(v) => toggle(a, v)} label="Candidate" /></Td>
                   <Td>{c && (
                     <div className="flex gap-1">
                       <Input className="h-8 w-44 text-xs" placeholder="#spark code" value={codes[a.id] ?? c.spark_code ?? ""} onChange={(e) => setCodes({ ...codes, [a.id]: e.target.value })} />
-                      <Button size="sm" variant="outline" onClick={() => upsert(a, { spark_code: codes[a.id] ?? c.spark_code ?? null, status: (codes[a.id] ?? c.spark_code) ? "spark_ready" : c.status })}>OK</Button>
+                      <Button size="sm" variant="secondary" onClick={() => upsert(a, { spark_code: codes[a.id] ?? c.spark_code ?? null, status: (codes[a.id] ?? c.spark_code) ? "spark_ready" : c.status })}>OK</Button>
                     </div>
                   )}</Td>
                   <Td>{c && (
-                    <Select className="h-8 w-40 text-xs" value={c.status} onChange={(e) => upsert(a, { status: e.target.value })}>
+                    <Select className="h-8 py-0 w-40 text-xs" value={c.status} onChange={(e) => upsert(a, { status: e.target.value })}>
                       <option value="candidate">Candidate</option><option value="spark_ready">Spark prêt</option><option value="meta_prepared">Préparée Meta</option><option value="archived">Archivée</option>
                     </Select>
                   )}</Td>

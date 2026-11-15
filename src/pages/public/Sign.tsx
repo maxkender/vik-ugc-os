@@ -96,58 +96,60 @@ export default function Sign() {
   const date = (d: string | null | undefined) => (d ? new Date(d).toLocaleString(i18n.resolvedLanguage) : "");
 
   return (
-    <div className="min-h-full bg-muted/40">
-      <header className="mx-auto flex max-w-3xl items-center justify-between px-6 py-5">
-        <Logo className="h-7" />
-        <LangSwitcher />
+    <div className="min-h-full bg-white">
+      <header className="sticky top-0 z-30 border-b border-separator bg-white/90 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-5">
+          <Logo className="h-[22px]" />
+          <LangSwitcher />
+        </div>
       </header>
-      <main className="mx-auto max-w-3xl px-6 pb-20">
+      <main className="mx-auto max-w-3xl px-5 pb-24 pt-8 sm:pt-12">
         {q.isLoading ? (
           <div className="flex justify-center py-20"><Spinner /></div>
         ) : q.isError || !q.data ? (
           <Card className="p-10 text-center text-muted-foreground">{t("sign.notFound")}</Card>
         ) : status === "signed" ? (
-          <Card className="space-y-4 p-10 text-center">
-            <CheckCircle2 className="mx-auto h-10 w-10 text-success" />
-            <p className="text-lg font-medium">{t("sign.signed", { date: date(signedAt ?? q.data.signed_at) })}</p>
-            <Button variant="outline" onClick={download}><Download className="h-4 w-4" /> {t("sign.download")}</Button>
+          <Card className="space-y-5 rounded-3xl px-6 py-14 text-center">
+            <span className="mx-auto inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-tint-green text-success"><CheckCircle2 className="h-7 w-7" /></span>
+            <p className="mx-auto max-w-md text-lg font-semibold text-foreground">{t("sign.signed", { date: date(signedAt ?? q.data.signed_at) })}</p>
+            <Button variant="secondary" size="lg" onClick={download}><Download className="h-4 w-4" /> {t("sign.download")}</Button>
           </Card>
         ) : status !== "sent" ? (
           <Card className="p-10 text-center text-muted-foreground">{t("sign.expired")}</Card>
         ) : (
           <div className="space-y-6">
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight">{t("sign.title")}</h1>
-              <p className="mt-1 text-sm text-muted-foreground">{t("sign.read")}</p>
+              <h1 className="text-[28px] font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">{t("sign.title")}</h1>
+              <p className="mt-2 text-[15px] text-muted-foreground">{t("sign.read")}</p>
             </div>
             {q.data.summary ? (
               <>
-                <Card className="border-accent/40 bg-accent/5 p-8">
-                  <div className="mb-2 flex items-center gap-2 text-accent"><Sparkles className="h-4 w-4" /></div>
+                <div className="rounded-2xl border border-[#dbe5ff] bg-tint-blue p-6 sm:p-8">
+                  <span className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white text-accent shadow-xs"><Sparkles className="h-4 w-4" /></span>
                   <Markdown text={q.data.summary} />
-                </Card>
-                <Card className="p-0">
-                  <button type="button" onClick={() => setShowFull((v) => !v)} className="flex w-full items-center justify-between px-8 py-4 text-sm font-medium">
+                </div>
+                <Card className="overflow-hidden p-0">
+                  <button type="button" onClick={() => setShowFull((v) => !v)} className="flex w-full items-center justify-between px-6 py-4 text-sm font-semibold text-foreground hover:bg-muted sm:px-8">
                     {FULL_LABEL[(i18n.resolvedLanguage ?? "en").split("-")[0]] ?? FULL_LABEL.en}
                     <ChevronDown className={`h-4 w-4 transition-transform ${showFull ? "rotate-180" : ""}`} />
                   </button>
-                  {showFull && <div className="max-h-[60vh] overflow-y-auto border-t px-8 py-6"><Markdown text={q.data.body.slice(q.data.summary.length).replace(/^\s*---\s*/, "")} /></div>}
+                  {showFull && <div className="max-h-[60vh] overflow-y-auto border-t border-separator px-6 py-6 sm:px-8"><Markdown text={q.data.body.slice(q.data.summary.length).replace(/^\s*---\s*/, "")} /></div>}
                 </Card>
               </>
             ) : (
-              <Card className="max-h-[60vh] overflow-y-auto p-8"><Markdown text={q.data.body} /></Card>
+              <Card className="max-h-[60vh] overflow-y-auto p-6 sm:p-8"><Markdown text={q.data.body} /></Card>
             )}
-            <Card className="space-y-4">
-              <div className="flex items-start gap-2 rounded-md bg-warning/15 p-3 text-sm">
+            <Card className="space-y-5 rounded-2xl">
+              <div className="flex items-start gap-2.5 rounded-xl bg-tint-yellow px-4 py-3 text-sm text-[#7a4f00]">
                 <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> {t("sign.warn")}
               </div>
               <Field label={t("sign.typeName")} hint={t("sign.typeNameHint", { name: `${q.data.first_name} ${q.data.last_name}` })}>
                 <Input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
               </Field>
-              <label className="flex items-start gap-3 text-sm"><input type="checkbox" className="mt-0.5" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} /> {t("sign.accept")}</label>
+              <label className="flex cursor-pointer items-start gap-3 text-sm text-foreground"><input type="checkbox" className="mt-0.5 h-4 w-4 accent-[#004dff]" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} /> {t("sign.accept")}</label>
               {error && <p className="text-sm text-danger">{error}</p>}
-              <Button size="lg" className="w-full" onClick={sign} loading={busy} disabled={!accepted || name.trim().length < 3}>{t("sign.button")}</Button>
-              <p className="break-all text-[11px] text-muted-foreground">SHA-256 · {q.data.doc_hash}</p>
+              <Button size="lg" className="h-12 w-full text-[15px]" onClick={sign} loading={busy} disabled={!accepted || name.trim().length < 3}>{t("sign.button")}</Button>
+              <p className="break-all text-[11px] text-subtle-foreground">SHA-256 · {q.data.doc_hash}</p>
             </Card>
           </div>
         )}

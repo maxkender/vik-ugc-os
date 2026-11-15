@@ -55,7 +55,7 @@ export default function Team() {
       </div>
       <div className="mb-4 flex flex-wrap gap-2">
         <Input className="h-8 w-64 text-xs" placeholder="Rechercher un email, un nom…" value={q} onChange={(e) => setQ(e.target.value)} />
-        <Select className="h-8 w-44 text-xs" value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)}>
+        <Select className="h-8 py-0 w-44 text-xs" value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)}>
           <option value="staff">Équipe (hors posteurs)</option><option value="all">Tout le monde</option>
           <option value="admin">Admins</option><option value="recruiter">Recruteurs</option><option value="controller">Contrôleurs</option><option value="poster">Posteurs</option>
         </Select>
