@@ -3,7 +3,7 @@
 ## V2 : retours de Max (15/11)
 
 **Données concurrents (priorité 1)**
-- Backfill terminé : 56 runs, **4,96 $ réels** (5,28 $ depuis le début), **+1 267 vidéos**. Bibliothèque ≈ 1 700 vidéos.
+- Backfill terminé : 56 runs, **4,96 $ réels** (5,28 $ depuis le début), **+1 267 vidéos**. Bibliothèque : **1 525 vidéos** (533 UGC, 165 pubs).
 - Par concurrent (vidéos UGC / officielles / pubs) :
   - Knowunity : 92 / 32 / 15
   - Astra AI : 116 / 15 / 31
