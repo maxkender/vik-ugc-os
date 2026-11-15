@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { Check, Circle, Clock, Mail, MousePointerClick, Send } from "lucide-react";
-import { Badge, Button, Drawer, Empty, PageHeader, Select, Spinner, Table, Td, Th, useToast } from "@/components/ui";
+import { AlertTriangle, CheckCircle2, Check, Clock, FileSignature, Mail, MailOpen, MousePointerClick, Rocket, Send, UserPlus, Users, X } from "lucide-react";
+import { Badge, Button, Card, Chip, Drawer, Empty, KpiCard, PageHeader, Select, Spinner, useToast } from "@/components/ui";
 import { callFn, supabase } from "@/lib/supabase";
 import { useCountries } from "@/lib/hooks";
 import { cn, dateFr, flag } from "@/lib/utils";
@@ -70,6 +70,41 @@ function computeRow(app: any, events: any[], lastSignIn: string | null): Row {
   return { app, done, current, since, blockedDays: current && since ? (Date.now() - new Date(since).getTime()) / DAY : 0 };
 }
 
+/** Initiale colorée (avatar) déterministe. */
+const AVATAR_TINTS = ["bg-tint-blue text-accent", "bg-tint-violet text-vik-violet", "bg-tint-cyan text-[#0a95e0]", "bg-tint-green text-success", "bg-tint-yellow text-[#b97800]", "bg-tint-red text-vik-red"];
+function Avatar({ name, className }: { name: string; className?: string }) {
+  const i = [...name].reduce((a, c) => a + c.charCodeAt(0), 0) % AVATAR_TINTS.length;
+  return <span className={cn("inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold uppercase", AVATAR_TINTS[i], className)}>{name.trim().charAt(0) || "?"}</span>;
+}
+
+const fmtSince = (days: number) => (days < 1 ? `${Math.max(1, Math.floor(days * 24))} h` : `${Math.floor(days)} j`);
+
+/** Stepper horizontal : 12 points reliés par un trait fin. */
+function Stepper({ r }: { r: Row }) {
+  const late = !!r.current && r.blockedDays >= 2;
+  const curIdx = r.current ? STEPS.findIndex((s) => s.key === r.current) : STEPS.length;
+  return (
+    <div className="flex items-center">
+      {STEPS.map((s, i) => {
+        const at = r.done[s.key];
+        const isCurrent = s.key === r.current;
+        return (
+          <div key={s.key} className="flex items-center">
+            {i > 0 && <span className={cn("h-px w-3 lg:w-4", i <= curIdx ? "bg-[#9ad7b2]" : "bg-border-strong")} />}
+            <span title={`${s.label}${at ? ` · ${dateFr(at, true)}` : isCurrent ? ` · en attente depuis ${fmtSince(r.blockedDays)}` : ""}`}
+              className={cn("flex h-5 w-5 shrink-0 items-center justify-center rounded-full",
+                at ? "bg-tint-green text-success"
+                  : isCurrent ? (late ? "bg-tint-yellow text-[#b97800] ring-2 ring-[#ffbb43]/60" : "bg-white text-accent ring-2 ring-accent")
+                  : "bg-white ring-1 ring-border-strong")}>
+              {at ? <Check className="h-3 w-3" strokeWidth={3} /> : isCurrent ? <span className={cn("h-1.5 w-1.5 rounded-full", late ? "bg-[#ffbb43]" : "bg-accent")} /> : null}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function Onboarding() {
   const toast = useToast();
   const qc = useQueryClient();
@@ -105,6 +140,17 @@ export default function Onboarding() {
     for (const r of data ?? []) if (r.current) m.set(r.current, (m.get(r.current) ?? 0) + 1);
     return m;
   }, [data]);
+  const kpi = useMemo(() => {
+    const all = data ?? [];
+    const weekAgo = Date.now() - 7 * DAY;
+    return {
+      pipeline: all.filter((r) => r.current).length,
+      blocked: all.filter((r) => r.current && r.blockedDays >= 2).length,
+      signedWeek: all.filter((r) => r.done.signed && new Date(r.done.signed).getTime() >= weekAgo).length,
+      active: all.filter((r) => r.done.first_post).length,
+    };
+  }, [data]);
+  const usedCountries = useMemo(() => [...new Set((data ?? []).map((r) => r.app.country))], [data]);
 
   const remind = async (r: Row) => {
     const step = r.current ? REMIND[r.current] : null;
@@ -130,74 +176,99 @@ export default function Onboarding() {
     } catch (e) { toast((e as Error).message, "danger"); } finally { setBusy(null); }
   };
   const remindable = rows.filter((r) => selected.includes(r.app.id) && r.current && REMIND[r.current]).length;
+  const allChecked = rows.length > 0 && selected.length === rows.length;
 
   return (
     <div>
       <PageHeader
-        title="Suivi d'onboarding"
-        description="Où en est chaque créateur, de la candidature au premier post. Une étape en orange bloque depuis plus de 48 h."
-        actions={selected.length > 0 && <Button onClick={remindBulk} loading={busy === "bulk"} disabled={remindable === 0}><Send className="h-4 w-4" /> Relancer la sélection ({remindable})</Button>}
+        title="Onboarding"
+        description="Où en est chaque créateur, de la candidature au premier post. Une étape en jaune bloque depuis plus de 48 h."
       />
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <Select className="h-8 w-44 text-xs" value={country} onChange={(e) => setCountry(e.target.value)}>
-          <option value="">Tous les pays</option>
-          {(countries ?? []).map((c: any) => <option key={c.code} value={c.code}>{flag(c.code)} {c.name}</option>)}
-        </Select>
-        <Select className="h-8 w-52 text-xs" value={stepFilter} onChange={(e) => setStepFilter(e.target.value)}>
-          <option value="">Toutes les étapes en cours</option>
-          {STEPS.map((s) => <option key={s.key} value={s.key}>{s.label} ({counts.get(s.key) ?? 0})</option>)}
-        </Select>
-        <label className="flex items-center gap-1.5 text-xs"><input type="checkbox" checked={blockedOnly} onChange={(e) => setBlockedOnly(e.target.checked)} /> Bloqués &gt; 48 h</label>
-        <span className="ml-auto text-xs text-muted-foreground">{rows.length} créateur(s)</span>
+
+      <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <KpiCard label="En cours" value={kpi.pipeline} icon={<Users />} tint="blue" hint="Créateurs dans le parcours" />
+        <KpiCard label="Bloqués > 48 h" value={kpi.blocked} icon={<AlertTriangle />} tint="yellow" hint={kpi.blocked ? "À relancer" : "Personne ne bloque"} />
+        <KpiCard label="Signés (7 j)" value={kpi.signedWeek} icon={<FileSignature />} tint="violet" hint="Contrats signés cette semaine" />
+        <KpiCard label="Actifs" value={kpi.active} icon={<Rocket />} tint="green" hint="Premier post publié" />
       </div>
+
+      {/* Filtres */}
+      <div className="mb-5 flex flex-wrap items-center gap-2">
+        <Chip active={!stepFilter && !blockedOnly} onClick={() => { setStepFilter(""); setBlockedOnly(false); }}>Tous <span className="tabular text-subtle-foreground">{data?.length ?? 0}</span></Chip>
+        <Chip active={blockedOnly} onClick={() => setBlockedOnly(!blockedOnly)} onClear={() => setBlockedOnly(false)}>
+          <AlertTriangle className="h-3.5 w-3.5" /> Bloqués &gt; 48 h <span className="tabular text-subtle-foreground">{kpi.blocked}</span>
+        </Chip>
+        {STEPS.filter((s) => counts.get(s.key)).map((s) => (
+          <Chip key={s.key} active={stepFilter === s.key} onClick={() => setStepFilter(stepFilter === s.key ? "" : s.key)} onClear={() => setStepFilter("")}>
+            {s.label} <span className="tabular text-subtle-foreground">{counts.get(s.key)}</span>
+          </Chip>
+        ))}
+        <Select className="ml-auto h-8 w-44 rounded-full text-[13px]" value={country} onChange={(e) => setCountry(e.target.value)}>
+          <option value="">Tous les pays</option>
+          {(countries ?? []).filter((c: any) => usedCountries.includes(c.code)).map((c: any) => <option key={c.code} value={c.code}>{flag(c.code)} {c.name}</option>)}
+        </Select>
+      </div>
+
+      {/* Barre d'action groupée */}
+      {selected.length > 0 && (
+        <div className="sticky top-2 z-20 mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-[#cddcff] bg-accent-soft px-4 py-3 shadow-xs">
+          <span className="text-[13px] font-medium text-[#0040d6]">{selected.length} sélectionné(s)</span>
+          <span className="text-xs text-muted-foreground">{remindable} relançable(s) à leur étape actuelle</span>
+          <div className="ml-auto flex gap-2">
+            <Button size="sm" variant="ghost" onClick={() => setSelected([])}><X className="h-3.5 w-3.5" /> Annuler</Button>
+            <Button size="sm" onClick={remindBulk} loading={busy === "bulk"} disabled={remindable === 0}><Send className="h-3.5 w-3.5" /> Relancer la sélection</Button>
+          </div>
+        </div>
+      )}
 
       {isLoading ? <div className="flex justify-center py-20"><Spinner /></div>
         : rows.length === 0 ? (
-          <Empty title={data?.length ? "Aucun créateur pour ces filtres" : "Aucun créateur en cours d'onboarding"}>
-            {data?.length ? "Élargis les filtres." : <>Les candidatures acceptées apparaissent ici, étape par étape. <Link className="underline" to="/admin/recruitment/candidates">Voir les candidats</Link>.</>}
+          <Empty title={data?.length ? "Aucun créateur pour ces filtres" : "Aucun créateur en cours d'onboarding"} icon={<UserPlus className="h-5 w-5" />}
+            action={!data?.length ? <Link to="/admin/recruitment/candidates"><Button variant="secondary">Voir les candidats</Button></Link> : <Button variant="secondary" onClick={() => { setStepFilter(""); setBlockedOnly(false); setCountry(""); }}>Réinitialiser les filtres</Button>}>
+            {data?.length ? "Élargis les filtres pour voir les autres créateurs." : "Dès qu'une candidature est acceptée, le créateur apparaît ici avec ses 12 étapes, de l'email de contrat au premier post."}
           </Empty>
         ) : (
-          <Table>
-            <thead>
-              <tr>
-                <Th className="w-8"><input type="checkbox" checked={selected.length > 0 && selected.length === rows.length} onChange={(e) => setSelected(e.target.checked ? rows.map((r) => r.app.id) : [])} /></Th>
-                <Th>Créateur</Th><Th>Parcours</Th><Th>Bloque sur</Th><Th>Depuis</Th><Th />
-              </tr>
-            </thead>
-            <tbody>
+          <Card className="overflow-hidden p-0">
+            <div className="hidden items-center gap-4 border-b px-5 py-3 text-[11px] font-medium uppercase tracking-[0.06em] text-subtle-foreground md:flex">
+              <input type="checkbox" className="h-4 w-4 accent-[#004dff]" checked={allChecked} onChange={(e) => setSelected(e.target.checked ? rows.map((r) => r.app.id) : [])} />
+              <span className="w-56">Créateur</span><span className="flex-1">Parcours</span><span className="w-44">Étape en cours</span><span className="w-40 text-right">Action</span>
+            </div>
+            <ul>
               {rows.map((r) => {
                 const late = !!r.current && r.blockedDays >= 2;
                 const step = r.current ? REMIND[r.current] : null;
+                const name = `${r.app.first_name} ${r.app.last_name}`;
                 return (
-                  <tr key={r.app.id} className="cursor-pointer hover:bg-muted/40" onClick={() => setOpen(r)}>
-                    <Td><input type="checkbox" onClick={(e) => e.stopPropagation()} checked={selected.includes(r.app.id)} onChange={(e) => setSelected((s) => e.target.checked ? [...s, r.app.id] : s.filter((x) => x !== r.app.id))} /></Td>
-                    <Td><p className="font-medium">{flag(r.app.country)} {r.app.first_name} {r.app.last_name}</p><p className="text-xs text-muted-foreground">{r.app.email}</p></Td>
-                    <Td>
-                      <div className="flex items-center gap-1">
-                        {STEPS.map((s) => {
-                          const at = r.done[s.key];
-                          const isCurrent = s.key === r.current;
-                          return (
-                            <span key={s.key} title={`${s.label}${at ? ` · ${dateFr(at, true)}` : isCurrent ? " · en attente" : ""}`}
-                              className={cn("flex h-5 w-5 items-center justify-center rounded-full border text-[10px]",
-                                at ? "border-success bg-success text-white" : isCurrent ? (late ? "border-warning bg-warning/20" : "border-accent bg-accent/10") : "border-border")}>
-                              {at ? <Check className="h-3 w-3" /> : isCurrent ? <Clock className="h-3 w-3" /> : null}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    </Td>
-                    <Td>{r.current ? <Badge tone={late ? "warning" : "accent"}>{STEPS.find((s) => s.key === r.current)!.label}</Badge> : <Badge tone="success">Terminé</Badge>}</Td>
-                    <Td className={cn("whitespace-nowrap text-xs", late && "font-medium text-[color-mix(in_oklch,var(--warning),black_35%)]")}>{r.current ? `${Math.floor(r.blockedDays)} j ${Math.floor((r.blockedDays % 1) * 24)} h` : "—"}</Td>
-                    <Td className="whitespace-nowrap" >
-                      {step ? <Button size="sm" variant="outline" loading={busy === r.app.id} onClick={(e) => { e.stopPropagation(); remind(r); }}><Send className="h-3.5 w-3.5" /> Relancer ({REMIND_LABEL[step]})</Button>
-                        : r.current === "accepted" ? <Link to="/admin/recruitment/candidates" onClick={(e) => e.stopPropagation()} className="text-xs text-accent underline">Décider</Link> : null}
-                    </Td>
-                  </tr>
+                  <li key={r.app.id} onClick={() => setOpen(r)}
+                    className="flex cursor-pointer flex-col gap-3 border-b border-separator px-5 py-4 transition-colors last:border-b-0 hover:bg-muted md:flex-row md:items-center md:gap-4">
+                    <div className="flex w-full items-center gap-3 md:w-56 md:shrink-0" onClick={(e) => e.stopPropagation()}>
+                      <input type="checkbox" className="h-4 w-4 accent-[#004dff]" checked={selected.includes(r.app.id)} onChange={(e) => setSelected((s) => e.target.checked ? [...s, r.app.id] : s.filter((x) => x !== r.app.id))} />
+                      <button className="flex min-w-0 items-center gap-3 text-left" onClick={() => setOpen(r)}>
+                        <Avatar name={name} />
+                        <span className="min-w-0">
+                          <span className="block truncate text-[14px] font-medium text-foreground">{name}</span>
+                          <span className="block truncate text-xs text-subtle-foreground">{flag(r.app.country)} {countries?.find((c: any) => c.code === r.app.country)?.name ?? r.app.country}</span>
+                        </span>
+                      </button>
+                    </div>
+                    <div className="flex-1 overflow-x-auto"><Stepper r={r} /></div>
+                    <div className="md:w-44">
+                      {r.current ? (
+                        <div>
+                          <p className={cn("text-[13px] font-medium", late ? "text-[#8a5a00]" : "text-foreground")}>{STEPS.find((s) => s.key === r.current)!.label}</p>
+                          <p className={cn("flex items-center gap-1 text-xs", late ? "text-[#b97800]" : "text-subtle-foreground")}><Clock className="h-3 w-3" /> depuis {fmtSince(r.blockedDays)}</p>
+                        </div>
+                      ) : <Badge tone="success"><CheckCircle2 className="h-3 w-3" /> Terminé</Badge>}
+                    </div>
+                    <div className="md:w-40 md:text-right" onClick={(e) => e.stopPropagation()}>
+                      {step ? <Button size="sm" variant={late ? "default" : "secondary"} loading={busy === r.app.id} onClick={() => remind(r)}><Send className="h-3.5 w-3.5" /> Relancer</Button>
+                        : r.current === "accepted" ? <Link to="/admin/recruitment/candidates"><Button size="sm" variant="secondary">Décider</Button></Link> : null}
+                    </div>
+                  </li>
                 );
               })}
-            </tbody>
-          </Table>
+            </ul>
+          </Card>
         )}
       <OnboardingDrawer row={open} onClose={() => setOpen(null)} onRemind={remind} busy={busy} />
     </div>
@@ -206,8 +277,22 @@ export default function Onboarding() {
 
 const EVENT_LABEL: Record<string, string> = {
   ...Object.fromEntries(STEPS.map((s) => [s.key, s.label])),
-  reminder: "Relance", rejected: "Refusée", applied: "Candidature reçue",
+  reminder: "Relance envoyée", rejected: "Refusée", applied: "Candidature reçue",
 };
+const EVENT_ICON: Record<string, any> = {
+  applied: UserPlus, accepted: CheckCircle2, contract_email_sent: Mail, email_opened: MailOpen, link_clicked: MousePointerClick,
+  signed: FileSignature, access_sent: Send, reminder: Send, first_post: Rocket, rejected: X,
+};
+
+function MailStatus({ m }: { m: any }) {
+  if (m.clicked_at) return <Badge tone="violet"><MousePointerClick className="h-3 w-3" /> Cliqué{m.click_count > 1 ? ` ×${m.click_count}` : ""}</Badge>;
+  if (m.opened_at) return <Badge tone="cyan"><MailOpen className="h-3 w-3" /> Ouvert{m.open_count > 1 ? ` ×${m.open_count}` : ""}</Badge>;
+  if (m.status === "sent") return <Badge tone="success"><Check className="h-3 w-3" /> Envoyé</Badge>;
+  if (m.status === "failed") return <Badge tone="danger">Échec</Badge>;
+  if (m.status === "held") return <Badge tone="warning">En attente</Badge>;
+  if (m.status === "cancelled") return <Badge>Annulé</Badge>;
+  return <Badge tone="accent">En file</Badge>;
+}
 
 function OnboardingDrawer({ row, onClose, onRemind, busy }: { row: Row | null; onClose: () => void; onRemind: (r: Row) => void; busy: string | null }) {
   const { data } = useQuery({
@@ -224,27 +309,45 @@ function OnboardingDrawer({ row, onClose, onRemind, busy }: { row: Row | null; o
   });
   if (!row) return null;
   const step = row.current ? REMIND[row.current] : null;
+  const name = `${row.app.first_name} ${row.app.last_name}`;
+  const late = !!row.current && row.blockedDays >= 2;
   return (
-    <Drawer open onClose={onClose} title={`${flag(row.app.country)} ${row.app.first_name} ${row.app.last_name}`}>
+    <Drawer open onClose={onClose} title={<span className="flex items-center gap-3"><Avatar name={name} className="h-8 w-8" /><span>{name} <span className="font-normal text-subtle-foreground">{flag(row.app.country)}</span></span></span>}>
       <div className="space-y-8">
         <div className="flex flex-wrap items-center gap-2 text-sm">
           <span className="text-muted-foreground">{row.app.email}</span>
-          {row.app.posters?.tiktok_handle && <Badge tone="outline">TT @{row.app.posters.tiktok_handle}</Badge>}
-          {row.app.posters?.instagram_handle && <Badge tone="outline">IG @{row.app.posters.instagram_handle}</Badge>}
-          {step && <Button size="sm" className="ml-auto" loading={busy === row.app.id} onClick={() => onRemind(row)}><Send className="h-3.5 w-3.5" /> Relancer ({REMIND_LABEL[step]})</Button>}
+          {row.app.posters?.tiktok_handle && <Badge tone="outline">TikTok @{row.app.posters.tiktok_handle}</Badge>}
+          {row.app.posters?.instagram_handle && <Badge tone="outline">Instagram @{row.app.posters.instagram_handle}</Badge>}
         </div>
 
+        {row.current && (
+          <div className={cn("flex flex-wrap items-center gap-3 rounded-xl px-4 py-3", late ? "bg-tint-yellow" : "bg-accent-soft")}>
+            <Clock className={cn("h-4 w-4", late ? "text-[#b97800]" : "text-accent")} />
+            <div className="min-w-0 flex-1">
+              <p className="text-[13px] font-medium text-foreground">En attente : {STEPS.find((s) => s.key === row.current)!.label}</p>
+              <p className="text-xs text-muted-foreground">depuis {fmtSince(row.blockedDays)}</p>
+            </div>
+            {step && <Button size="sm" loading={busy === row.app.id} onClick={() => onRemind(row)}><Send className="h-3.5 w-3.5" /> Relancer ({REMIND_LABEL[step]})</Button>}
+          </div>
+        )}
+
         <section>
-          <h3 className="mb-3 text-sm font-semibold">Étapes</h3>
-          <ol className="space-y-2">
-            {STEPS.map((s) => {
+          <h3 className="mb-4 text-[11px] font-medium uppercase tracking-[0.08em] text-subtle-foreground">Étapes</h3>
+          <ol className="relative space-y-0">
+            {STEPS.map((s, i) => {
               const at = row.done[s.key];
               const isCurrent = s.key === row.current;
               return (
-                <li key={s.key} className="flex items-center gap-3 text-sm">
-                  {at ? <Check className="h-4 w-4 text-success" /> : isCurrent ? <Clock className="h-4 w-4 text-accent" /> : <Circle className="h-4 w-4 text-border" />}
-                  <span className={cn(!at && !isCurrent && "text-muted-foreground")}>{s.label}</span>
-                  <span className="ml-auto text-xs text-muted-foreground">{at ? dateFr(at, true) : isCurrent ? `en attente depuis ${Math.floor(row.blockedDays)} j` : ""}</span>
+                <li key={s.key} className="relative flex gap-3 pb-4 last:pb-0">
+                  {i < STEPS.length - 1 && <span className={cn("absolute left-[11px] top-6 h-[calc(100%-16px)] w-px", at ? "bg-[#9ad7b2]" : "bg-border-strong")} />}
+                  <span className={cn("relative z-[1] flex h-6 w-6 shrink-0 items-center justify-center rounded-full",
+                    at ? "bg-tint-green text-success" : isCurrent ? (late ? "bg-tint-yellow text-[#b97800] ring-2 ring-[#ffbb43]/60" : "bg-white text-accent ring-2 ring-accent") : "bg-white ring-1 ring-border-strong")}>
+                    {at ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : isCurrent ? <span className={cn("h-2 w-2 rounded-full", late ? "bg-[#ffbb43]" : "bg-accent")} /> : null}
+                  </span>
+                  <div className="flex min-w-0 flex-1 items-baseline justify-between gap-3 pt-0.5">
+                    <span className={cn("text-[13px]", at || isCurrent ? "font-medium text-foreground" : "text-subtle-foreground")}>{s.label}</span>
+                    <span className="tabular shrink-0 text-xs text-subtle-foreground">{at ? dateFr(at, true) : isCurrent ? `en attente · ${fmtSince(row.blockedDays)}` : ""}</span>
+                  </div>
                 </li>
               );
             })}
@@ -252,36 +355,42 @@ function OnboardingDrawer({ row, onClose, onRemind, busy }: { row: Row | null; o
         </section>
 
         <section>
-          <h3 className="mb-3 text-sm font-semibold">Historique</h3>
+          <h3 className="mb-4 text-[11px] font-medium uppercase tracking-[0.08em] text-subtle-foreground">Historique</h3>
           {!data ? <Spinner /> : data.events.length === 0 ? <p className="text-sm text-muted-foreground">Aucun événement enregistré.</p> : (
-            <ul className="space-y-1.5 border-l pl-4 text-sm">
-              {data.events.map((e: any, i: number) => (
-                <li key={i} className="flex gap-3"><span className="w-32 shrink-0 text-xs text-muted-foreground">{dateFr(e.at, true)}</span>
-                  <span>{EVENT_LABEL[e.step] ?? e.step}{e.meta?.step ? ` · ${REMIND_LABEL[e.meta.step] ?? e.meta.step}` : ""}{e.meta?.template ? <span className="text-muted-foreground"> · {e.meta.template}</span> : null}</span></li>
-              ))}
+            <ul className="space-y-3">
+              {data.events.map((e: any, i: number) => {
+                const Icon = EVENT_ICON[e.step] ?? Check;
+                return (
+                  <li key={i} className="flex items-start gap-3">
+                    <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#f1f3f7] text-muted-foreground"><Icon className="h-3.5 w-3.5" /></span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[13px] text-foreground">{EVENT_LABEL[e.step] ?? e.step}{e.meta?.step ? <span className="text-muted-foreground"> · {REMIND_LABEL[e.meta.step] ?? e.meta.step}</span> : null}</p>
+                      <p className="tabular text-xs text-subtle-foreground">{dateFr(e.at, true)}{e.meta?.template ? ` · ${e.meta.template}` : ""}</p>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </section>
 
         <section>
-          <h3 className="mb-3 text-sm font-semibold">Emails</h3>
+          <h3 className="mb-4 text-[11px] font-medium uppercase tracking-[0.08em] text-subtle-foreground">Emails</h3>
           {!data ? <Spinner /> : data.mails.length === 0 ? <p className="text-sm text-muted-foreground">Aucun email pour ce créateur.</p> : (
-            <Table>
-              <thead><tr><Th>Créé</Th><Th>Objet</Th><Th>Statut</Th><Th>Ouvert</Th><Th>Cliqué</Th></tr></thead>
-              <tbody>
-                {data.mails.map((m: any) => (
-                  <tr key={m.id}>
-                    <Td className="whitespace-nowrap text-xs">{dateFr(m.created_at, true)}</Td>
-                    <Td className="max-w-56 truncate text-xs" >{m.subject}</Td>
-                    <Td><Badge tone={m.status === "sent" ? "success" : m.status === "failed" ? "danger" : m.status === "held" ? "warning" : "default"}>{m.status}</Badge>{m.hold_reason && <p className="text-[11px] text-muted-foreground">{m.hold_reason}</p>}</Td>
-                    <Td className="text-xs">{m.opened_at ? <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> {m.open_count}×</span> : "—"}</Td>
-                    <Td className="text-xs">{m.clicked_at ? <span className="flex items-center gap-1"><MousePointerClick className="h-3 w-3" /> {m.click_count}×</span> : "—"}</Td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
+            <ul className="divide-y divide-separator rounded-xl border">
+              {data.mails.map((m: any) => (
+                <li key={m.id} className="flex items-center gap-3 px-4 py-3">
+                  <Mail className="h-4 w-4 shrink-0 text-subtle-foreground" />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[13px] font-medium text-foreground">{m.subject}</p>
+                    <p className="tabular text-xs text-subtle-foreground">{dateFr(m.created_at, true)}{m.hold_reason ? ` · ${m.hold_reason}` : ""}</p>
+                  </div>
+                  <MailStatus m={m} />
+                </li>
+              ))}
+            </ul>
           )}
-          <p className="mt-2 text-xs text-muted-foreground">Ouvertures et clics suivis par nos propres liens (pixel et redirection), même en mode test. Un email « held » est resté dans la boîte d'envoi (mode test sans destinataire ou pas d'expéditeur).</p>
+          <p className="mt-3 text-xs text-subtle-foreground">Ouvertures et clics suivis par nos propres liens (pixel et redirection), même en mode test. « En attente » = resté dans la boîte d'envoi (mode test sans destinataire ou pas d'expéditeur).</p>
         </section>
       </div>
     </Drawer>

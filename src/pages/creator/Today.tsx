@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { ExternalLink } from "lucide-react";
+import { CheckCircle2, Clock, ExternalLink, Lightbulb, Link2, Play, Quote, Send, Sparkles, XCircle } from "lucide-react";
 import { publicUrl, supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
-import { Badge, Button, Card, Empty, Input, Spinner, useToast } from "@/components/ui";
+import { Button, Spinner, useToast } from "@/components/ui";
 import { formatMoney } from "@shared/zones.ts";
+import { cn } from "@/lib/utils";
 import { todayIso, useMyPoster } from "./shared";
 
 interface RefVideo { id: string; url: string | null; thumbnail_path: string | null; thumbnail_src: string | null; video_path: string | null; caption: string | null; platform: string }
@@ -14,10 +15,22 @@ interface Assignment {
   briefs: { title: string; hook: string | null; instructions: string | null; reference_video_id: string | null; videos: RefVideo | null } | null;
 }
 
-const TONE = { todo: "default", posted: "accent", validated: "success", rejected: "danger" } as const;
+const STATUS = {
+  todo: { cls: "bg-[#f1f3f7] text-muted-foreground", icon: Clock },
+  posted: { cls: "bg-tint-blue text-[#0040d6]", icon: Send },
+  validated: { cls: "bg-tint-green text-[#0b7a3c]", icon: CheckCircle2 },
+  rejected: { cls: "bg-tint-red text-[#c42a2d]", icon: XCircle },
+} as const;
+
+function StatusPill({ status }: { status: Assignment["status"] }) {
+  const { t } = useTranslation();
+  const s = STATUS[status];
+  return <span className={cn("inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold", s.cls)}><s.icon className="h-3.5 w-3.5" />{t(`creator.status.${status}`)}</span>;
+}
 
 function Reference({ v }: { v: RefVideo }) {
   const { t } = useTranslation();
+  const [play, setPlay] = useState(false);
   const signed = useQuery({
     queryKey: ["ref-video", v.video_path],
     enabled: !!v.video_path,
@@ -25,20 +38,34 @@ function Reference({ v }: { v: RefVideo }) {
     staleTime: 50 * 60_000,
   });
   const thumb = publicUrl("thumbnails", v.thumbnail_path) ?? v.thumbnail_src;
+  const canPlay = !!(v.video_path && signed.data);
   return (
-    <div className="space-y-2">
-      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t("creator.reference")}</p>
-      {v.video_path && signed.data ? (
-        <video src={signed.data} controls playsInline className="aspect-[9/16] max-h-[480px] w-auto rounded-lg bg-black" poster={thumb ?? undefined} />
-      ) : thumb ? (
-        <img src={thumb} alt="" className="aspect-[9/16] max-h-[360px] w-auto rounded-lg bg-muted object-cover" loading="lazy" />
-      ) : null}
-      {v.url && <a href={v.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sm text-accent hover:underline"><ExternalLink className="h-3.5 w-3.5" /> {t("creator.openOriginal")}</a>}
+    <div>
+      <p className="mb-2 text-xs font-medium text-subtle-foreground">{t("creator.reference")}</p>
+      <div className="relative mx-auto aspect-[9/16] w-full max-w-[260px] overflow-hidden rounded-2xl bg-[#0b1530] ring-1 ring-border sm:mx-0">
+        {canPlay && play ? (
+          <video src={signed.data!} controls autoPlay playsInline className="h-full w-full object-cover" poster={thumb ?? undefined} />
+        ) : (
+          <>
+            {thumb && <img src={thumb} alt="" className="h-full w-full object-cover" loading="lazy" onError={(e) => ((e.target as HTMLImageElement).style.visibility = "hidden")} />}
+            {canPlay ? (
+              <button onClick={() => setPlay(true)} className="absolute inset-0 flex items-center justify-center bg-black/10 transition-colors hover:bg-black/20" aria-label="Play">
+                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/95 shadow-lg"><Play className="ml-0.5 h-6 w-6 fill-[#0b1530] text-[#0b1530]" /></span>
+              </button>
+            ) : !thumb && <div className="absolute inset-0 flex items-center justify-center text-white/50"><Play className="h-8 w-8" /></div>}
+          </>
+        )}
+      </div>
+      {v.url && (
+        <a href={v.url} target="_blank" rel="noreferrer" className="mt-2.5 inline-flex items-center gap-1.5 text-[13px] font-medium text-accent hover:underline">
+          <ExternalLink className="h-3.5 w-3.5" /> {t("creator.openOriginal")}
+        </a>
+      )}
     </div>
   );
 }
 
-function AssignmentCard({ a, compact }: { a: Assignment; compact?: boolean }) {
+function BriefCard({ a, index }: { a: Assignment; index: number }) {
   const { t, i18n } = useTranslation();
   const qc = useQueryClient();
   const toast = useToast();
@@ -55,32 +82,90 @@ function AssignmentCard({ a, compact }: { a: Assignment; compact?: boolean }) {
       qc.invalidateQueries({ queryKey: ["my-assignments"] });
     }
   };
+  const valid = /^https?:\/\//i.test(url.trim());
   return (
-    <Card className="space-y-4">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h3 className="font-semibold">{b?.title}</h3>
-          <p className="text-xs text-muted-foreground">{t("creator.due", { date: new Date(`${a.due_date}T12:00:00Z`).toLocaleDateString(i18n.resolvedLanguage) })}</p>
+    <article className="overflow-hidden rounded-2xl border bg-white shadow-xs">
+      <div className="flex items-start justify-between gap-3 border-b border-separator px-5 py-4">
+        <div className="flex min-w-0 items-start gap-3">
+          <span className="tabular mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-soft text-[13px] font-semibold text-accent">{index + 1}</span>
+          <div className="min-w-0">
+            <h3 className="text-[15px] font-semibold leading-snug text-foreground">{b?.title}</h3>
+            <p className="mt-0.5 text-xs text-subtle-foreground">{t("creator.due", { date: new Date(`${a.due_date}T12:00:00Z`).toLocaleDateString(i18n.resolvedLanguage, { weekday: "long", day: "numeric", month: "long" }) })}</p>
+          </div>
         </div>
-        <Badge tone={TONE[a.status]}>{t(`creator.status.${a.status}`)}</Badge>
+        <StatusPill status={a.status} />
       </div>
-      {!compact && (
-        <>
-          {b?.hook && <div><p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t("creator.hook")}</p><p className="mt-1 text-lg font-medium">“{b.hook}”</p></div>}
-          {b?.instructions && <div><p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t("creator.instructions")}</p><p className="mt-1 whitespace-pre-line text-sm">{b.instructions}</p></div>}
-          {b?.videos && <Reference v={b.videos} />}
-        </>
-      )}
-      {a.status === "rejected" && a.rejection_reason && <p className="rounded-md bg-danger/10 p-3 text-sm text-danger">{t("creator.rejectedReason", { reason: a.rejection_reason })}</p>}
-      {a.status === "validated" ? (
-        a.posted_url && <a href={a.posted_url} target="_blank" rel="noreferrer" className="block truncate text-sm text-accent hover:underline">{a.posted_url}</a>
-      ) : (
-        <div className="flex gap-2">
-          <Input type="url" placeholder="https://www.tiktok.com/@you/video/…" value={url} onChange={(e) => setUrl(e.target.value)} aria-label={t("creator.postedLink")} />
-          <Button onClick={submit} loading={busy} disabled={!/^https?:\/\//i.test(url.trim()) || url.trim() === (a.posted_url ?? "")}>{t("creator.submit")}</Button>
+
+      <div className="space-y-5 px-5 py-5">
+        {b?.hook && (
+          <div className="rounded-xl bg-tint-blue px-4 py-3.5">
+            <p className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-[#0040d6]"><Quote className="h-3.5 w-3.5" /> {t("creator.hook")}</p>
+            <p className="text-[17px] font-semibold leading-snug text-[#0b1530]">{b.hook}</p>
+          </div>
+        )}
+        <div className="grid gap-5 sm:grid-cols-[1fr_auto] sm:items-start">
+          {b?.instructions && (
+            <div className="order-2 sm:order-1">
+              <p className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-subtle-foreground"><Lightbulb className="h-3.5 w-3.5" /> {t("creator.instructions")}</p>
+              <p className="whitespace-pre-line text-[14px] leading-relaxed text-foreground">{b.instructions}</p>
+            </div>
+          )}
+          {b?.videos && <div className="order-1 sm:order-2 sm:w-[200px]"><Reference v={b.videos} /></div>}
         </div>
-      )}
-    </Card>
+
+        {a.status === "rejected" && a.rejection_reason && (
+          <div className="flex gap-2.5 rounded-xl bg-tint-red px-4 py-3 text-sm text-[#a52326]">
+            <XCircle className="mt-0.5 h-4 w-4 shrink-0" /> {t("creator.rejectedReason", { reason: a.rejection_reason })}
+          </div>
+        )}
+
+        {a.status === "validated" ? (
+          a.posted_url && (
+            <a href={a.posted_url} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-xl bg-tint-green px-4 py-3 text-sm font-medium text-[#0b7a3c]">
+              <CheckCircle2 className="h-4 w-4 shrink-0" /> <span className="truncate">{a.posted_url}</span>
+            </a>
+          )
+        ) : (
+          <div className="rounded-xl border border-border-strong bg-muted p-3">
+            <label className="mb-2 flex items-center gap-1.5 px-1 text-xs font-medium text-muted-foreground"><Link2 className="h-3.5 w-3.5" /> {t("creator.postedLink")}</label>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <input type="url" inputMode="url" placeholder="https://www.tiktok.com/@you/video/…" value={url} onChange={(e) => setUrl(e.target.value)} aria-label={t("creator.postedLink")}
+                className="h-12 w-full rounded-lg border border-border-strong bg-white px-3.5 text-[15px] placeholder:text-subtle-foreground focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/10" />
+              <Button size="lg" className="h-12 shrink-0 sm:px-6" onClick={submit} loading={busy} disabled={!valid || url.trim() === (a.posted_url ?? "")}>
+                <Send className="h-4 w-4" /> {t("creator.submit")}
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    </article>
+  );
+}
+
+function EarlierRow({ a }: { a: Assignment }) {
+  const { i18n } = useTranslation();
+  return (
+    <div className="flex items-center justify-between gap-3 px-4 py-3.5">
+      <div className="min-w-0">
+        <p className="truncate text-sm font-medium text-foreground">{a.briefs?.title}</p>
+        <p className="text-xs text-subtle-foreground">{new Date(`${a.due_date}T12:00:00Z`).toLocaleDateString(i18n.resolvedLanguage, { day: "numeric", month: "short" })}
+          {a.posted_url && <> · <a href={a.posted_url} target="_blank" rel="noreferrer" className="text-accent hover:underline">{hostOf(a.posted_url)}</a></>}
+        </p>
+      </div>
+      <StatusPill status={a.status} />
+    </div>
+  );
+}
+
+const hostOf = (u: string) => { try { return new URL(u).hostname.replace("www.", ""); } catch { return u; } };
+
+function ProgressRing({ done, total }: { done: number; total: number }) {
+  const r = 26, c = 2 * Math.PI * r, pct = total ? Math.min(1, done / total) : 0;
+  return (
+    <svg viewBox="0 0 64 64" className="h-16 w-16 shrink-0 -rotate-90">
+      <circle cx="32" cy="32" r={r} fill="none" stroke="#eef0f4" strokeWidth="6" />
+      <circle cx="32" cy="32" r={r} fill="none" stroke={pct >= 1 ? "#12a150" : "#004dff"} strokeWidth="6" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - pct)} className="transition-all duration-500" />
+    </svg>
   );
 }
 
@@ -105,23 +190,52 @@ export default function Today() {
   const earlier = list.filter((a) => !current.includes(a));
   const z = poster.data?.zones;
   const lang = i18n.resolvedLanguage ?? "en";
+  const goal = z?.videos_per_day ?? 2;
+  const doneToday = list.filter((a) => a.due_date === today && (a.status === "posted" || a.status === "validated")).length;
+  const first = (profile?.full_name ?? "").split(" ")[0];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">{t("creator.hello", { name: (profile?.full_name ?? "").split(" ")[0] })}</h1>
-        {z && <p className="mt-1 text-sm text-muted-foreground">{t("creator.rate", { price: formatMoney(Number(z.price_per_video), z.currency, lang), rpm: formatMoney(Number(z.rpm), z.currency, lang), views: new Intl.NumberFormat(lang).format(z.rpm_views) })}</p>}
-      </div>
-      <section className="space-y-4">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">{t("creator.todayTitle")}</h2>
-        {q.isLoading ? <Spinner /> : current.length === 0 ? <Empty title={t("creator.none")} /> : current.map((a) => <AssignmentCard key={a.id} a={a} />)}
+    <div className="space-y-8">
+      <section className="flex items-center gap-4 rounded-2xl border bg-white p-5 shadow-xs">
+        <div className="relative">
+          <ProgressRing done={doneToday} total={goal} />
+          <span className="tabular absolute inset-0 flex items-center justify-center text-[15px] font-semibold text-foreground">{doneToday}/{goal}</span>
+        </div>
+        <div className="min-w-0">
+          <h1 className="text-xl font-semibold tracking-[-0.01em] text-foreground">{t("creator.hello", { name: first })} 👋</h1>
+          <p className="mt-0.5 text-sm text-muted-foreground">{t("creator.todayTitle")} · {doneToday}/{goal}</p>
+          {z && (
+            <p className="mt-2 inline-flex flex-wrap items-center gap-1.5 rounded-full bg-tint-green px-2.5 py-1 text-xs font-medium text-[#0b7a3c]">
+              <Sparkles className="h-3.5 w-3.5" />
+              {t("creator.rate", { price: formatMoney(Number(z.price_per_video), z.currency, lang), rpm: formatMoney(Number(z.rpm), z.currency, lang), views: new Intl.NumberFormat(lang).format(z.rpm_views) })}
+            </p>
+          )}
+        </div>
       </section>
+
+      <section className="space-y-4">
+        <h2 className="text-[13px] font-semibold text-muted-foreground">{t("creator.todayTitle")}</h2>
+        {q.isLoading ? <div className="flex justify-center py-10"><Spinner /></div>
+          : current.length === 0 ? (
+            <div className="flex flex-col items-center rounded-2xl border border-dashed border-border-strong bg-white px-6 py-12 text-center">
+              <span className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-tint-blue text-accent"><CalendarIcon /></span>
+              <p className="max-w-xs text-sm text-muted-foreground">{t("creator.none")}</p>
+            </div>
+          ) : current.map((a, i) => <BriefCard key={a.id} a={a} index={i} />)}
+      </section>
+
       {earlier.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">{t("creator.earlier")}</h2>
-          {earlier.map((a) => <AssignmentCard key={a.id} a={a} compact />)}
+          <h2 className="text-[13px] font-semibold text-muted-foreground">{t("creator.earlier")}</h2>
+          <div className="divide-y divide-separator overflow-hidden rounded-2xl border bg-white shadow-xs">
+            {earlier.map((a) => <EarlierRow key={a.id} a={a} />)}
+          </div>
         </section>
       )}
     </div>
   );
+}
+
+function CalendarIcon() {
+  return <Clock className="h-6 w-6" />;
 }

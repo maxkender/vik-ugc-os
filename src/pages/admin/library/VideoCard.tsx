@@ -1,19 +1,38 @@
 import { memo, useRef, useState } from "react";
-import { Eye, Heart, Megaphone, Play } from "lucide-react";
+import { Eye, Heart, Instagram, Megaphone, Music2, Zap } from "lucide-react";
+import { MetricPill } from "@/components/ui";
 import { cn, compact, flag } from "@/lib/utils";
-import type { Video } from "./types";
+import { ORIGIN_LABEL, PLATFORM_LABEL, pct, type Video } from "./types";
 import { playableUrl, thumbOf } from "./media";
 
-function PlatformDot({ p }: { p: Video["platform"] }) {
-  const label = p === "tiktok" ? "TT" : p === "instagram" ? "IG" : "Ads";
-  return <span className="rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-semibold text-white backdrop-blur">{label}</span>;
+export function PlatformIcon({ p, className }: { p: Video["platform"]; className?: string }) {
+  const I = p === "tiktok" ? Music2 : p === "instagram" ? Instagram : Megaphone;
+  return <I className={className} />;
 }
 
-export const VideoCard = memo(function VideoCard({ v, fav, onOpen, onFav, categoryName }: {
-  v: Video; fav: boolean; onOpen: () => void; onFav: () => void; categoryName?: string;
+/** Fond de remplacement quand la miniature manque (dégradé doux teinté par plateforme). */
+export function ThumbPlaceholder({ v, size = "lg" }: { v: Pick<Video, "platform" | "author_handle" | "ad_page_name">; size?: "lg" | "sm" }) {
+  const bg = v.platform === "tiktok" ? "from-[#eef3ff] via-[#f3edff] to-[#e8f7ff]" : v.platform === "instagram" ? "from-[#f3edff] via-[#ffeded] to-[#fff6e5]" : "from-[#fff6e5] via-[#eef3ff] to-[#f3edff]";
+  return (
+    <div className={cn("absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br", bg)}>
+      <span className={cn("flex items-center justify-center rounded-full bg-white/80 text-[#5b6478] shadow-xs", size === "lg" ? "h-11 w-11" : "h-6 w-6")}>
+        <PlatformIcon p={v.platform} className={size === "lg" ? "h-5 w-5" : "h-3 w-3"} />
+      </span>
+      {size === "lg" && <span className="max-w-[80%] truncate text-[11px] font-medium text-[#5b6478]">@{v.author_handle ?? v.ad_page_name ?? "?"}</span>}
+    </div>
+  );
+}
+
+const ORIGIN_TONE: Record<string, string> = {
+  ugc: "bg-white/90 text-[#0040d6]", official: "bg-white/90 text-[#7a32ef]", ad: "bg-white/90 text-[#8a5a00]", other: "bg-white/90 text-[#5b6478]",
+};
+
+export const VideoCard = memo(function VideoCard({ v, fav, onOpen, onFav, categoryName, competitorName }: {
+  v: Video; fav: boolean; onOpen: () => void; onFav: () => void; categoryName?: string; competitorName?: string;
 }) {
   const [src, setSrc] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
+  const [imgOk, setImgOk] = useState(true);
   const timer = useRef<number | null>(null);
   const thumb = thumbOf(v);
   const enter = () => {
@@ -24,31 +43,51 @@ export const VideoCard = memo(function VideoCard({ v, fav, onOpen, onFav, catego
     if (timer.current) clearTimeout(timer.current);
     setSrc(null);
   };
-  const scoreTone = v.score >= 75 ? "bg-success" : v.score >= 50 ? "bg-accent" : "bg-black/60";
+  const scoreTone = v.score >= 80 ? "bg-[#12a150] text-white" : v.score >= 60 ? "bg-accent text-white" : "bg-white/90 text-foreground";
   return (
     <div className="group cursor-pointer" onClick={onOpen} onMouseEnter={enter} onMouseLeave={leave}>
-      <div className="relative aspect-[9/16] overflow-hidden rounded-lg bg-muted">
-        {thumb ? <img src={thumb} alt="" loading="lazy" className="h-full w-full object-cover" onError={(e) => ((e.target as HTMLImageElement).style.visibility = "hidden")} />
-          : <div className="flex h-full items-center justify-center text-muted-foreground"><Play className="h-8 w-8" /></div>}
+      <div className="relative aspect-[9/16] overflow-hidden rounded-xl bg-muted shadow-xs ring-1 ring-border transition-all duration-200 group-hover:-translate-y-0.5 group-hover:shadow-[0_12px_28px_-10px_rgba(16,24,40,0.25)]">
+        {(!thumb || !imgOk) && <ThumbPlaceholder v={v} />}
+        {thumb && imgOk && <img src={thumb} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" onError={() => setImgOk(false)} />}
         {src && <video src={src} autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover" onError={() => { setFailed(true); setSrc(null); }} />}
-        <div className="absolute left-2 top-2 flex gap-1"><PlatformDot p={v.platform} />{v.video_path && <span className="rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-white">MP4</span>}</div>
-        <span className={cn("absolute right-2 top-2 rounded px-1.5 py-0.5 text-[11px] font-semibold text-white", scoreTone)} title="Score de performance">{Math.round(v.score)}</span>
-        <button onClick={(e) => { e.stopPropagation(); onFav(); }} className="absolute bottom-2 right-2 rounded-full bg-black/50 p-1.5 text-white opacity-0 transition-opacity group-hover:opacity-100 data-[fav=true]:opacity-100" data-fav={fav} aria-label="Favori">
-          <Heart className={cn("h-4 w-4", fav && "fill-red-500 text-red-500")} />
+
+        <div className="absolute left-2.5 right-2.5 top-2.5 flex items-start justify-between gap-1">
+          <div className="flex flex-wrap gap-1">
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-foreground shadow-xs" title={PLATFORM_LABEL[v.platform]}><PlatformIcon p={v.platform} className="h-3.5 w-3.5" /></span>
+            {v.origin && v.origin !== "other" && <span className={cn("inline-flex h-6 items-center rounded-full px-2 text-[11px] font-semibold shadow-xs", ORIGIN_TONE[v.origin])}>{ORIGIN_LABEL[v.origin]}</span>}
+          </div>
+          <span className={cn("tabular inline-flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-[11px] font-bold shadow-xs", scoreTone)} title="Score de performance">{Math.round(v.score)}</span>
+        </div>
+
+        <button onClick={(e) => { e.stopPropagation(); onFav(); }} data-fav={fav} aria-label="Favori"
+          className="absolute right-2.5 top-11 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-foreground opacity-0 shadow-xs transition-opacity group-hover:opacity-100 data-[fav=true]:opacity-100">
+          <Heart className={cn("h-3.5 w-3.5", fav && "fill-[#fe504f] text-[#fe504f]")} />
         </button>
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2 pt-8 text-xs text-white">
+
+        <div className="absolute inset-x-0 bottom-0 flex flex-wrap gap-1 bg-gradient-to-t from-black/65 via-black/25 to-transparent p-2.5 pt-12">
           {v.is_ad ? (
-            <span className="flex items-center gap-1"><Megaphone className="h-3 w-3" /> {v.ad_days ?? "?"} j {v.ad_active ? "· active" : ""}</span>
+            <MetricPill tone="dark" icon={<Megaphone />}>Diffusée depuis {v.ad_days ?? "?"} j{v.ad_active ? " · active" : ""}</MetricPill>
           ) : (
-            <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {compact(v.views)}</span>
+            <>
+              <MetricPill tone="dark" icon={<Eye />}>{compact(v.views)}</MetricPill>
+              {v.engagement !== null && v.engagement !== undefined && <MetricPill tone="dark" icon={<Heart />}>{pct(v.engagement)}</MetricPill>}
+              {v.outlier !== null && v.outlier !== undefined && Number(v.outlier) >= 10 && <MetricPill tone="dark" icon={<Zap />}>×{Math.round(Number(v.outlier))}</MetricPill>}
+            </>
           )}
         </div>
       </div>
-      <div className="mt-1.5 space-y-0.5 px-0.5">
-        <p className="truncate text-xs font-medium">@{v.author_handle ?? v.ad_page_name ?? "?"} <span className="text-muted-foreground">{flag(v.country)} {v.language ?? ""}</span></p>
-        <p className="line-clamp-2 text-xs text-muted-foreground">{v.caption || "—"}</p>
-        {categoryName && <p className="text-[11px] text-accent">{categoryName}</p>}
+      <div className="mt-2.5 flex items-start gap-2 px-0.5">
+        <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-tint-violet text-[10px] font-semibold uppercase text-[#7a32ef]">
+          {(v.author_handle ?? v.ad_page_name ?? "?").replace(/^@/, "").charAt(0)}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[13px] font-medium text-foreground">@{v.author_handle ?? v.ad_page_name ?? "?"}</p>
+          <p className="truncate text-xs text-subtle-foreground">
+            {competitorName ?? "Hors concurrents"}{categoryName ? ` · ${categoryName}` : ""}{v.country ? ` · ${flag(v.country)}` : v.language ? ` · ${v.language}` : ""}
+          </p>
+        </div>
       </div>
     </div>
   );
 });
+
