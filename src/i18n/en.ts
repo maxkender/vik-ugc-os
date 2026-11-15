@@ -76,7 +76,7 @@ const en = {
     nav: { today: "Today", stats: "Views", payments: "Payments" },
     hello: "Hi {{name}}",
     todayTitle: "Your briefs for today", none: "No brief for today yet. New briefs arrive every morning.",
-    due: "Due {{date}}", hook: "Hook", instructions: "Instructions", reference: "Reference video", openOriginal: "Open the original",
+    due: "Due {{date}}", hook: "Hook", instructions: "Instructions", reference: "Reference video", openOriginal: "Open the original", assets: "Files for this video", download: "Download",
     postedLink: "Link to your posted video", submit: "Submit", submitted: "Submitted ✓",
     status: { todo: "To do", posted: "Posted", validated: "Validated", rejected: "Needs changes" },
     earlier: "Earlier briefs", rejectedReason: "Feedback: {{reason}}",

@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth";
 import { cn, compact, dateFr, flag } from "@/lib/utils";
 import { AssignBriefDialog } from "./library/AssignBriefDialog";
 import { thumbOf } from "./library/media";
+import { BriefAssetsPicker } from "./assets/BriefAssets";
 import { VideoPlayer } from "./library/VideoPlayer";
 import type { Video } from "./library/types";
 import { createContext, useContext } from "react";
@@ -224,6 +225,7 @@ function BriefDrawer({ brief, onClose, onReview }: { brief: any; onClose: () => 
             <p className="mt-1 whitespace-pre-wrap text-sm text-foreground">{brief.instructions}</p>
           </div>
         )}
+        <BriefAssetsPicker briefId={brief.id} appId={brief.app_id ?? null} />
         <section>
           <h3 className="mb-3 text-[11px] font-medium uppercase tracking-[0.08em] text-subtle-foreground">Assignations</h3>
           {isLoading ? <Spinner /> : (data ?? []).length === 0 ? <p className="text-sm text-muted-foreground">Pas encore assigné : la répartition du matin s'en charge pour les briefs « pool ».</p> : (

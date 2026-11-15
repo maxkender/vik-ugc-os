@@ -69,7 +69,7 @@ const fr: Dict = {
     nav: { today: "Aujourd'hui", stats: "Vues", payments: "Paiements" },
     hello: "Salut {{name}}",
     todayTitle: "Tes briefs du jour", none: "Pas encore de brief aujourd'hui. Les nouveaux arrivent chaque matin.",
-    due: "Pour le {{date}}", hook: "Hook", instructions: "Consignes", reference: "Vidéo de référence", openOriginal: "Ouvrir l'original",
+    due: "Pour le {{date}}", hook: "Hook", instructions: "Consignes", reference: "Vidéo de référence", openOriginal: "Ouvrir l'original", assets: "Fichiers à utiliser", download: "Télécharger",
     postedLink: "Lien de ta vidéo publiée", submit: "Envoyer", submitted: "Envoyé ✓",
     status: { todo: "À faire", posted: "Posté", validated: "Validé", rejected: "À reprendre" },
     earlier: "Briefs précédents", rejectedReason: "Retour : {{reason}}",

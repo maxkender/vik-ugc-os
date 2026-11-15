@@ -7,12 +7,16 @@ import { authorUrl } from "@shared/playback.ts";
 import { compact, dateFr, flag } from "@/lib/utils";
 import { PlatformIcon, displayName } from "./VideoCard";
 import { PLATFORM_LABEL, pct, times, type Video } from "./types";
+import { VideoInsights } from "./Insights";
+import type { Cat } from "./Badges";
+import { playInline } from "@/components/video/inlinePlay";
 
 /**
  * Lecteur plein écran 9:16 pour toute liste de vidéos (bibliothèque, concurrents, pubs, briefs).
  * ← → : vidéo précédente / suivante dans la liste affichée ; Échap : fermer.
  */
-export function VideoPlayer({ list, index, onIndex, fav, onFav, onAssign, assignLabel = "Assigner en brief", onDetails, competitorName }: {
+export function VideoPlayer({ list, index, onIndex, fav, onFav, onAssign, assignLabel = "Assigner en brief", onDetails, competitorName, apps, cats }: {
+  apps?: { id: string; name: string }[]; cats?: Cat[];
   list: Video[]; index: number | null; onIndex: (i: number | null) => void;
   fav?: (v: Video) => boolean; onFav?: (v: Video) => void; onAssign?: (v: Video) => void; assignLabel?: string;
   onDetails?: (v: Video) => void; competitorName?: (id: string | null) => string | undefined;
@@ -22,6 +26,7 @@ export function VideoPlayer({ list, index, onIndex, fav, onFav, onAssign, assign
   const go = (d: number) => open && onIndex(Math.min(list.length - 1, Math.max(0, index! + d)));
   useEffect(() => {
     if (!open) return;
+    playInline(null); // une seule vidéo à la fois : on coupe la lecture dans la carte
     const k = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement;
       if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
@@ -53,7 +58,7 @@ export function VideoPlayer({ list, index, onIndex, fav, onFav, onAssign, assign
         <NavButton dir="prev" disabled={index === 0} onClick={() => go(-1)} />
         <VideoSurface key={v.id} v={v} className="w-[min(100%,calc(82vh*9/16))] shrink-0 shadow-[0_24px_64px_-12px_rgba(0,0,0,0.6)] max-md:w-[min(100%,calc(62vh*9/16))]" />
 
-        <aside className="w-full max-w-sm shrink-0 rounded-2xl border border-white/40 bg-white/95 p-5 shadow-xl">
+        <aside className="max-h-[88vh] w-full max-w-sm shrink-0 overflow-y-auto rounded-2xl border border-white/40 bg-white/95 p-5 shadow-xl">
           <div className="flex items-center gap-3">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-tint-violet text-sm font-semibold uppercase text-[#7a32ef]">{displayName(v).charAt(0)}</span>
             <div className="min-w-0">
@@ -76,6 +81,7 @@ export function VideoPlayer({ list, index, onIndex, fav, onFav, onAssign, assign
             ))}
           </div>
 
+          {cats && <div className="mt-4 border-t border-separator pt-4"><VideoInsights v={v} apps={apps ?? []} cats={cats} /></div>}
           {v.caption && <p className="mt-4 line-clamp-4 whitespace-pre-wrap text-[13px] leading-relaxed text-muted-foreground">{v.caption}</p>}
           {!v.is_ad && v.published_at && <p className="mt-2 text-xs text-subtle-foreground">Publiée le {dateFr(v.published_at)}</p>}
 

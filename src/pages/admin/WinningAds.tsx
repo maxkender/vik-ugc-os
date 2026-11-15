@@ -1,11 +1,15 @@
 // Pubs gagnantes : les pubs vidéo des concurrents (Meta Ad Library), triées par longévité, variantes ou récence.
 // Une pub qui tourne longtemps, déclinée en plusieurs variantes, est une pub rentable : on la recycle en brief organique.
 import { VideoPlayer } from "./library/VideoPlayer";
+import { RelevanceBadge, type AppRef } from "./library/Badges";
+import { playInline, useInlinePlaying } from "@/components/video/inlinePlay";
+import { useApps, useCategories } from "@/lib/hooks";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import {
   Archive, CalendarDays, Clock, ExternalLink, Flame, Globe2, Layers, LayoutGrid, Megaphone, Play, Recycle, Rows3, Trophy, Zap,
+  Maximize2, X,
 } from "lucide-react";
 import { Badge, Button, Card, Dialog, Empty, IconTile, KpiCard, MetricPill, PageHeader, Spinner, Table, Tabs, Td, Th, useToast, type Tint } from "@/components/ui";
 import { callFn, supabase } from "@/lib/supabase";
@@ -52,6 +56,10 @@ export default function WinningAds() {
   const [playing, setPlaying] = useState<number | null>(null);
   const [assign, setAssign] = useState<Video | null>(null);
 
+  const { data: appsData } = useApps();
+  const { data: catsData } = useCategories();
+  const appList = useMemo(() => ((appsData ?? []) as any[]).filter((a) => a.active !== false).map((a) => ({ id: a.id as string, name: a.name as string })), [appsData]);
+  const catList = useMemo(() => ((catsData ?? []) as any[]).map((c) => ({ id: c.id, name: c.name })), [catsData]);
   const { data: comps } = useQuery({ queryKey: ["competitors-names"], queryFn: async () => (await supabase.from("competitors").select("id, name")).data ?? [] });
   const compName = (id: string | null) => (comps ?? []).find((c: any) => c.id === id)?.name as string | undefined;
 
@@ -116,6 +124,7 @@ export default function WinningAds() {
 
   // Liste affichée (groupes à plat), pour ← → dans le lecteur.
   const displayed: Video[] = grouped ? groups.flatMap(([, rows]: [string, Video[]]) => rows) : filtered;
+  const relApp: AppRef | null = appList[0] ?? null;
   const playAt = (v: Video) => setPlaying(Math.max(0, displayed.findIndex((x) => x.id === v.id)));
   return (
     <div>
@@ -171,15 +180,15 @@ export default function WinningAds() {
                 </div>
                 {view === "table"
                   ? <AdsTable rows={rows} compName={compName} onOpen={playAt} onRecycle={setAssign} hideCompetitor />
-                  : <AdGrid rows={rows} compName={compName} onOpen={playAt} onRecycle={setAssign} />}
+                  : <AdGrid rows={rows} compName={compName} onOpen={playAt} onRecycle={setAssign} relApp={relApp} />}
               </section>
             ))}
           </div>
         ) : view === "table"
           ? <AdsTable rows={filtered} compName={compName} onOpen={playAt} onRecycle={setAssign} />
-          : <AdGrid rows={filtered} compName={compName} onOpen={playAt} onRecycle={setAssign} />}
+          : <AdGrid rows={filtered} compName={compName} onOpen={playAt} onRecycle={setAssign} relApp={relApp} />}
 
-      <VideoPlayer list={displayed} index={playing} onIndex={setPlaying} competitorName={compName}
+      <VideoPlayer list={displayed} index={playing} onIndex={setPlaying} competitorName={compName} apps={appList} cats={catList}
         onAssign={(v) => { setPlaying(null); setAssign(v); }} assignLabel="Recycler en brief organique" onDetails={(v) => { setPlaying(null); setOpen(v); }} />
       <AdPlayer ad={open} competitor={open ? compName(open.competitor_id) : undefined} onClose={() => setOpen(null)}
         onRecycle={() => { setAssign(open); setOpen(null); }} onArchive={() => open && archive(open)} canArchive={profile?.role !== "controller"} />
@@ -225,20 +234,30 @@ function StatusPill({ active }: { active: boolean | null }) {
     : <Badge>Arrêtée</Badge>;
 }
 
-function AdGrid({ rows, compName, onOpen, onRecycle }: { rows: Video[]; compName: (id: string | null) => string | undefined; onOpen: (v: Video) => void; onRecycle: (v: Video) => void }) {
+function AdGrid({ rows, compName, onOpen, onRecycle, relApp }: { rows: Video[]; compName: (id: string | null) => string | undefined; onOpen: (v: Video) => void; onRecycle: (v: Video) => void; relApp?: AppRef | null }) {
   return (
     <div className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-      {rows.map((v) => <AdCard key={v.id} v={v} competitor={compName(v.competitor_id)} onOpen={() => onOpen(v)} onRecycle={() => onRecycle(v)} />)}
+      {rows.map((v) => <AdCard key={v.id} v={v} competitor={compName(v.competitor_id)} onOpen={() => onOpen(v)} onRecycle={() => onRecycle(v)} relApp={relApp} />)}
     </div>
   );
 }
 
-function AdCard({ v, competitor, onOpen, onRecycle }: { v: Video; competitor?: string; onOpen: () => void; onRecycle: () => void }) {
+function AdCard({ v, competitor, onOpen, onRecycle, relApp }: { v: Video; competitor?: string; onOpen: () => void; onRecycle: () => void; relApp?: AppRef | null }) {
   const [imgOk, setImgOk] = useState(true);
+  const playing = useInlinePlaying(v.id);
   const thumb = thumbOf(v);
   const variants = variantsOf(v);
   return (
-    <div className="group">
+    <div className="group relative">
+      {playing && (
+        <div className="absolute inset-x-0 top-0 z-20 aspect-[9/16] overflow-hidden rounded-xl bg-black ring-1 ring-border">
+          <VideoSurface v={v} className="h-full w-full rounded-none" />
+          <div className="absolute right-2 top-2 flex gap-1.5">
+            <button onClick={() => { playInline(null); onOpen(); }} className="flex h-7 items-center gap-1 rounded-full bg-white/90 px-2 text-[11px] font-medium text-foreground shadow-xs hover:bg-white"><Maximize2 className="h-3 w-3" /> Agrandir</button>
+            <button onClick={() => playInline(null)} aria-label="Arrêter" className="flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-foreground shadow-xs hover:bg-white"><X className="h-3.5 w-3.5" /></button>
+          </div>
+        </div>
+      )}
       <button type="button" onClick={onOpen} className="relative block aspect-[9/16] w-full overflow-hidden rounded-xl bg-muted text-left shadow-xs ring-1 ring-border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_28px_-10px_rgba(16,24,40,0.25)]">
         {(!thumb || !imgOk) && <ThumbPlaceholder v={v} />}
         {thumb && imgOk && <img src={thumb} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" onError={() => setImgOk(false)} />}
@@ -248,9 +267,11 @@ function AdCard({ v, competitor, onOpen, onRecycle }: { v: Video; competitor?: s
             ? <span className="inline-flex h-6 items-center gap-1 rounded-full bg-white/95 px-2 text-[11px] font-semibold text-[#0b7a3c] shadow-xs"><span className="h-1.5 w-1.5 rounded-full bg-[#12a150]" />Active</span>
             : <span className="inline-flex h-6 items-center rounded-full bg-white/90 px-2 text-[11px] font-medium text-[#5b6478] shadow-xs">Arrêtée</span>}
         </div>
-        <span className="absolute left-1/2 top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-foreground opacity-0 shadow-card transition-opacity group-hover:opacity-100">
+        <span role="button" tabIndex={0} aria-label="Lire ici" data-testid="inline-play" onClick={(e) => { e.stopPropagation(); playInline(v.id); }}
+          className="absolute left-1/2 top-1/2 z-10 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-foreground opacity-80 shadow-card transition-all hover:scale-105 group-hover:opacity-100 [@media(hover:none)]:opacity-100">
           <Play className="ml-0.5 h-5 w-5 fill-current" />
         </span>
+        {relApp && <RelevanceBadge v={v} app={relApp} className="absolute bottom-10 left-2.5" />}
         <div className="absolute inset-x-0 bottom-0 flex flex-wrap gap-1 bg-gradient-to-t from-black/65 via-black/25 to-transparent p-2.5 pt-12">
           {variants > 1 && <MetricPill tone="dark" icon={<Layers />}>{variants} variantes</MetricPill>}
           <MetricPill tone="dark" icon={<CalendarDays />}>{dateFr(v.ad_started_at, { day: "numeric", month: "short", year: "2-digit" })}</MetricPill>

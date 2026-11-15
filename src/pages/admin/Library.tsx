@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useSearchParams } from "react-router-dom";
-import { Calendar, ChevronLeft, ChevronRight, Download, FileDown, Film, Globe2, Heart, Languages, LayoutGrid, Layers, Rows3, Search, SlidersHorizontal, Tag, Trophy, X } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight, Download, FileDown, Film, Globe2, Heart, Languages, LayoutGrid, Layers, Rows3, Search, SlidersHorizontal, Tag, Target, Trophy, X, Hash } from "lucide-react";
 import { Button, Dialog, Empty, Field, Input, PageHeader, Select, Spinner, Tabs, useToast } from "@/components/ui";
 import { callFn, supabase } from "@/lib/supabase";
 import { useApps, useCategories, useCompetitors, useCountries } from "@/lib/hooks";
@@ -18,8 +18,8 @@ import { cursorValue, SORT_LABEL, type Sort, type Video } from "./library/types"
 
 const PAGE = 48;
 const PERIODS: Record<string, number | null> = { all: null, "7": 7, "30": 30, "90": 90, "365": 365 };
-const ORGANIC_SORTS: Sort[] = ["score", "views", "likes", "shares", "engagement", "outlier", "velocity", "date", "recent"];
-const AD_SORTS: Sort[] = ["ad_days", "score", "date", "recent"];
+const ORGANIC_SORTS: Sort[] = ["relevance", "score", "views", "likes", "shares", "engagement", "outlier", "velocity", "date", "recent"];
+const AD_SORTS: Sort[] = ["ad_days", "relevance", "score", "date", "recent"];
 
 export default function Library({ adsOnly = false }: { adsOnly?: boolean }) {
   const [params, setParams] = useSearchParams();
@@ -65,12 +65,32 @@ export default function Library({ adsOnly = false }: { adsOnly?: boolean }) {
     enabled: !!profile,
   });
 
+  // App de référence pour la pertinence (badge, tri) : l'app filtrée, sinon la première app active (Micabo).
+  const relApp = useMemo(() => {
+    const list = (apps ?? []) as any[];
+    const a = list.find((x) => x.id === get("app")) ?? list.find((x) => x.active !== false) ?? null;
+    return a ? { id: a.id as string, name: a.name as string } : null;
+  }, [apps, params]);
+  const catList = useMemo(() => ((cats ?? []) as any[]).map((c) => ({ id: c.id, name: c.name, color: c.color })), [cats]);
+  const { data: allTags } = useQuery({
+    queryKey: ["video-tags"],
+    queryFn: async () => {
+      const { data } = await supabase.from("videos").select("tags").neq("tags", "{}").limit(5000);
+      const m = new Map<string, number>();
+      for (const r of data ?? []) for (const t of (r as any).tags ?? []) m.set(t, (m.get(t) ?? 0) + 1);
+      return [...m.entries()].sort((a, b) => b[1] - a[1]);
+    },
+  });
+
   // Filtres communs à la grille, au tableau, aux groupes et à l'export.
   const filters = useMemo(() => {
     const days = PERIODS[get("period", "all")];
     return {
       p_app: get("app") || null, p_competitor: get("competitor") || null, p_platform: get("platform") || null,
-      p_language: get("lang") || null, p_country: get("country") || null, p_category: get("category") || null,
+      p_language: get("lang") || null, p_country: get("country") || null,
+      p_category: get("category") && get("category") !== "none" ? get("category") : null,
+      p_uncategorized: get("category") === "none",
+      p_tag: get("tag") || null, p_compat_app: get("compat") || null, p_rel_app: relApp?.id ?? null,
       p_since: days ? new Date(Date.now() - days * 86_400_000).toISOString() : null,
       p_min_views: get("minViews") ? Number(get("minViews")) : null, p_min_score: get("minScore") ? Number(get("minScore")) : null,
       p_favorites: get("fav") === "1", p_ads: adsOnly ? "ads" : get("ads", "all"),
@@ -80,9 +100,9 @@ export default function Library({ adsOnly = false }: { adsOnly?: boolean }) {
       // Par défaut, seulement les vidéos rattachées à un concurrent ; la puce « Hors concurrents » les ajoute.
       p_with_competitor: !adsOnly && get("scope", "competitors") === "competitors",
     };
-  }, [params, adsOnly]);
+  }, [params, adsOnly, relApp?.id]);
   const countFilters = useMemo(() => {
-    const { p_favorites: _f, p_sort: _s, p_collection: _c, ...rest } = filters;
+    const { p_favorites: _f, p_sort: _s, p_collection: _c, p_rel_app: _r, ...rest } = filters;
     return rest;
   }, [filters]);
 
@@ -96,7 +116,7 @@ export default function Library({ adsOnly = false }: { adsOnly?: boolean }) {
       if (error) throw error;
       return (data ?? []) as Video[];
     },
-    getNextPageParam: (last) => (last.length < PAGE ? undefined : { v: cursorValue(last[last.length - 1], sort), id: last[last.length - 1].id }),
+    getNextPageParam: (last) => (last.length < PAGE ? undefined : { v: cursorValue(last[last.length - 1], sort, relApp?.id), id: last[last.length - 1].id }),
   });
   const gridVideos = infinite.data?.pages.flat() ?? [];
 
@@ -165,8 +185,9 @@ export default function Library({ adsOnly = false }: { adsOnly?: boolean }) {
         title={adsOnly ? "Pubs gagnantes" : "Bibliothèque"}
         description={adsOnly
           ? "Les pubs vidéo des concurrents qui tournent depuis longtemps : une pub qui dure est une pub rentable. Recycle-les en brief organique."
-          : "Toutes les vidéos de référence : comptes officiels, UGC qui cite une marque et pubs Meta. Survole une carte pour la lire, clique pour le détail."}
+          : "Toutes les vidéos de référence : comptes officiels, UGC qui cite une marque et pubs Meta. ▶ lit la vidéo dans la carte, un clic ailleurs l'agrandit avec le détail."}
         actions={<>
+          {!adsOnly && <AiBudget />}
           <Tabs value={view} onChange={(v) => set("view", v === "grid" ? "" : v, false)}
             items={[{ value: "grid", label: <span className="inline-flex items-center gap-1.5"><LayoutGrid className="h-4 w-4" /> Grille</span> }, { value: "table", label: <span className="inline-flex items-center gap-1.5"><Rows3 className="h-4 w-4" /> Tableau</span> }]} />
           <Button variant="secondary" onClick={doExport} loading={exporting}><FileDown className="h-4 w-4" /> Export CSV</Button>
@@ -201,7 +222,11 @@ export default function Library({ adsOnly = false }: { adsOnly?: boolean }) {
           <FilterChip label="Pays" icon={<Globe2 />} value={get("country")} onChange={(v) => set("country", v)}
             options={(countries ?? []).map((c: any) => ({ value: c.code, label: `${c.name}`, hint: c.code }))} />
           <FilterChip label="Format" icon={<Tag />} value={get("category")} onChange={(v) => set("category", v)}
-            options={(cats ?? []).map((c: any) => ({ value: c.id, label: c.name }))} />
+            options={[...(cats ?? []).map((c: any) => ({ value: c.id, label: c.name })), { value: "none", label: "Non classé", hint: "à corriger" }]} />
+          <FilterChip label="Compatible" icon={<Target />} value={get("compat")} onChange={(v) => set("compat", v)}
+            options={(apps ?? []).map((a: any) => ({ value: a.id, label: `Compatible ${a.name}`, hint: "score IA ou correction" }))} />
+          {(allTags?.length ?? 0) > 0 && <FilterChip label="Tag" icon={<Hash />} value={get("tag")} onChange={(v) => set("tag", v)}
+            options={(allTags ?? []).map(([t, n]) => ({ value: t, label: `#${t}`, hint: String(n) }))} />}
           <FilterChip label="Période" icon={<Calendar />} value={get("period")} onChange={(v) => set("period", v)}
             options={[{ value: "7", label: "7 derniers jours" }, { value: "30", label: "30 derniers jours" }, { value: "90", label: "90 derniers jours" }, { value: "365", label: "12 derniers mois" }]} />
           <button type="button" onClick={() => set("fav", get("fav") === "1" ? "" : "1")}
@@ -249,7 +274,7 @@ export default function Library({ adsOnly = false }: { adsOnly?: boolean }) {
                 <Trophy className="h-3.5 w-3.5" /> Grouper par concurrent
               </button>
             )}
-            <SortMenu value={sort} onChange={setSort} options={(adsOnly ? AD_SORTS : ORGANIC_SORTS).map((x) => ({ value: x, label: SORT_LABEL[x] }))}
+            <SortMenu value={sort} onChange={setSort} options={(adsOnly ? AD_SORTS : ORGANIC_SORTS).map((x) => ({ value: x, label: x === "relevance" ? `Pertinence ${relApp?.name ?? "app"}` : SORT_LABEL[x] }))}
               asc={view === "table" ? asc : undefined} onToggleDir={view === "table" ? () => set("dir", asc ? "" : "asc") : undefined} />
           </div>
         </div>
@@ -278,7 +303,7 @@ export default function Library({ adsOnly = false }: { adsOnly?: boolean }) {
       ) : grouped ? (
         <div className="space-y-12">
           {[...(comps ?? []), { id: null, name: "Hors concurrents" }].map((c: any) => (
-            <GroupSection key={c.id ?? "none"} competitor={c} filters={filters} favs={favs} onOpen={play} onFav={toggleFav} catName={catName} />
+            <GroupSection key={c.id ?? "none"} competitor={c} filters={filters} favs={favs} onOpen={play} onFav={toggleFav} catName={catName} cats={catList} relApp={relApp} />
           ))}
         </div>
       ) : infinite.isLoading ? <div className="flex justify-center py-24"><Spinner /></div>
@@ -286,14 +311,14 @@ export default function Library({ adsOnly = false }: { adsOnly?: boolean }) {
         : gridVideos.length === 0 ? <EmptyLibrary adsOnly={adsOnly} filtered={anyFilter} onReset={resetAll} />
         : (
           <div className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {gridVideos.map((v) => <VideoCard key={v.id} v={v} fav={!!favs?.has(v.id)} onOpen={() => play(gridVideos, v)} onFav={() => toggleFav(v)} categoryName={catName(v.category_id)} competitorName={v.competitor_id ? compName(v.competitor_id) : undefined} />)}
+            {gridVideos.map((v) => <VideoCard key={v.id} v={v} fav={!!favs?.has(v.id)} onOpen={() => play(gridVideos, v)} onFav={() => toggleFav(v)} categoryName={catName(v.category_id)} competitorName={v.competitor_id ? compName(v.competitor_id) : undefined} cats={catList} relApp={relApp} />)}
           </div>
         )}
       {view === "grid" && !grouped && <div ref={sentinel} className="flex justify-center py-10">{infinite.isFetchingNextPage && <Spinner />}</div>}
 
       <VideoPlayer list={player?.list ?? []} index={player?.index ?? null} onIndex={(i) => setPlayer((p) => (i === null || !p ? null : { ...p, index: i }))}
         fav={(v) => !!favs?.has(v.id)} onFav={toggleFav} onAssign={(v) => { setPlayer(null); setAssign(v); }} onDetails={(v) => { setPlayer(null); setOpen(v); }}
-        competitorName={(id) => (id ? compName(id) : undefined)} />
+        competitorName={(id) => (id ? compName(id) : undefined)} apps={(apps ?? []) as any[]} cats={catList} />
       <VideoDrawer video={open} onClose={() => setOpen(null)} fav={!!(open && favs?.has(open.id))} onFav={() => open && toggleFav(open)} onAssign={() => setAssign(open)} />
       <AssignBriefDialog video={assign} open={!!assign} onClose={() => setAssign(null)} origin={assign?.is_ad ? "ad" : "library"} />
       <AdhocDialog open={adhoc} onClose={() => setAdhoc(false)} onDone={() => toast("Run lancé : les vidéos arrivent dans quelques minutes (Agents de collecte)", "success")} />
@@ -312,7 +337,8 @@ function EmptyLibrary({ adsOnly, filtered, onReset }: { adsOnly: boolean; filter
   );
 }
 
-function GroupSection({ competitor, filters, favs, onOpen, onFav, catName }: {
+function GroupSection({ competitor, filters, favs, onOpen, onFav, catName, cats, relApp }: {
+  cats?: { id: string; name: string }[]; relApp?: { id: string; name: string } | null;
   competitor: { id: string | null; name: string }; filters: Record<string, unknown>; favs?: Set<string>;
   onOpen: (list: Video[], v: Video) => void; onFav: (v: Video) => void; catName: (id: string | null) => string | undefined;
 }) {
@@ -344,7 +370,7 @@ function GroupSection({ competitor, filters, favs, onOpen, onFav, catName }: {
         {competitor.id && <button className="text-[13px] font-medium text-accent hover:underline" onClick={() => setParams((p) => { const n = new URLSearchParams(p); n.delete("group"); n.set("competitor", competitor.id!); return n; }, { replace: true })}>Tout voir →</button>}
       </div>
       <div className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-        {data.map((v) => <VideoCard key={v.id} v={v} fav={!!favs?.has(v.id)} onOpen={() => onOpen(data, v)} onFav={() => onFav(v)} categoryName={catName(v.category_id)} competitorName={competitor.id ? competitor.name : undefined} />)}
+        {data.map((v) => <VideoCard key={v.id} v={v} fav={!!favs?.has(v.id)} onOpen={() => onOpen(data, v)} onFav={() => onFav(v)} categoryName={catName(v.category_id)} competitorName={competitor.id ? competitor.name : undefined} cats={cats} relApp={relApp} />)}
       </div>
     </section>
   );
@@ -381,5 +407,30 @@ function AdhocDialog({ open, onClose, onDone }: { open: boolean; onClose: () => 
         <Field label="Nombre max. de vidéos" hint={`Coût estimé ≈ ${(unit * max).toFixed(2)} $ (plafonds dans Réglages → Intégrations)`}><Input type="number" min={1} max={200} value={max} onChange={(e) => setMax(Number(e.target.value))} /></Field>
       </div>
     </Dialog>
+  );
+}
+
+/** Budget IA (classement des vidéos par fal) : dépense du mois / plafond, vidéos en attente. */
+function AiBudget() {
+  const { data } = useQuery({
+    queryKey: ["ai-budget"],
+    queryFn: async () => {
+      const start = new Date(); start.setUTCDate(1); start.setUTCHours(0, 0, 0, 0);
+      const [usage, cfg, pending] = await Promise.all([
+        supabase.from("ai_usage").select("cost_usd").gte("created_at", start.toISOString()),
+        supabase.from("settings").select("value").eq("key", "ai").maybeSingle(),
+        supabase.from("videos").select("id", { count: "exact", head: true }).is("ai_scored_at", null),
+      ]);
+      const spent = (usage.data ?? []).reduce((a, r: any) => a + Number(r.cost_usd), 0);
+      return { spent, cap: Number((cfg.data?.value as any)?.monthly_cap_usd ?? 5), pending: pending.count ?? 0 };
+    },
+    staleTime: 60_000,
+  });
+  if (!data) return null;
+  return (
+    <span className="hidden items-center gap-1.5 rounded-full border border-border-strong bg-white px-3 py-1.5 text-[12px] text-muted-foreground md:inline-flex"
+      title="Catégorie et pertinence par app calculées par l'IA (fal, Gemini flash). Plafond mensuel : settings.ai.monthly_cap_usd.">
+      <Target className="h-3.5 w-3.5 text-accent" /> IA : <span className="tabular font-medium text-foreground">{data.spent.toFixed(2)} $</span> / {data.cap} $ ce mois{data.pending ? ` · ${data.pending} en attente` : ""}
+    </span>
   );
 }

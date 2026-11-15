@@ -1,5 +1,8 @@
 import { memo, useRef, useState } from "react";
-import { Eye, Heart, Instagram, Layers, Megaphone, Music2, Zap } from "lucide-react";
+import { Eye, Heart, Instagram, Layers, Maximize2, Megaphone, Music2, Play, X, Zap } from "lucide-react";
+import { VideoSurface } from "@/components/video/VideoSurface";
+import { playInline, useInlinePlaying } from "@/components/video/inlinePlay";
+import { CategoryBadge, RelevanceBadge, type AppRef, type Cat } from "./Badges";
 import { MetricPill } from "@/components/ui";
 import { cn, compact, flag } from "@/lib/utils";
 import { ORIGIN_LABEL, PLATFORM_LABEL, pct, type Video } from "./types";
@@ -35,9 +38,12 @@ const ORIGIN_TONE: Record<string, string> = {
   ugc: "bg-white/90 text-[#0040d6]", official: "bg-white/90 text-[#7a32ef]", ad: "bg-white/90 text-[#8a5a00]", other: "bg-white/90 text-[#5b6478]",
 };
 
-export const VideoCard = memo(function VideoCard({ v, fav, onOpen, onFav, categoryName, competitorName }: {
+export const VideoCard = memo(function VideoCard({ v, fav, onOpen, onFav, categoryName, competitorName, cats, relApp }: {
   v: Video; fav: boolean; onOpen: () => void; onFav: () => void; categoryName?: string; competitorName?: string;
+  /** Catégories : badge de format modifiable d'un clic. */ cats?: Cat[];
+  /** App de référence : badge « Micabo 92 ». */ relApp?: AppRef | null;
 }) {
+  const playing = useInlinePlaying(v.id);
   const [src, setSrc] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
   const [imgOk, setImgOk] = useState(true);
@@ -45,7 +51,7 @@ export const VideoCard = memo(function VideoCard({ v, fav, onOpen, onFav, catego
   const thumb = thumbOf(v);
   const enter = () => {
     // Aperçu muet seulement si un MP4 est lisible (archivé ou lien CDN encore valide), sinon la miniature reste.
-    const h = failed ? null : hoverSource(v);
+    const h = failed || playing ? null : hoverSource(v);
     if (!h) return;
     timer.current = window.setTimeout(async () => setSrc(h.kind === "stored" ? await signedVideoUrl(h.path) : h.kind === "mp4" ? h.url : null), 250);
   };
@@ -55,8 +61,22 @@ export const VideoCard = memo(function VideoCard({ v, fav, onOpen, onFav, catego
   };
   const scoreTone = v.score >= 80 ? "bg-[#12a150] text-white" : v.score >= 60 ? "bg-accent text-white" : "bg-white/90 text-foreground";
   return (
-    <div className="group cursor-pointer" onClick={onOpen} onMouseEnter={enter} onMouseLeave={leave}>
+    <div className="group cursor-pointer" onClick={playing ? undefined : onOpen} onMouseEnter={enter} onMouseLeave={leave}>
       <div className="relative aspect-[9/16] overflow-hidden rounded-xl bg-muted shadow-xs ring-1 ring-border transition-all duration-200 group-hover:-translate-y-0.5 group-hover:shadow-[0_12px_28px_-10px_rgba(16,24,40,0.25)]">
+        {playing ? (
+          <div className="absolute inset-0 z-20 bg-black" onClick={(e) => e.stopPropagation()}>
+            <VideoSurface v={v} className="h-full w-full rounded-none" />
+            <div className="absolute right-2 top-2 flex gap-1.5">
+              <button onClick={() => { playInline(null); onOpen(); }} aria-label="Agrandir" title="Agrandir" className="flex h-7 items-center gap-1 rounded-full bg-white/90 px-2 text-[11px] font-medium text-foreground shadow-xs hover:bg-white"><Maximize2 className="h-3 w-3" /> Agrandir</button>
+              <button onClick={() => playInline(null)} aria-label="Arrêter" className="flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-foreground shadow-xs hover:bg-white"><X className="h-3.5 w-3.5" /></button>
+            </div>
+          </div>
+        ) : (
+          <button onClick={(e) => { e.stopPropagation(); leave(); playInline(v.id); }} aria-label="Lire ici" data-testid="inline-play"
+            className="absolute left-1/2 top-1/2 z-10 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 opacity-80 shadow-lg transition-all hover:scale-105 hover:bg-white group-hover:opacity-100 [@media(hover:none)]:opacity-100">
+            <Play className="ml-0.5 h-5 w-5 fill-[#0b1530] text-[#0b1530]" />
+          </button>
+        )}
         {(!thumb || !imgOk) && <ThumbPlaceholder v={v} />}
         {thumb && imgOk && <img src={thumb} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" onError={() => setImgOk(false)} />}
         {src && <video src={src} autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover" onError={() => { setFailed(true); setSrc(null); }} />}
@@ -64,6 +84,7 @@ export const VideoCard = memo(function VideoCard({ v, fav, onOpen, onFav, catego
         <div className="absolute left-2.5 right-2.5 top-2.5 flex items-start justify-between gap-1">
           <div className="flex flex-wrap gap-1">
             <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-foreground shadow-xs" title={PLATFORM_LABEL[v.platform]}><PlatformIcon p={v.platform} className="h-3.5 w-3.5" /></span>
+            {relApp && <RelevanceBadge v={v} app={relApp} />}
             {v.is_ad
               ? <span className="tabular inline-flex h-6 items-center gap-1 rounded-full bg-[#fff6e5] px-2 text-[11px] font-bold text-[#8a5a00] shadow-xs" title="Durée de diffusion">{v.ad_days ?? "?"} j de diffusion</span>
               : v.origin && v.origin !== "other" && <span className={cn("inline-flex h-6 items-center rounded-full px-2 text-[11px] font-semibold shadow-xs", ORIGIN_TONE[v.origin])}>{ORIGIN_LABEL[v.origin]}</span>}
@@ -99,8 +120,14 @@ export const VideoCard = memo(function VideoCard({ v, fav, onOpen, onFav, catego
         <div className="min-w-0 flex-1">
           <p className="truncate text-[13px] font-medium text-foreground">{v.is_ad ? displayName(v) : `@${displayName(v)}`}</p>
           <p className="truncate text-xs text-subtle-foreground">
-            {competitorName ?? "Hors concurrents"}{categoryName ? ` · ${categoryName}` : ""}{v.country ? ` · ${flag(v.country)}` : v.language ? ` · ${v.language}` : ""}
+            {competitorName ?? "Hors concurrents"}{!cats && categoryName ? ` · ${categoryName}` : ""}{v.country ? ` · ${flag(v.country)}` : v.language ? ` · ${v.language}` : ""}
           </p>
+          {(cats || (v.tags?.length ?? 0) > 0) && (
+            <div className="mt-1.5 flex flex-wrap items-center gap-1">
+              {cats && <CategoryBadge v={v} cats={cats} />}
+              {(v.tags ?? []).slice(0, 3).map((t) => <span key={t} className="inline-flex h-5 items-center rounded-full bg-[#f1f3f7] px-2 text-[11px] text-muted-foreground">#{t}</span>)}
+            </div>
+          )}
         </div>
       </div>
     </div>

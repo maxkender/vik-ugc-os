@@ -42,18 +42,21 @@ export interface Video {
   outlier: number | null;
   velocity: number | null;
   mentions: string[];
+  tags?: string[];
+  app_scores?: Record<string, any>;
+  ai_scored_at?: string | null;
 }
 
 export const ORIGIN_LABEL: Record<string, string> = { official: "Officiel", ugc: "UGC", ad: "Pub", other: "Autre" };
 
-export type Sort = "score" | "views" | "likes" | "shares" | "engagement" | "outlier" | "velocity" | "date" | "recent" | "ad_days";
+export type Sort = "relevance" | "score" | "views" | "likes" | "shares" | "engagement" | "outlier" | "velocity" | "date" | "recent" | "ad_days";
 export const SORT_LABEL: Record<Sort, string> = {
-  score: "Score", views: "Vues", likes: "Likes", shares: "Partages", engagement: "Engagement",
+  relevance: "Pertinence app", score: "Score", views: "Vues", likes: "Likes", shares: "Partages", engagement: "Engagement",
   outlier: "Outlier (vues/abonnés)", velocity: "Vélocité (vues/jour)", date: "Date de publication", recent: "Ajout récent", ad_days: "Durée de diffusion (pubs)",
 };
 
 /** Valeur de curseur (keyset) pour un tri décroissant ; null est traité comme -1 côté SQL. */
-export function cursorValue(v: Video, sort: Sort): number {
+export function cursorValue(v: Video, sort: Sort, relApp?: string | null): number {
   const n = (x: number | null | undefined) => (x === null || x === undefined ? -1 : Number(x));
   switch (sort) {
     case "views": return n(v.views);
@@ -65,6 +68,11 @@ export function cursorValue(v: Video, sort: Sort): number {
     case "date": return v.published_at ? new Date(v.published_at).getTime() / 1000 : -1;
     case "recent": return new Date(v.first_seen_at).getTime() / 1000;
     case "ad_days": return n(v.ad_days);
+    case "relevance": {
+      if (!relApp) return Number(v.score);
+      const s = v.app_scores?.[relApp];
+      return !s || s.manual === false ? -1 : Number(s.score);
+    }
     default: return Number(v.score);
   }
 }

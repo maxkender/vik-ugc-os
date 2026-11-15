@@ -7,11 +7,11 @@ import { Badge, Button, Dialog, Empty, Field, Input, PageHeader, Spinner, Switch
 import { bioFor, displayNameFor, generateHandles } from "@shared/handles.ts";
 
 type App = {
-  id?: string; slug: string; name: string; description: string | null; website: string | null; ios_url: string | null; android_url: string | null; active: boolean;
+  id?: string; slug: string; name: string; description: string | null; audience?: string | null; website: string | null; ios_url: string | null; android_url: string | null; active: boolean;
   handle_patterns: string[]; bio_templates: Record<string, string>; display_name_pattern: string; link_in_bio: string | null; profile_photo_tips: string | null;
 };
 const blank: App = {
-  slug: "", name: "", description: "", website: "", ios_url: "", android_url: "", active: true,
+  slug: "", name: "", description: "", audience: "", website: "", ios_url: "", android_url: "", active: true,
   handle_patterns: ["{app}.{first}", "{first}.studies", "{first}{app}", "{first}.{last1}.{app}"], bio_templates: { en: "{App} ambassador 📚 Study smarter with AI ✨" },
   display_name_pattern: "{First} | {App}", link_in_bio: "", profile_photo_tips: "",
 };
@@ -29,7 +29,7 @@ export default function Apps() {
     if (!edit.name.trim() || !/^[a-z0-9-]+$/.test(edit.slug)) return toast("Nom et slug (minuscules, chiffres, tirets) obligatoires", "danger");
     setBusy(true);
     const row = {
-      ...edit, description: edit.description || null, website: edit.website || null, ios_url: edit.ios_url || null, android_url: edit.android_url || null,
+      ...edit, description: edit.description || null, audience: edit.audience || null, website: edit.website || null, ios_url: edit.ios_url || null, android_url: edit.android_url || null,
       link_in_bio: edit.link_in_bio || null, profile_photo_tips: edit.profile_photo_tips || null,
       handle_patterns: edit.handle_patterns.map((x) => x.trim()).filter(Boolean),
       bio_templates: Object.fromEntries(Object.entries(edit.bio_templates).filter(([, v]) => v.trim())),
@@ -79,6 +79,7 @@ export default function Apps() {
             <Field label="Nom"><Input value={edit.name} onChange={(e) => set("name", e.target.value)} /></Field>
             <Field label="Slug" hint="minuscules, ex. micabo"><Input value={edit.slug} onChange={(e) => set("slug", e.target.value.toLowerCase())} /></Field>
             <Field label="Description" className="sm:col-span-2"><Textarea value={edit.description ?? ""} onChange={(e) => set("description", e.target.value)} /></Field>
+            <Field label="Cible (pour le score de pertinence IA)" hint="Qui utilise l'app, pour quoi faire. L'IA s'en sert pour noter chaque vidéo de 0 à 100." className="sm:col-span-2"><Textarea value={edit.audience ?? ""} onChange={(e) => set("audience" as any, e.target.value)} /></Field>
             <Field label="Site web"><Input value={edit.website ?? ""} onChange={(e) => set("website", e.target.value)} /></Field>
             <Field label="App Store (iOS)"><Input value={edit.ios_url ?? ""} onChange={(e) => set("ios_url", e.target.value)} /></Field>
             <Field label="Google Play"><Input value={edit.android_url ?? ""} onChange={(e) => set("android_url", e.target.value)} /></Field>

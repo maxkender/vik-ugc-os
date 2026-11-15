@@ -24,6 +24,7 @@ const CreatorAccount = lazy(() => import("./pages/creator/Account"));
 const WinningAds = lazy(() => import("./pages/admin/WinningAds"));
 const Agents = lazy(() => import("./pages/admin/Agents"));
 const Briefs = lazy(() => import("./pages/admin/Briefs"));
+const Assets = lazy(() => import("./pages/admin/Assets"));
 const Candidates = lazy(() => import("./pages/admin/Candidates"));
 const Campaigns = lazy(() => import("./pages/admin/Campaigns"));
 const Creatives = lazy(() => import("./pages/admin/Creatives"));
@@ -77,6 +78,7 @@ export function App() {
           <Route path="competitors" element={<Competitors />} />
           <Route path="agents" element={<RequireRole roles={[...adminOnly]}><Agents /></RequireRole>} />
           <Route path="briefs" element={<Briefs />} />
+          <Route path="assets" element={<Assets />} />
           <Route path="recruitment" element={<Navigate to="candidates" replace />} />
           <Route path="recruitment/candidates" element={<RequireRole roles={[...recruiting]}><Candidates /></RequireRole>} />
           <Route path="recruitment/onboarding" element={<RequireRole roles={[...recruiting]}><Onboarding /></RequireRole>} />

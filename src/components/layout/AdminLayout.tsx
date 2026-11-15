@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
-  BarChart3, Bot, Clapperboard, Contact, Flame, Home, Image, LayoutGrid, MessageCircle, ListChecks, LogOut, Megaphone, Menu, Moon, Settings, Sun, Trophy, UserPlus, Users, Wallet, X,
+  BarChart3, Bot, Clapperboard, FolderOpen, Contact, Flame, Home, Image, LayoutGrid, MessageCircle, ListChecks, LogOut, Megaphone, Menu, Moon, Settings, Sun, Trophy, UserPlus, Users, Wallet, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
@@ -30,6 +30,7 @@ const SECTIONS: NavSection[] = [
   ] },
   { title: "Production", color: "var(--sec-production)", items: [
     { to: "/admin/briefs", label: "Briefs", icon: Clapperboard, roles: ALL },
+    { to: "/admin/assets", label: "Assets", icon: FolderOpen, roles: ALL },
     { to: "/admin/creators", label: "Créateurs", icon: Contact, roles: ALL },
     { to: "/admin/posters", label: "Posteurs", icon: Users, roles: ALL },
     { to: "/admin/assistant", label: "Assistant posteurs", icon: MessageCircle, roles: RECRUIT },

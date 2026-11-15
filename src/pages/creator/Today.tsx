@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { CheckCircle2, Clock, ExternalLink, Lightbulb, Link2, Play, Quote, Send, Sparkles, XCircle } from "lucide-react";
+import { CheckCircle2, Clock, Download, ExternalLink, Lightbulb, Link2, Play, Quote, Send, Sparkles, XCircle } from "lucide-react";
 import { publicUrl, supabase } from "@/lib/supabase";
 import { Button, Spinner, useToast } from "@/components/ui";
 import { formatMoney } from "@shared/zones.ts";
@@ -11,9 +11,10 @@ import { VideoSurface } from "@/components/video/VideoSurface";
 import { READ_ONLY_HINT, todayIso, useCreatorIdentity, useMyPoster } from "./shared";
 
 interface RefVideo { id: string; url: string | null; thumbnail_path: string | null; thumbnail_src: string | null; video_path: string | null; video_src?: string | null; external_id?: string | null; caption: string | null; platform: string }
+interface BriefFile { id: string; name: string; kind: string; path: string; mime: string | null; size_bytes: number | null }
 interface Assignment {
   id: string; due_date: string; status: "todo" | "posted" | "validated" | "rejected"; posted_url: string | null; rejection_reason: string | null;
-  briefs: { title: string; hook: string | null; instructions: string | null; reference_video_id: string | null; videos: RefVideo | null } | null;
+  briefs: { title: string; hook: string | null; instructions: string | null; reference_video_id: string | null; videos: RefVideo | null; brief_assets?: { assets: BriefFile | null }[] } | null;
 }
 
 const STATUS = {
@@ -55,6 +56,31 @@ function Reference({ v }: { v: RefVideo }) {
           <ExternalLink className="h-3.5 w-3.5" /> {t("creator.openOriginal")}
         </a>
       )}
+    </div>
+  );
+}
+
+/** Assets joints au brief (logo, captures, démo, son…) : aperçu et téléchargement depuis le téléphone. */
+function BriefFiles({ files }: { files: BriefFile[] }) {
+  const { t } = useTranslation();
+  if (!files.length) return null;
+  return (
+    <div>
+      <p className="mb-2 text-xs font-medium text-subtle-foreground">{t("creator.assets")}</p>
+      <ul className="space-y-2">
+        {files.map((f) => {
+          const url = publicUrl("brief-assets", f.path) ?? "";
+          return (
+            <li key={f.id} className="flex items-center gap-3 rounded-xl border bg-white p-2">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[#f1f3f7]">
+                {f.mime?.startsWith("image/") ? <img src={url} alt="" className="h-full w-full object-cover" loading="lazy" /> : f.mime?.startsWith("video/") ? <Play className="h-4 w-4 text-subtle-foreground" /> : <Download className="h-4 w-4 text-subtle-foreground" />}
+              </span>
+              <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-foreground">{f.name}</span>
+              <a href={`${url}?download=${encodeURIComponent(f.name)}`} className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg bg-accent px-3 text-[13px] font-medium text-white"><Download className="h-3.5 w-3.5" />{t("creator.download")}</a>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
@@ -108,6 +134,7 @@ function BriefCard({ a, index }: { a: Assignment; index: number }) {
           )}
           {b?.videos && <div className="order-1 sm:order-2 sm:w-[200px]"><Reference v={b.videos} /></div>}
         </div>
+        <BriefFiles files={(b?.brief_assets ?? []).map((x) => x.assets).filter((x): x is BriefFile => !!x)} />
 
         {a.status === "rejected" && a.rejection_reason && (
           <div className="flex gap-2.5 rounded-xl bg-tint-red px-4 py-3 text-sm text-[#a52326]">
@@ -174,7 +201,7 @@ export default function Today() {
     enabled: !!me.id,
     queryFn: async () => {
       const { data, error } = await supabase.from("brief_assignments")
-        .select("id, due_date, status, posted_url, rejection_reason, briefs(title, hook, instructions, reference_video_id, videos(id, url, external_id, thumbnail_path, thumbnail_src, video_path, video_src, caption, platform))")
+        .select("id, due_date, status, posted_url, rejection_reason, briefs(title, hook, instructions, reference_video_id, videos(id, url, external_id, thumbnail_path, thumbnail_src, video_path, video_src, caption, platform), brief_assets(assets(id, name, kind, path, mime, size_bytes)))")
         .eq("poster_id", me.id!).order("due_date", { ascending: false }).limit(60);
       if (error) throw error;
       return (data ?? []) as unknown as Assignment[];
