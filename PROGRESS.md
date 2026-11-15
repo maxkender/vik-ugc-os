@@ -1,4 +1,17 @@
-# PROGRESS : état au 15/11/2026 (V3)
+# PROGRESS : état au 15/11/2026 (V4)
+
+## V4 : lecture dans la carte, IA catégories + pertinence, tags, assets (15/11, soir)
+
+- **Lecture dans la carte** (Bibliothèque, Concurrents, Pubs gagnantes) : ▶ lit la vidéo sur place (MP4, lecteur TikTok / Instagram), une seule à la fois ; « Agrandir » ouvre le lecteur plein écran.
+- **IA via fal** (Gemini 2.5 flash, repli Claude Sonnet 5.5), en lots de 10 : format (catégorie) + pertinence 0–100 par app avec raison et « compatible ».
+  - Stock : 1 595 / 1 608 vidéos notées, 1 185 catégories posées, **coût réel 0,60 $** (table `ai_usage`). 1 302 vidéos compatibles Micabo.
+  - Nouvelles vidéos : edge function `ai` toutes les 30 min (cron `vik_ai_classify`), plafond `settings.ai.monthly_cap_usd` (5 $). **Nécessite le secret `FAL_KEY`** ; sans lui, rien ne part.
+  - Les corrections manuelles (format, compatible / pas compatible) ne sont jamais écrasées.
+- **UI** : badge « Micabo 92 », badge de format cliquable, tri « Pertinence Micabo », filtres « Compatible », « Non classé », « Tag » ; tags libres dans le lecteur ; budget IA affiché.
+- **Production → Assets** (bucket public `brief-assets`) : upload par app et type, aperçu, téléchargement, lien. Joints aux briefs (tiroir du brief), visibles et téléchargeables par le posteur.
+- **Réglages → Apps** : champ « Cible » (sert au score).
+- Vérifié en prod : `scripts/v4-check.cjs` (captures `docs/screenshots/v4/`).
+
 
 ## V3 : ads, aperçus, assistant, créateurs, paie du lundi, design verre (15/11, soir)
 
