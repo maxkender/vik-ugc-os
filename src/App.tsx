@@ -13,6 +13,7 @@ const CreatorToday = lazy(() => import("./pages/creator/Today"));
 const CreatorStats = lazy(() => import("./pages/creator/Stats"));
 const CreatorPayments = lazy(() => import("./pages/creator/Payments"));
 const Library = lazy(() => import("./pages/admin/Library"));
+const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
 const Competitors = lazy(() => import("./pages/admin/Competitors"));
 const Onboarding = lazy(() => import("./pages/admin/Onboarding"));
 const CreatorAccount = lazy(() => import("./pages/creator/Account"));
@@ -38,7 +39,7 @@ function Home() {
   const { profile, session, loading } = useAuth();
   if (loading) return <Spinner />;
   if (!session) return <Navigate to="/login" replace />;
-  return <Navigate to={profile?.role === "poster" ? "/creator" : "/admin/library"} replace />;
+  return <Navigate to={profile?.role === "poster" ? "/creator" : "/admin"} replace />;
 }
 
 const Loading = () => <div className="flex h-full items-center justify-center"><Spinner /></div>;
@@ -66,7 +67,7 @@ export function App() {
         </Route>
 
         <Route path="/admin" element={<RequireRole roles={[...staff]}><AdminLayout /></RequireRole>}>
-          <Route index element={<Navigate to="library" replace />} />
+          <Route index element={<Dashboard />} />
           <Route path="library" element={<Library />} />
           <Route path="winning-ads" element={<WinningAds />} />
           <Route path="competitors" element={<Competitors />} />

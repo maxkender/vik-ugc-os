@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
-  BarChart3, Bot, Clapperboard, Flame, Image, LayoutGrid, ListChecks, LogOut, Megaphone, Menu, Moon, Settings, Sun, Trophy, UserPlus, Users, Wallet, X,
+  BarChart3, Bot, Clapperboard, Flame, Home, Image, LayoutGrid, ListChecks, LogOut, Megaphone, Menu, Moon, Settings, Sun, Trophy, UserPlus, Users, Wallet, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
@@ -19,6 +19,9 @@ const WATCH: Role[] = ["admin", "recruiter", "controller"];
 
 /** Navigation par sections. Chaque entrée déclare les rôles qui la voient. */
 const SECTIONS: NavSection[] = [
+  { title: "", items: [
+    { to: "/admin", label: "Tableau de bord", icon: Home, roles: ALL },
+  ] },
   { title: "Veille", items: [
     { to: "/admin/library", label: "Bibliothèque", icon: LayoutGrid, roles: WATCH },
     { to: "/admin/competitors", label: "Concurrents", icon: Trophy, roles: WATCH },
@@ -56,12 +59,12 @@ const ROLE_LABEL: Record<Role, string> = { admin: "Admin", recruiter: "Recruteur
 
 const itemClass = ({ isActive }: { isActive: boolean }) =>
   cn(
-    "group relative flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm transition-colors",
-    isActive ? "bg-card font-medium text-foreground shadow-sm ring-1 ring-border" : "text-muted-foreground hover:bg-black/[0.04] hover:text-foreground dark:hover:bg-white/5",
+    "group relative flex h-9 items-center gap-3 rounded-lg px-3 text-[14px] transition-colors",
+    isActive ? "bg-accent-soft font-medium text-[#0040d6]" : "text-muted-foreground hover:bg-muted hover:text-foreground",
   );
 
 function Indicator() {
-  return <span className="absolute -left-3 top-1.5 bottom-1.5 w-[3px] rounded-r bg-accent" aria-hidden />;
+  return null;
 }
 
 export function AdminLayout() {
@@ -81,25 +84,25 @@ export function AdminLayout() {
   };
 
   const sidebar = (
-    <aside className="flex h-full w-64 shrink-0 flex-col border-r bg-surface">
-      <div className="flex items-center gap-2 px-5 pb-4 pt-5">
-        <Logo className="h-6" />
-        <span className="rounded border border-border-strong bg-card px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">UGC OS</span>
+    <aside className="flex h-full w-[260px] shrink-0 flex-col border-r bg-white">
+      <div className="flex h-16 items-center gap-2.5 px-6">
+        <Logo className="h-[22px]" />
+        <span className="rounded-md bg-accent-soft px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent">UGC OS</span>
       </div>
-      <nav className="flex-1 space-y-5 overflow-y-auto px-3 pb-4 pt-1">
+      <nav className="flex-1 space-y-6 overflow-y-auto px-4 pb-6 pt-3">
         {SECTIONS.map((sec) => {
           const items = sec.items.filter((i) => i.roles.includes(role));
           if (!items.length) return null;
           return (
             <div key={sec.title}>
-              <p className="mb-1 px-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80">{sec.title}</p>
-              <div className="space-y-0.5 pl-3">
+              {sec.title && <p className="mb-1.5 px-3 text-[11px] font-medium uppercase tracking-[0.08em] text-subtle-foreground">{sec.title}</p>}
+              <div className="space-y-0.5">
                 {items.map((i) => (
-                  <NavLink key={i.to} to={i.to} className={itemClass}>
+                  <NavLink key={i.to} to={i.to} end={i.to === "/admin"} className={itemClass}>
                     {({ isActive }) => (
                       <>
                         {isActive && <Indicator />}
-                        <i.icon className={cn("h-4 w-4", isActive ? "text-accent" : "text-muted-foreground group-hover:text-foreground")} />
+                        <i.icon strokeWidth={1.75} className={cn("h-[18px] w-[18px]", isActive ? "text-accent" : "text-subtle-foreground group-hover:text-muted-foreground")} />
                         {i.label}
                       </>
                     )}
@@ -111,25 +114,25 @@ export function AdminLayout() {
         })}
         {isAdmin && (
           <div>
-            <p className="mb-1 flex items-center gap-1.5 px-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80"><Settings className="h-3 w-3" /> Réglages</p>
-            <div className="space-y-0.5 pl-3">
+            <p className="mb-1.5 flex items-center gap-1.5 px-3 text-[11px] font-medium uppercase tracking-[0.08em] text-subtle-foreground"><Settings className="h-3 w-3" /> Réglages</p>
+            <div className="space-y-0.5">
               {SETTINGS.map((i) => (
-                <NavLink key={i.to} to={i.to} className={({ isActive }) => cn(itemClass({ isActive }), "py-1")}>
-                  {({ isActive }) => (<>{isActive && <Indicator />}<span className="pl-[26px]">{i.label}</span></>)}
+                <NavLink key={i.to} to={i.to} className={({ isActive }) => cn(itemClass({ isActive }), "h-8 text-[13px]")}>
+                  {({ isActive }) => (<>{isActive && <Indicator />}<span className="pl-[30px]">{i.label}</span></>)}
                 </NavLink>
               ))}
             </div>
           </div>
         )}
       </nav>
-      <div className="border-t px-3 py-3">
+      <div className="border-t border-separator px-4 py-4">
         <div className="mb-2 flex items-center gap-2.5 px-2">
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent/10 text-xs font-semibold uppercase text-accent">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-tint-violet text-xs font-semibold uppercase text-vik-violet">
             {(profile?.full_name ?? profile?.email ?? "?").charAt(0)}
           </div>
           <div className="min-w-0">
-            <p className="truncate text-xs font-medium text-foreground">{profile?.full_name ?? profile?.email}</p>
-            <p className="truncate text-[11px] text-muted-foreground">{ROLE_LABEL[role]} · {profile?.email}</p>
+            <p className="truncate text-[13px] font-medium text-foreground">{profile?.full_name ?? profile?.email}</p>
+            <p className="truncate text-[11px] text-subtle-foreground">{ROLE_LABEL[role]}</p>
           </div>
         </div>
         <div className="flex gap-1">
@@ -145,22 +148,22 @@ export function AdminLayout() {
   );
 
   return (
-    <div className="flex h-full bg-background text-sm">
+    <div className="flex h-full bg-white text-sm">
       <div className="hidden md:flex">{sidebar}</div>
       {open && (
         <div className="fixed inset-0 z-40 flex md:hidden">
           <div className="relative">{sidebar}
             <button onClick={() => setOpen(false)} className="absolute right-2 top-4 rounded p-1.5 text-muted-foreground hover:bg-muted" aria-label="Fermer le menu"><X className="h-4 w-4" /></button>
           </div>
-          <div className="flex-1 bg-[#00113e]/30" onClick={() => setOpen(false)} />
+          <div className="flex-1 bg-[#0b1530]/20" onClick={() => setOpen(false)} />
         </div>
       )}
       <main className="flex-1 overflow-y-auto">
-        <div className="sticky top-0 z-30 flex items-center gap-2 border-b bg-background/90 px-4 py-2.5 backdrop-blur md:hidden">
+        <div className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-white/90 px-4 backdrop-blur md:hidden">
           <button onClick={() => setOpen(true)} className="rounded p-1.5 hover:bg-muted" aria-label="Ouvrir le menu"><Menu className="h-5 w-5" /></button>
           <Logo className="h-5" />
         </div>
-        <div className="mx-auto max-w-[1440px] px-5 py-8 md:px-8 lg:px-10"><Outlet /></div>
+        <div className="mx-auto max-w-[1360px] px-5 py-8 md:px-10 md:py-10"><Outlet /></div>
       </main>
     </div>
   );

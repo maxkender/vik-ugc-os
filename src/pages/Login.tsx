@@ -19,7 +19,7 @@ export default function Login() {
   const [error, setError] = useState<string | null>(params.get("denied") ? t("login.denied") : null);
 
   useEffect(() => {
-    if (session && profile) nav(params.get("next") ?? (profile.role === "poster" ? "/creator" : "/admin/library"), { replace: true });
+    if (session && profile) nav(params.get("next") ?? (profile.role === "poster" ? "/creator" : "/admin"), { replace: true });
   }, [session, profile]);
 
   const submit = async (e: React.FormEvent) => {

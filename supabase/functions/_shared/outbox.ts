@@ -104,6 +104,12 @@ export async function processOutbox(db: SupabaseClient, limit = 50, fetchFn: typ
     .order("created_at").limit(limit);
   const result = { sent: 0, held: 0, failed: 0 };
   for (const m of queue ?? []) {
+    // Comptes de test (QA) : jamais d'envoi réel.
+    if (/@vik-qa\.test$/i.test(m.to_email)) {
+      await db.from("email_outbox").update({ status: "cancelled", hold_reason: "test_account" }).eq("id", m.id);
+      result.held++;
+      continue;
+    }
     const route = routeEmail(m.to_email, settings);
     if (!route.send) {
       // On laisse en file (« held ») avec la raison ; repassera en queued quand les réglages changent.

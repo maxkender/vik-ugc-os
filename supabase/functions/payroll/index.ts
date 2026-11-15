@@ -14,7 +14,9 @@ import { formatMoney } from "../_shared/logic/zones.ts";
 
 async function compute(db: SupabaseClient, weekStart: string) {
   const { data: zones } = await db.from("zones").select("*");
-  const { data: posters } = await db.from("posters").select("id, zone_code, status");
+  const { data: allPosters } = await db.from("posters").select("id, zone_code, status, profiles(is_test)");
+  // Comptes de test exclus de la paie.
+  const posters = (allPosters ?? []).filter((p: any) => !p.profiles?.is_test);
   const from = `${addDays(weekStart, -8)}T00:00:00Z`, to = `${addDays(weekStart, 7)}T00:00:00Z`;
   const { data: assignments } = await db.from("brief_assignments").select("id, poster_id, status, posted_url, posted_at, views_d7, briefs(title)")
     .gte("posted_at", from).lt("posted_at", to);

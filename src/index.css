@@ -16,24 +16,45 @@
   --vik-yellow: #ffbb43;
   --vik-red: #fe504f;
 
-  /* Clair (défaut) : fond blanc, texte navy, accent bleu. Contraste ≥ 4,5:1 pour le texte secondaire. */
+  /* Direction « blanc » (15/11, Max) : tout est blanc, on sépare par des bordures fines et de l'espace. */
   --accent: var(--vik-blue);
   --accent-foreground: #ffffff;
+  --accent-soft: #eef3ff;        /* fond actif / badge bleu */
   --background: #ffffff;
-  --foreground: var(--vik-navy);
-  --surface: #f7f8fa;            /* sidebar, en-têtes de tableau */
-  --muted: #f1f3f7;              /* survols, fonds discrets */
-  --muted-foreground: #5b6378;   /* 6,1:1 sur blanc */
+  --foreground: #0b1530;         /* texte principal */
+  --surface: #ffffff;            /* sidebar, en-têtes : blanc aussi */
+  --muted: #f7f8fb;              /* survol des lignes, champs */
+  --muted-foreground: #5b6478;   /* texte secondaire */
+  --subtle-foreground: #8c94a6;  /* texte tertiaire, labels */
   --card: #ffffff;
-  --border: #e6e8ee;
-  --border-strong: #d5d9e2;
+  --border: #eef0f4;
+  --border-strong: #e3e6ed;
+  --separator: #f0f2f6;
   --ring: var(--accent);
   --danger: #e5383b;
-  --success: #0f9d58;
-  --warning: #b97800;            /* texte « warning » lisible ; le jaune Vik sert de fond */
-  --radius: 0.625rem;
+  --success: #12a150;
+  --warning: #b97800;
+  /* Teintes douces (fonds de badges / icônes) */
+  --tint-blue: #eef3ff;
+  --tint-violet: #f3edff;
+  --tint-cyan: #e8f7ff;
+  --tint-yellow: #fff6e5;
+  --tint-red: #ffeded;
+  --tint-green: #eaf8ef;
+  --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.03);
+  --radius: 0.75rem;
 }
 .dark {
+  --accent-soft: color-mix(in oklch, var(--vik-cyan) 18%, var(--vik-navy));
+  --subtle-foreground: color-mix(in oklch, white 50%, var(--vik-navy));
+  --separator: color-mix(in oklch, var(--vik-navy) 80%, white);
+  --tint-blue: color-mix(in oklch, var(--vik-blue) 22%, var(--vik-navy));
+  --tint-violet: color-mix(in oklch, var(--vik-violet) 22%, var(--vik-navy));
+  --tint-cyan: color-mix(in oklch, var(--vik-cyan) 22%, var(--vik-navy));
+  --tint-yellow: color-mix(in oklch, var(--vik-yellow) 22%, var(--vik-navy));
+  --tint-red: color-mix(in oklch, var(--vik-red) 22%, var(--vik-navy));
+  --tint-green: color-mix(in oklch, #12a150 22%, var(--vik-navy));
   --accent: var(--vik-cyan);
   --accent-foreground: var(--vik-navy);
   --background: var(--vik-navy);
@@ -56,6 +77,17 @@
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-subtle-foreground: var(--subtle-foreground);
+  --color-accent-soft: var(--accent-soft);
+  --color-separator: var(--separator);
+  --color-tint-blue: var(--tint-blue);
+  --color-tint-violet: var(--tint-violet);
+  --color-tint-cyan: var(--tint-cyan);
+  --color-tint-yellow: var(--tint-yellow);
+  --color-tint-red: var(--tint-red);
+  --color-tint-green: var(--tint-green);
+  --shadow-xs: var(--shadow-xs);
+  --shadow-card: var(--shadow-sm);
   --color-card: var(--card);
   --color-surface: var(--surface);
   --color-border-strong: var(--border-strong);
