@@ -8,13 +8,18 @@ language sql stable security invoker set search_path = public as $$
   test_posters as (
     select p.id from public.posters p join public.profiles pr on pr.id = p.id where pr.is_test
   ),
+  real_apps as (
+    select a.* from public.applications a
+    where a.email not like '%@vik-qa.test'
+      and not exists (select 1 from public.profiles pr where pr.is_test and (pr.id = a.poster_id or lower(pr.email) = lower(a.email)))
+  ),
   vids as (
     select d.d, count(v.id) n, count(v.id) filter (where v.outlier >= 10 and not v.is_ad) outliers
     from days d left join public.videos v on v.first_seen_at::date = d.d group by d.d
   ),
   apps as (
     select d.d, count(a.id) n from days d
-    left join public.applications a on a.created_at::date = d.d and a.email not like '%@vik-qa.test' group by d.d
+    left join real_apps a on a.created_at::date = d.d group by d.d
   ),
   posts as (
     select d.d, count(b.id) n from days d
@@ -22,7 +27,9 @@ language sql stable security invoker set search_path = public as $$
   ),
   spend as (
     select d.d, coalesce(sum(m.spend), 0) s from days d
-    left join public.meta_insights m on m.date = d.d and m.level = 'campaign' group by d.d
+    -- Seulement les campagnes créées par Vik UGC OS (le compte pub contient d'autres campagnes).
+    left join public.meta_insights m on m.date = d.d and m.level = 'campaign'
+      and m.meta_id in (select meta_id from public.meta_campaigns where meta_id is not null) group by d.d
   ),
   apify as (
     select d.d, coalesce(sum(r.cost_usd), 0) c from days d
@@ -56,18 +63,20 @@ language sql stable security invoker set search_path = public as $$
       'posts_goal', (select n from active) * (select n from per_day)
     ),
     'funnel', jsonb_build_object(
-      'applied', (select count(*) from public.applications where email not like '%@vik-qa.test'),
-      'accepted', (select count(*) from public.applications where email not like '%@vik-qa.test' and status in ('accepted','contract_sent','signed','active')),
-      'signed', (select count(*) from public.applications where email not like '%@vik-qa.test' and status in ('signed','active')),
-      'active', (select count(*) from public.applications where email not like '%@vik-qa.test' and status = 'active')
+      'applied', (select count(*) from real_apps),
+      'accepted', (select count(*) from real_apps where status in ('accepted','contract_sent','signed','active')),
+      'signed', (select count(*) from real_apps where status in ('signed','active')),
+      'active', (select count(*) from real_apps where status = 'active')
     ),
     'todo', jsonb_build_object(
-      'to_review', (select count(*) from public.applications where status in ('new','review') and email not like '%@vik-qa.test'),
-      'blocked', (select count(*) from public.applications a where a.email not like '%@vik-qa.test'
-                    and ((a.status = 'contract_sent' and a.updated_at < now() - interval '48 hours')
+      'to_review', (select count(*) from real_apps where status in ('new','review')),
+      'blocked', (select count(*) from real_apps a where ((a.status = 'contract_sent' and a.updated_at < now() - interval '48 hours')
                       or (a.status = 'signed' and a.updated_at < now() - interval '48 hours'))),
       'to_validate', (select count(*) from public.brief_assignments where status = 'posted' and poster_id not in (select id from test_posters))
     )
   )
 $$;
 grant execute on function public.dashboard_stats() to authenticated;
+
+-- La candidature de démonstration du build (« Zoé Martin-E2E ») est un compte de test.
+update public.profiles set is_test = true where email = 'e2e-candidate@example.com';
