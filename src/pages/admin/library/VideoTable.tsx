@@ -26,7 +26,7 @@ export function VideoTable({ rows, sort, asc, onSort, onOpen, competitorName, ca
   competitorName: (id: string | null) => string; categoryName: (id: string | null) => string | undefined; adsOnly?: boolean; footer?: React.ReactNode;
 }) {
   const cols: Col[] = [
-    { key: "video", label: "Vidéo", className: "min-w-[220px]", cell: (v) => (
+    { key: "video", label: "Vidéo", className: "min-w-[200px]", cell: (v) => (
       <div className="flex items-center gap-3">
         <Thumb v={v} />
         <div className="min-w-0">
@@ -34,7 +34,7 @@ export function VideoTable({ rows, sort, asc, onSort, onOpen, competitorName, ca
             <span title={PLATFORM_LABEL[v.platform]} className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#f1f3f7] text-muted-foreground"><PlatformIcon p={v.platform} className="h-3 w-3" /></span>
             <p className="max-w-[160px] truncate font-medium text-foreground">@{v.author_handle ?? v.ad_page_name ?? "?"}</p>
           </div>
-          <p className="mt-0.5 max-w-[190px] truncate text-xs text-subtle-foreground">{v.caption || "—"}</p>
+          <p className="mt-0.5 max-w-[170px] truncate text-xs text-subtle-foreground">{v.caption || "—"}</p>
         </div>
       </div>
     ) },
@@ -57,8 +57,13 @@ export function VideoTable({ rows, sort, asc, onSort, onOpen, competitorName, ca
       { key: "velocity", label: "Vues/j", sort: "velocity", num: true, cell: (v: Video) => compact(v.velocity) },
     ] as Col[] : []),
     { key: "score", label: "Score", sort: "score", num: true, cell: (v) => <ScorePill score={v.score} /> },
-    { key: "date", label: "Publiée", sort: "date", num: true, cell: (v) => <span className="whitespace-nowrap text-muted-foreground">{(() => { const d = v.is_ad ? v.ad_started_at : v.published_at; return d ? new Date(d).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "2-digit" }) : "—"; })()}</span> },
-    ...(adsOnly || rows.some((r) => r.is_ad) ? [{ key: "ad", label: "Diffusion", sort: "ad_days", num: true, cell: (v: Video) => (v.is_ad ? <span className="whitespace-nowrap"><span className="font-medium text-foreground">{v.ad_days ?? "?"} j</span>{v.ad_active && <span className="ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-[#12a150] align-middle" title="Active" />}</span> : <span className="text-subtle-foreground">—</span>) } as Col] : []),
+    { key: "date", label: "Publiée", sort: "date", num: true, cell: (v) => (
+      <div className="whitespace-nowrap">
+        <p className="text-muted-foreground">{(() => { const d = v.is_ad ? v.ad_started_at : v.published_at; return d ? new Date(d).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "2-digit" }) : "—"; })()}</p>
+        {!adsOnly && v.is_ad && <p className="text-xs text-[#8a5a00]">{v.ad_days ?? "?"} j{v.ad_active ? " · active" : ""}</p>}
+      </div>
+    ) },
+    ...(adsOnly ? [{ key: "ad", label: "Diffusion", sort: "ad_days", num: true, cell: (v: Video) => (v.is_ad ? <span className="whitespace-nowrap"><span className="font-medium text-foreground">{v.ad_days ?? "?"} j</span>{v.ad_active && <span className="ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-[#12a150] align-middle" title="Active" />}</span> : <span className="text-subtle-foreground">—</span>) } as Col] : []),
   ];
   return (
     <div className="overflow-hidden rounded-xl border bg-white shadow-xs">
