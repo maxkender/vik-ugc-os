@@ -15,7 +15,7 @@
 - **Secrets posés** (sauf `APP_URL`). Les fonctions déployées ont été retestées avec les vraies clés : collecte, archivage MP4, Meta, Brevo.
 - **Logos Vik Studios intégrés** : palette officielle, sidebar, espace posteur, landing, login, favicon, en-tête des emails.
 - **Pour démarrer : SETUP.md** (Vercel + `APP_URL`, première connexion = admin).
-- ⚠️ Le code n'est **pas encore sur GitHub** : push refusé (403), l'app GitHub Claude n'a pas accès à `maxkender/vik-ugc-os`. Il y a 8 commits locaux, plus une copie dans `vik-ugc-os.bundle` (racine du dossier).
+- ⚠️ Le code n'est **pas encore sur GitHub** : push refusé (403), l'app GitHub Claude n'a pas accès à `maxkender/vik-ugc-os`. Il y a 9 commits locaux, plus une copie dans `vik-ugc-os.bundle` (racine du dossier).
 
 ## Tester en 10 minutes (après SETUP.md §1–3)
 
@@ -129,7 +129,7 @@
   - `meta.create_ad` (upload d'image → adcreative → ad), qui a besoin du secret Meta et d'une créa ;
   - le fond IA ElevenLabs (plan Pro) ;
   - le relevé des vues sur de vrais posts.
-- Modèles d'emails en EN et ES seulement (FR / DE / … retombent sur EN). À compléter dans Réglages → Emails.
+- Modèles d'emails en EN, ES et FR (les autres langues retombent sur EN). Modifiables dans Réglages → Emails.
 - **Juridique** : contrat et clauses pays marqués `[À VALIDER PAR MAX/JURIDIQUE]` (droit applicable, statut indépendant par pays, exigences Ruul).
 - **Meta** : avec la catégorie EMPLOYMENT, pas de ciblage 18–25 / étudiants (interdit par Meta). Voir DECISIONS.md §13.
 - PDF de contrat : police Helvetica (caractères non latins remplacés par « ? »). Pour le japonais, l'hébreu, etc., embarquer une police Unicode.

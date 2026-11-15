@@ -50,7 +50,7 @@ Chaque choix ci-dessous a été pris seul, pour ne pas bloquer. Tout est modifia
     - Mode test **activé** par défaut ; sans email de test → statut `held`, rien ne part.
     - Sans expéditeur Brevo → `held` aussi.
     - Les emails `held` repartent automatiquement quand les réglages le permettent.
-    - Les modèles existent en EN et ES ; les autres langues retombent sur EN.
+    - Les modèles existent en EN, ES et FR ; les autres langues retombent sur EN.
 20. **Crons via pg_cron + pg_net.** Ils appellent les edge functions avec l'en-tête `x-cron-secret`. Le secret (`CRON_SECRET`) a été généré pendant le build et posé à la fois dans les secrets des functions et dans Vault. Personne n'a besoin de le connaître.
 21. **i18n.** Admin en français. Landing, candidature, signature et espace posteur en EN / ES / FR (langue déduite du pays, `?lang=` prioritaire).
 22. **Kit UI.** Composants style shadcn écrits à la main (Tailwind v4 + variables CSS, sans Radix) : moins de dépendances, et le thème se change avec `--accent` dans `src/index.css`.
