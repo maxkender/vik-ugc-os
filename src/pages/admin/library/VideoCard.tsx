@@ -1,5 +1,5 @@
 import { memo, useRef, useState } from "react";
-import { Eye, Heart, Instagram, Megaphone, Music2, Zap } from "lucide-react";
+import { Eye, Heart, Instagram, Layers, Megaphone, Music2, Zap } from "lucide-react";
 import { MetricPill } from "@/components/ui";
 import { cn, compact, flag } from "@/lib/utils";
 import { ORIGIN_LABEL, PLATFORM_LABEL, pct, type Video } from "./types";
@@ -21,6 +21,12 @@ export function ThumbPlaceholder({ v, size = "lg" }: { v: Pick<Video, "platform"
       {size === "lg" && <span className="max-w-[80%] truncate text-[11px] font-medium text-[#5b6478]">@{v.author_handle ?? v.ad_page_name ?? "?"}</span>}
     </div>
   );
+}
+
+/** Nom affiché : pour une pub, le nom de la page (l'identifiant numérique n'est pas lisible). */
+export function displayName(v: Pick<Video, "is_ad" | "author_handle" | "ad_page_name">): string {
+  if (v.is_ad) return v.ad_page_name ?? (v.author_handle && !/^\d+$/.test(v.author_handle) ? v.author_handle : "Page Meta");
+  return (v.author_handle ?? "?").replace(/^@/, "");
 }
 
 const ORIGIN_TONE: Record<string, string> = {
@@ -71,6 +77,7 @@ export const VideoCard = memo(function VideoCard({ v, fav, onOpen, onFav, catego
             <>
               <MetricPill tone="dark" icon={<Megaphone />}>{v.ad_started_at ? `Depuis le ${new Date(v.ad_started_at).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}` : "Pub Meta"}</MetricPill>
               {v.ad_active ? <MetricPill tone="dark"><span className="mr-0.5 inline-block h-1.5 w-1.5 rounded-full bg-[#3ddc84]" />Active</MetricPill> : <MetricPill tone="dark">Arrêtée</MetricPill>}
+              {(v.ad_variants ?? 1) > 1 && <MetricPill tone="dark" icon={<Layers />}>{v.ad_variants} variantes</MetricPill>}
             </>
           ) : (
             <>
@@ -83,10 +90,10 @@ export const VideoCard = memo(function VideoCard({ v, fav, onOpen, onFav, catego
       </div>
       <div className="mt-2.5 flex items-start gap-2 px-0.5">
         <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-tint-violet text-[10px] font-semibold uppercase text-[#7a32ef]">
-          {(v.author_handle ?? v.ad_page_name ?? "?").replace(/^@/, "").charAt(0)}
+          {displayName(v).charAt(0)}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[13px] font-medium text-foreground">@{v.author_handle ?? v.ad_page_name ?? "?"}</p>
+          <p className="truncate text-[13px] font-medium text-foreground">{v.is_ad ? displayName(v) : `@${displayName(v)}`}</p>
           <p className="truncate text-xs text-subtle-foreground">
             {competitorName ?? "Hors concurrents"}{categoryName ? ` · ${categoryName}` : ""}{v.country ? ` · ${flag(v.country)}` : v.language ? ` · ${v.language}` : ""}
           </p>

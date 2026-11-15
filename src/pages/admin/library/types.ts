@@ -32,6 +32,10 @@ export interface Video {
   ad_active: boolean | null;
   ad_days: number | null;
   ad_page_name: string | null;
+  ad_countries?: string[] | null;
+  ad_variants?: number | null;
+  ad_platforms?: string[] | null;
+  ad_collation_id?: string | null;
   first_seen_at: string;
   origin: "official" | "ugc" | "ad" | "other" | null;
   engagement: number | null;

@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Camera, Check, CheckCircle2, Copy, HelpCircle, Instagram, RefreshCw, ShieldCheck, X, XCircle } from "lucide-react";
 import { Button, Card, Spinner, useToast } from "@/components/ui";
 import { callFn, supabase } from "@/lib/supabase";
-import { useAuth } from "@/lib/auth";
+import { READ_ONLY_HINT, useCreatorIdentity } from "./shared";
 import { bioFor, displayNameFor } from "@shared/handles.ts";
 
 type Avail = "available" | "taken" | "unknown";
@@ -24,7 +24,7 @@ function CopyButton({ text }: { text: string | null | undefined }) {
 
 export default function Account() {
   const { t, i18n } = useTranslation();
-  const { profile } = useAuth();
+  const me = useCreatorIdentity();
   const toast = useToast();
   const qc = useQueryClient();
   const [busy, setBusy] = useState<"suggest" | "save" | "verify" | null>(null);
@@ -32,12 +32,12 @@ export default function Account() {
   const [instagram, setInstagram] = useState("");
 
   const { data, isLoading } = useQuery({
-    queryKey: ["my-account", profile?.id],
-    enabled: !!profile,
+    queryKey: ["my-account", me.id],
+    enabled: !!me.id,
     queryFn: async () => {
       const { data: p } = await supabase.from("posters")
         .select("id, display_name, language, app_id, tiktok_handle, instagram_handle, handle_suggestions, handles_status, handles_report, handles_checked_at")
-        .eq("id", profile!.id).maybeSingle();
+        .eq("id", me.id!).maybeSingle();
       let app: any = null;
       if (p?.app_id) app = (await supabase.from("apps").select("*").eq("id", p.app_id).maybeSingle()).data;
       if (!app) app = (await supabase.from("apps").select("*").eq("active", true).order("created_at").limit(1).maybeSingle()).data;
@@ -52,13 +52,13 @@ export default function Account() {
 
   // Première visite : on propose tout de suite des handles.
   useEffect(() => {
-    if (p && (p.handle_suggestions ?? []).length === 0 && p.handles_status === "none" && !busy) suggest();
+    if (!me.readOnly && p && (p.handle_suggestions ?? []).length === 0 && p.handles_status === "none" && !busy) suggest();
   }, [p?.id]);
 
   if (isLoading) return <div className="flex justify-center py-16"><Spinner /></div>;
   if (!p) return <Card><p className="text-sm text-muted-foreground">{t("common.error")}</p></Card>;
 
-  const full = (profile?.full_name ?? p.display_name ?? "").trim();
+  const full = (me.fullName ?? p.display_name ?? "").trim();
   const ctx = { app: app?.name ?? "Micabo", first: full.split(/\s+/)[0] || "creator", last: full.split(/\s+/).slice(1).join(" ") };
   const bio = bioFor(app?.bio_templates, i18n.resolvedLanguage ?? p.language, ctx);
   const displayName = displayNameFor(app?.display_name_pattern, ctx);
@@ -67,12 +67,14 @@ export default function Account() {
   const refresh = () => qc.invalidateQueries({ queryKey: ["my-account"] });
 
   async function suggest() {
+    if (me.readOnly) return;
     setBusy("suggest");
     try { await callFn("handles", { action: "suggest" }); refresh(); }
     catch (e) { toast((e as Error).message, "danger"); }
     finally { setBusy(null); }
   }
   const save = async () => {
+    if (me.readOnly) return;
     setBusy("save");
     const { error } = await supabase.rpc("poster_submit_handles", { p_tiktok: tiktok, p_instagram: instagram });
     setBusy(null);
@@ -81,6 +83,7 @@ export default function Account() {
     refresh();
   };
   const verify = async () => {
+    if (me.readOnly) return;
     setBusy("verify");
     try { await callFn("handles", { action: "verify" }); refresh(); }
     catch (e) { toast((e as Error).message, "danger"); }
@@ -106,7 +109,7 @@ export default function Account() {
       </header>
 
       <Step n={1} done={step1Done} title={t("account.step1")} hint={t("account.step1Hint")}
-        action={<Button size="sm" variant="secondary" onClick={suggest} loading={busy === "suggest"}><RefreshCw className="h-3.5 w-3.5" /> {t("account.regenerate")}</Button>}>
+        action={<Button size="sm" variant="secondary" onClick={suggest} loading={busy === "suggest"} disabled={me.readOnly} title={me.readOnly ? READ_ONLY_HINT : undefined}><RefreshCw className="h-3.5 w-3.5" /> {t("account.regenerate")}</Button>}>
         {busy === "suggest" ? (
           <p className="flex items-center gap-2 rounded-xl bg-muted px-4 py-4 text-sm text-muted-foreground"><Spinner className="h-4 w-4" /> {t("account.generating")}</p>
         ) : !hasSuggestions ? (
@@ -149,8 +152,8 @@ export default function Account() {
           <HandleInput icon={<Instagram className="h-4 w-4" />} label={t("account.instagram")} value={instagram} onChange={setInstagram} />
         </div>
         <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-          <Button size="lg" variant="secondary" className="h-11" onClick={save} loading={busy === "save"} disabled={!tiktok.trim()}>{t("account.save")}</Button>
-          <Button size="lg" className="h-11" onClick={verify} loading={busy === "verify"} disabled={!p.tiktok_handle}><ShieldCheck className="h-4 w-4" /> {busy === "verify" ? t("account.checking") : t("account.verify")}</Button>
+          <Button size="lg" variant="secondary" className="h-11" onClick={save} loading={busy === "save"} disabled={me.readOnly || !tiktok.trim()} title={me.readOnly ? READ_ONLY_HINT : undefined}>{t("account.save")}</Button>
+          <Button size="lg" className="h-11" onClick={verify} loading={busy === "verify"} disabled={me.readOnly || !p.tiktok_handle} title={me.readOnly ? READ_ONLY_HINT : undefined}><ShieldCheck className="h-4 w-4" /> {busy === "verify" ? t("account.checking") : t("account.verify")}</Button>
         </div>
         {report && (
           <div className="mt-4 grid gap-2">

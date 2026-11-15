@@ -70,7 +70,21 @@ export default function Landing() {
   const lang = i18n.resolvedLanguage ?? "en";
   const price = zone ? formatMoney(Number(zone.price_per_video), zone.currency, lang) : "";
   const steps = t("landing.steps", { returnObjects: true }) as unknown as string[][];
-  const faqs = t("landing.faqs", { returnObjects: true }) as unknown as string[][];
+  // Textes surchargés pour ce pays et cette langue (Réglages → Contenus & aperçus → Landing).
+  const overrides = useQuery({
+    queryKey: ["landing-overrides", code, lang],
+    enabled: !!code,
+    queryFn: async () => {
+      const { data } = await supabase.from("landing_overrides").select("key, value").eq("country_code", code).eq("language", lang.split("-")[0]);
+      return Object.fromEntries((data ?? []).map((r: { key: string; value: string }) => [r.key, r.value])) as Record<string, string>;
+    },
+  });
+  const ov = overrides.data ?? {};
+  /** Texte i18n, ou sa surcharge (mêmes variables {{brand}}, {{price}}…). */
+  const tt = (key: string, vars: Record<string, string> = {}): string =>
+    ov[key] ? ov[key].replace(/\{\{\s*(\w+)\s*\}\}/g, (m, k) => vars[k] ?? m) : (t(key, vars) as string);
+  const faqs = (t("landing.faqs", { returnObjects: true }) as unknown as string[][]).map(([q, a], i) =>
+    [ov[`landing.faq.${i}.q`] ?? q, ov[`landing.faq.${i}.a`] ?? a]);
   const openCountries = useMemo(() => (countries ?? []).filter((c) => c.open && c.zone_code), [countries]);
   const applyHref = `/apply/${code.toLowerCase()}${kept}`;
 
@@ -93,7 +107,7 @@ export default function Landing() {
           <Logo className="h-[22px] sm:h-6" />
           <div className="flex items-center gap-2">
             <LangSwitcher />
-            {open && <Link to={applyHref} className="hidden sm:block"><Button size="sm">{t("landing.cta")}</Button></Link>}
+            {open && <Link to={applyHref} className="hidden sm:block"><Button size="sm">{tt("landing.cta")}</Button></Link>}
           </div>
         </div>
       </header>
@@ -103,7 +117,7 @@ export default function Landing() {
       ) : !open ? (
         <section className="mx-auto max-w-xl px-6 py-24 text-center">
           <span className="mx-auto mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-tint-blue text-accent"><Globe2 className="h-6 w-6" /></span>
-          <h1 className="text-3xl font-semibold tracking-[-0.02em] text-foreground">{t("landing.badge")}</h1>
+          <h1 className="text-3xl font-semibold tracking-[-0.02em] text-foreground">{tt("landing.badge")}</h1>
           <p className="mt-3 text-muted-foreground">{code ? t("landing.closed") : t("landing.country")}</p>
           <div className="mt-8 flex justify-center">{selector}</div>
         </section>
@@ -116,12 +130,12 @@ export default function Landing() {
             <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 pb-16 pt-10 sm:px-8 sm:pt-16 lg:grid-cols-[1.15fr_0.85fr] lg:pb-24">
               <div>
                 <span className="inline-flex items-center gap-2 rounded-full border border-[#dbe5ff] bg-white px-3 py-1 text-xs font-medium text-[#0040d6] shadow-xs">
-                  <span className="h-1.5 w-1.5 rounded-full bg-success" /> {t("landing.badge")} · {flag(country!.code)} {country!.name}
+                  <span className="h-1.5 w-1.5 rounded-full bg-success" /> {tt("landing.badge")} · {flag(country!.code)} {country!.name}
                 </span>
-                <h1 className="mt-6 text-[34px] font-semibold leading-[1.1] tracking-[-0.03em] text-foreground sm:text-5xl lg:text-[56px]">{t("landing.title", { brand: BRAND })}</h1>
-                <p className="mt-5 max-w-xl text-[17px] leading-relaxed text-muted-foreground">{t("landing.subtitle", { price })}</p>
+                <h1 className="mt-6 text-[34px] font-semibold leading-[1.1] tracking-[-0.03em] text-foreground sm:text-5xl lg:text-[56px]">{tt("landing.title", { brand: BRAND })}</h1>
+                <p className="mt-5 max-w-xl text-[17px] leading-relaxed text-muted-foreground">{tt("landing.subtitle", { price })}</p>
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <Link to={applyHref}><Button size="lg" className="h-12 w-full px-7 text-[15px] sm:w-auto">{t("landing.cta")} <ArrowRight className="h-4 w-4" /></Button></Link>
+                  <Link to={applyHref}><Button size="lg" className="h-12 w-full px-7 text-[15px] sm:w-auto">{tt("landing.cta")} <ArrowRight className="h-4 w-4" /></Button></Link>
                   {selector}
                 </div>
                 <div className="mt-10 grid grid-cols-3 gap-3 sm:max-w-xl">
@@ -199,9 +213,9 @@ export default function Landing() {
           {/* CTA final */}
           <section className="px-5 pb-16 sm:px-8 sm:pb-24">
             <div className="mx-auto flex max-w-6xl flex-col items-center gap-5 rounded-3xl bg-tint-blue px-6 py-12 text-center sm:py-16">
-              <h2 className="max-w-2xl text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">{t("landing.title", { brand: BRAND })}</h2>
-              <p className="max-w-xl text-muted-foreground">{t("landing.subtitle", { price })}</p>
-              <Link to={applyHref}><Button size="lg" className="h-12 px-7 text-[15px]">{t("landing.cta")} <ArrowRight className="h-4 w-4" /></Button></Link>
+              <h2 className="max-w-2xl text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">{tt("landing.title", { brand: BRAND })}</h2>
+              <p className="max-w-xl text-muted-foreground">{tt("landing.subtitle", { price })}</p>
+              <Link to={applyHref}><Button size="lg" className="h-12 px-7 text-[15px]">{tt("landing.cta")} <ArrowRight className="h-4 w-4" /></Button></Link>
             </div>
           </section>
         </>
@@ -211,7 +225,7 @@ export default function Landing() {
       {/* CTA collant mobile */}
       {open && (
         <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-white/95 p-3 pb-[calc(env(safe-area-inset-bottom)+12px)] backdrop-blur-md sm:hidden">
-          <Link to={applyHref}><Button size="lg" className="h-12 w-full text-[15px]">{t("landing.cta")} · {price} / {t("landing.perVideo")}</Button></Link>
+          <Link to={applyHref}><Button size="lg" className="h-12 w-full text-[15px]">{tt("landing.cta")} · {price} / {t("landing.perVideo")}</Button></Link>
         </div>
       )}
     </div>

@@ -3,8 +3,9 @@
 //   brevo_check        admin : lecture seule (compte, expéditeurs, templates) pour Réglages → Emails
 //   requeue { id? }    admin : remet en file les emails « held » (après changement des réglages)
 //   cancel { id }      admin
-import { caller, getSetting, HttpError, requireAdmin, serve } from "../_shared/http.ts";
-import { processOutbox } from "../_shared/outbox.ts";
+//   send_test { key, language, vars }   admin : « M'envoyer un test » (Contenus & aperçus) → uniquement vers l'email admin de test
+import { appUrl, caller, getSetting, HttpError, requireAdmin, serve } from "../_shared/http.ts";
+import { processOutbox, queueEmail } from "../_shared/outbox.ts";
 import { routeEmail } from "../_shared/logic/emailGuard.ts";
 
 async function brevo(path: string) {
@@ -41,6 +42,20 @@ serve(async (req, body, db) => {
       const { error } = await q;
       if (error) throw error;
       return { ok: true };
+    }
+    case "send_test": {
+      if (c.kind !== "user") throw new HttpError(403, "manual_only");
+      const email = await getSetting(db, "email");
+      const to = String(email.test_recipient ?? "").trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) throw new HttpError(409, "Renseigne d'abord l'email admin de test (Réglages → Emails)");
+      const key = String(body.key ?? "");
+      const vars = typeof body.vars === "object" && body.vars ? body.vars : {};
+      const id = await queueEmail(db, { template: key, to, language: String(body.language ?? "en"), vars, buttonUrl: appUrl("/") });
+      const { data: row } = await db.from("email_outbox").select("subject").eq("id", id).single();
+      await db.from("email_outbox").update({ subject: `[TEST] ${row?.subject ?? key}` }).eq("id", id);
+      const sent = await processOutbox(db, 20);
+      const { data: after } = await db.from("email_outbox").select("status, hold_reason, delivered_to").eq("id", id).single();
+      return { ok: true, id, to, status: after?.status, hold_reason: after?.hold_reason ?? null, processed: sent };
     }
     case "cancel":
       await db.from("email_outbox").update({ status: "cancelled" }).eq("id", body.id).neq("status", "sent");

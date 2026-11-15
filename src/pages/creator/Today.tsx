@@ -3,11 +3,10 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { CheckCircle2, Clock, ExternalLink, Lightbulb, Link2, Play, Quote, Send, Sparkles, XCircle } from "lucide-react";
 import { publicUrl, supabase } from "@/lib/supabase";
-import { useAuth } from "@/lib/auth";
 import { Button, Spinner, useToast } from "@/components/ui";
 import { formatMoney } from "@shared/zones.ts";
 import { cn } from "@/lib/utils";
-import { todayIso, useMyPoster } from "./shared";
+import { READ_ONLY_HINT, todayIso, useCreatorIdentity, useMyPoster } from "./shared";
 
 interface RefVideo { id: string; url: string | null; thumbnail_path: string | null; thumbnail_src: string | null; video_path: string | null; caption: string | null; platform: string }
 interface Assignment {
@@ -71,8 +70,10 @@ function BriefCard({ a, index }: { a: Assignment; index: number }) {
   const toast = useToast();
   const [url, setUrl] = useState(a.posted_url ?? "");
   const [busy, setBusy] = useState(false);
+  const { readOnly } = useCreatorIdentity();
   const b = a.briefs;
   const submit = async () => {
+    if (readOnly) return;
     setBusy(true);
     const { error } = await supabase.rpc("submit_post", { p_assignment: a.id, p_url: url.trim() });
     setBusy(false);
@@ -131,7 +132,7 @@ function BriefCard({ a, index }: { a: Assignment; index: number }) {
             <div className="flex flex-col gap-2 sm:flex-row">
               <input type="url" inputMode="url" placeholder="https://www.tiktok.com/@you/video/…" value={url} onChange={(e) => setUrl(e.target.value)} aria-label={t("creator.postedLink")}
                 className="h-12 w-full rounded-lg border border-border-strong bg-white px-3.5 text-[15px] placeholder:text-subtle-foreground focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/10" />
-              <Button size="lg" className="h-12 shrink-0 sm:px-6" onClick={submit} loading={busy} disabled={!valid || url.trim() === (a.posted_url ?? "")}>
+              <Button size="lg" className="h-12 shrink-0 sm:px-6" onClick={submit} loading={busy} disabled={readOnly || !valid || url.trim() === (a.posted_url ?? "")} title={readOnly ? READ_ONLY_HINT : undefined}>
                 <Send className="h-4 w-4" /> {t("creator.submit")}
               </Button>
             </div>
@@ -171,15 +172,15 @@ function ProgressRing({ done, total }: { done: number; total: number }) {
 
 export default function Today() {
   const { t, i18n } = useTranslation();
-  const { profile } = useAuth();
+  const me = useCreatorIdentity();
   const poster = useMyPoster();
   const q = useQuery({
-    queryKey: ["my-assignments", profile?.id],
-    enabled: !!profile,
+    queryKey: ["my-assignments", me.id],
+    enabled: !!me.id,
     queryFn: async () => {
       const { data, error } = await supabase.from("brief_assignments")
         .select("id, due_date, status, posted_url, rejection_reason, briefs(title, hook, instructions, reference_video_id, videos(id, url, thumbnail_path, thumbnail_src, video_path, caption, platform))")
-        .eq("poster_id", profile!.id).order("due_date", { ascending: false }).limit(60);
+        .eq("poster_id", me.id!).order("due_date", { ascending: false }).limit(60);
       if (error) throw error;
       return (data ?? []) as unknown as Assignment[];
     },
@@ -192,7 +193,7 @@ export default function Today() {
   const lang = i18n.resolvedLanguage ?? "en";
   const goal = z?.videos_per_day ?? 2;
   const doneToday = list.filter((a) => a.due_date === today && (a.status === "posted" || a.status === "validated")).length;
-  const first = (profile?.full_name ?? "").split(" ")[0];
+  const first = (me.fullName ?? "").split(" ")[0];
 
   return (
     <div className="space-y-8">

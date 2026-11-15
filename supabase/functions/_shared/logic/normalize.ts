@@ -32,6 +32,11 @@ export interface VideoRow {
   ad_days: number | null;
   ad_page_name: string | null;
   ad_countries: string[] | null;
+  /** Pubs : nombre de variantes (collationCount de l'Ad Library, sinon nombre de cartes). */
+  ad_variants?: number | null;
+  ad_collation_id?: string | null;
+  /** Pubs : plateformes de diffusion (facebook, instagram, messenger, audience_network, threads). */
+  ad_platforms?: string[] | null;
   raw_type: string | null;
   mentions: string[];
 }
@@ -147,6 +152,21 @@ export function adRunDays(start: string | null, end: string | null, active: bool
   return Math.max(1, Math.round((e - s) / DAY) + 1);
 }
 
+/** Pays ciblés ou atteints (codes ISO) ; liste vide = inconnu → null. */
+export function countriesOf(x: Any): string[] | null {
+  const raw = Array.isArray(x.targetedOrReachedCountries) && x.targetedOrReachedCountries.length ? x.targetedOrReachedCountries
+    : Array.isArray(x.reachedCountries) && x.reachedCountries.length ? x.reachedCountries : null;
+  if (!raw) return null;
+  const out = [...new Set(raw.map((c: unknown) => String(c).trim().toUpperCase()).filter((c: string) => /^[A-Z]{2}$/.test(c)))] as string[];
+  return out.length ? out : null;
+}
+
+/** Variantes d'une pub : collationCount (doublons regroupés par l'Ad Library), au moins le nombre de cartes (DCO / carrousel). */
+export function adVariants(x: Any, cards: Any[] = []): number {
+  const coll = num(x.collationCount) ?? 1;
+  return Math.max(1, coll, cards.length);
+}
+
 /** Item apify~facebook-ads-scraper (format « Ad Library »). Seules les pubs vidéo sont gardées. */
 export function normalizeFacebookAd(x: Any, now = new Date()): VideoRow | null {
   const id = str(String(x.adArchiveID ?? x.adArchiveId ?? x.ad_archive_id ?? x.id ?? ""));
@@ -189,7 +209,11 @@ export function normalizeFacebookAd(x: Any, now = new Date()): VideoRow | null {
     ad_active: active,
     ad_days: adRunDays(start, end, active, now),
     ad_page_name: pageName,
-    ad_countries: Array.isArray(x.targetedOrReachedCountries) ? x.targetedOrReachedCountries : Array.isArray(x.reachedCountries) ? x.reachedCountries : null,
+    ad_countries: countriesOf(x),
+    ad_variants: adVariants(x, cards),
+    ad_collation_id: str(String(x.collationID ?? x.collationId ?? "")) ?? null,
+    ad_platforms: Array.isArray(x.publisherPlatform) && x.publisherPlatform.length
+      ? [...new Set(x.publisherPlatform.map((p: unknown) => String(p).toLowerCase()))] as string[] : null,
     raw_type: str(snap.displayFormat),
     mentions: mentionsOf(null, null, body),
   };

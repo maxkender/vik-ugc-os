@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { BarChart3, Eye, Film, TrendingUp } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/lib/auth";
+import { useCreatorIdentity } from "./shared";
 import { IconTile, Spinner } from "@/components/ui";
 
 interface Row { id: string; posted_url: string | null; posted_at: string | null; views_d2: number | null; views_d7: number | null; last_views: number | null; briefs: { title: string } | null }
@@ -15,15 +15,15 @@ const EMPTY: Record<string, string> = {
 
 export default function Stats() {
   const { t, i18n } = useTranslation();
-  const { profile } = useAuth();
+  const me = useCreatorIdentity();
   const lang = i18n.resolvedLanguage ?? "en";
   const nf = new Intl.NumberFormat(lang, { notation: "compact", maximumFractionDigits: 1 });
   const q = useQuery({
-    queryKey: ["my-stats", profile?.id],
-    enabled: !!profile,
+    queryKey: ["my-stats", me.id],
+    enabled: !!me.id,
     queryFn: async () => {
       const { data } = await supabase.from("brief_assignments").select("id, posted_url, posted_at, views_d2, views_d7, last_views, briefs(title)")
-        .eq("poster_id", profile!.id).not("posted_url", "is", null).order("posted_at", { ascending: false }).limit(200);
+        .eq("poster_id", me.id!).not("posted_url", "is", null).order("posted_at", { ascending: false }).limit(200);
       return (data ?? []) as unknown as Row[];
     },
   });

@@ -3,12 +3,11 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Check, ChevronDown, Wallet } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/lib/auth";
 import { Button, IconTile, Spinner, useToast } from "@/components/ui";
 import { formatMoney } from "@shared/zones.ts";
 import { shortWeekLabel } from "@shared/dates.ts";
 import { cn } from "@/lib/utils";
-import { useMyPoster } from "./shared";
+import { READ_ONLY_HINT, useCreatorIdentity, useMyPoster } from "./shared";
 
 interface Line { kind: "video" | "bonus"; label: string; url: string | null; views_d7: number | null; amount: number; note?: string }
 interface Payout { id: string; week_start: string; currency: string; videos_count: number; base_amount: number; bonus_amount: number; total: number; status: "pending" | "paid" | "void"; lines: Line[] }
@@ -22,7 +21,7 @@ const RUUL_PROGRESS = { none: 0, email_given: 1, added: 2, done: 4, stopped: 0 }
 
 export default function Payments() {
   const { t, i18n } = useTranslation();
-  const { profile } = useAuth();
+  const me = useCreatorIdentity();
   const qc = useQueryClient();
   const toast = useToast();
   const poster = useMyPoster();
@@ -34,12 +33,13 @@ export default function Payments() {
   useEffect(() => { if (poster.data?.ruul_email) setEmail(poster.data.ruul_email); }, [poster.data?.ruul_email]);
 
   const payouts = useQuery({
-    queryKey: ["my-payouts", profile?.id],
-    enabled: !!profile,
-    queryFn: async () => ((await supabase.from("payouts").select("*").eq("poster_id", profile!.id).neq("status", "void").order("week_start", { ascending: false })).data ?? []) as Payout[],
+    queryKey: ["my-payouts", me.id],
+    enabled: !!me.id,
+    queryFn: async () => ((await supabase.from("payouts").select("*").eq("poster_id", me.id!).neq("status", "void").order("week_start", { ascending: false })).data ?? []) as Payout[],
   });
 
   const update = async (kind: "save" | "done") => {
+    if (me.readOnly) return;
     setBusy(kind);
     const { error } = await supabase.rpc("poster_update_self", kind === "save" ? { p_ruul_email: email.trim() } : { p_ruul_done: true });
     setBusy(null);
@@ -88,11 +88,12 @@ export default function Payments() {
             <input type="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={status === "done"}
               className="h-12 w-full rounded-lg border border-border-strong bg-white px-3.5 text-[15px] focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/10 disabled:opacity-60" />
             <Button size="lg" variant="secondary" className="h-12 shrink-0" onClick={() => update("save")} loading={busy === "save"}
-              disabled={!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) || email.trim() === poster.data?.ruul_email || status === "done"}>{t("creator.ruulSave")}</Button>
+              title={me.readOnly ? READ_ONLY_HINT : undefined}
+              disabled={me.readOnly || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) || email.trim() === poster.data?.ruul_email || status === "done"}>{t("creator.ruulSave")}</Button>
           </div>
         </div>
         {status !== "done" && (
-          <Button size="lg" className="mt-3 h-12 w-full" onClick={() => update("done")} loading={busy === "done"} disabled={!(status === "added" || status === "email_given")}>
+          <Button size="lg" className="mt-3 h-12 w-full" onClick={() => update("done")} loading={busy === "done"} disabled={me.readOnly || !(status === "added" || status === "email_given")} title={me.readOnly ? READ_ONLY_HINT : undefined}>
             <Check className="h-4 w-4" /> {t("creator.ruulDone")}
           </Button>
         )}
