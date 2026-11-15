@@ -58,7 +58,7 @@ export const VideoCard = memo(function VideoCard({ v, fav, onOpen, onFav, catego
               ? <span className="tabular inline-flex h-6 items-center gap-1 rounded-full bg-[#fff6e5] px-2 text-[11px] font-bold text-[#8a5a00] shadow-xs" title="Durée de diffusion">{v.ad_days ?? "?"} j de diffusion</span>
               : v.origin && v.origin !== "other" && <span className={cn("inline-flex h-6 items-center rounded-full px-2 text-[11px] font-semibold shadow-xs", ORIGIN_TONE[v.origin])}>{ORIGIN_LABEL[v.origin]}</span>}
           </div>
-          <span className={cn("tabular inline-flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-[11px] font-bold shadow-xs", scoreTone)} title="Score de performance">{Math.round(v.score)}</span>
+          {!v.is_ad && <span className={cn("tabular inline-flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-[11px] font-bold shadow-xs", scoreTone)} title="Score de performance">{Math.round(v.score)}</span>}
         </div>
 
         <button onClick={(e) => { e.stopPropagation(); onFav(); }} data-fav={fav} aria-label="Favori"

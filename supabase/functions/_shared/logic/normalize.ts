@@ -178,7 +178,10 @@ export function normalizeFacebookAd(x: Any, now = new Date()): VideoRow | null {
     published_at: start,
     hashtags: hashtagsFromText(body),
     sound_name: null,
-    thumbnail_src: str(video.videoPreviewImageUrl) ?? str(snap.images?.[0]?.resizedImageUrl),
+    // Miniature : aperçu de la vidéo, sinon image de la carte ou du snapshot (première frame fournie par l'Ad Library).
+    thumbnail_src: str(video.videoPreviewImageUrl) ?? str(cards.find((c) => c.videoPreviewImageUrl)?.videoPreviewImageUrl)
+      ?? str(snap.images?.[0]?.resizedImageUrl) ?? str(snap.images?.[0]?.originalImageUrl)
+      ?? str(cards[0]?.resizedImageUrl) ?? str(cards[0]?.originalImageUrl),
     video_src: str(video.videoHdUrl) ?? str(video.videoSdUrl),
     is_ad: true,
     ad_started_at: start,

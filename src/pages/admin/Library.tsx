@@ -42,7 +42,8 @@ export default function Library({ adsOnly = false }: { adsOnly?: boolean }) {
   const [assign, setAssign] = useState<Video | null>(null);
   const [adhoc, setAdhoc] = useState(false);
   const [exporting, setExporting] = useState(false);
-  const sort = get("sort", adsOnly ? "ad_days" : "score") as Sort;
+  // Par défaut : vues ÷ abonnés (ce qui perce), pas le score (retour du 15/11).
+  const sort = get("sort", adsOnly ? "ad_days" : "outlier") as Sort;
   const asc = get("dir") === "asc";
   const view = get("view", "grid") as "grid" | "table";
   const grouped = view === "grid" && get("group") === "1";
@@ -72,6 +73,8 @@ export default function Library({ adsOnly = false }: { adsOnly?: boolean }) {
       p_min_ad_days: adsOnly ? Number(get("minDays", "14")) : null,
       p_query: get("q") || null, p_sort: sort, p_collection: get("collection") || null,
       p_origin: get("origin") || null, p_author: get("author") || null,
+      // Par défaut, seulement les vidéos rattachées à un concurrent ; la puce « Hors concurrents » les ajoute.
+      p_with_competitor: !adsOnly && get("scope", "competitors") === "competitors",
     };
   }, [params, adsOnly]);
   const countFilters = useMemo(() => {
@@ -202,6 +205,14 @@ export default function Library({ adsOnly = false }: { adsOnly?: boolean }) {
               get("fav") === "1" ? "border-[#ffd1d1] bg-tint-red text-[#c42a2d]" : "border-border-strong bg-white text-muted-foreground hover:border-[#d5d9e2] hover:text-foreground")}>
             <Heart className={cn(get("fav") === "1" && "fill-current")} /> Favoris
           </button>
+          {!adsOnly && (
+            <button type="button" onClick={() => set("scope", get("scope", "competitors") === "competitors" ? "all" : "")}
+              title="Par défaut, seules les vidéos rattachées à un concurrent sont affichées"
+              className={cn("inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-[13px] transition-colors [&_svg]:h-3.5 [&_svg]:w-3.5",
+                get("scope", "competitors") === "all" ? "border-[#cddcff] bg-accent-soft text-[#0040d6]" : "border-border-strong bg-white text-muted-foreground hover:border-[#d5d9e2] hover:text-foreground")}>
+              <Layers /> {get("scope", "competitors") === "all" ? "Hors concurrents inclus" : "+ Hors concurrents"}
+            </button>
+          )}
           <Popover width={300} trigger={(open, toggle) => (
             <button type="button" onClick={toggle} className={cn("inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-[13px] transition-colors",
               moreActive ? "border-[#cddcff] bg-accent-soft text-[#0040d6]" : open ? "border-[#d5d9e2] text-foreground" : "border-border-strong bg-white text-muted-foreground hover:text-foreground")}>

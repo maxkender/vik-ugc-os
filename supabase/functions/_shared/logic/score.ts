@@ -51,6 +51,11 @@ export function organicScore(i: ScoreInput, now = new Date()): number {
   return round1(clamp(breakout + velocity + engagement));
 }
 
+/**
+ * Score de tri. Une pub n'a pas de vues publiques : elle ne doit pas passer devant les vidéos
+ * qui ont des métriques (retour du 15/11). Son score est 0 (« n/a » à l'écran) ; sa longévité
+ * reste visible via ad_days et `adScore` (vue « Pubs gagnantes »).
+ */
 export function performanceScore(i: ScoreInput, now = new Date()): number {
-  return i.isAd ? adScore(i.adDays, i.adActive) : organicScore(i, now);
+  return i.isAd ? 0 : organicScore(i, now);
 }

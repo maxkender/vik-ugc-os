@@ -154,7 +154,7 @@ describe("score", () => {
     expect(adScore(21, false)).toBe(50);
     expect(adScore(60, true)).toBeGreaterThan(adScore(60, false));
     expect(adScore(10_000, true)).toBe(100);
-    expect(performanceScore({ isAd: true, adDays: 7 })).toBe(25);
+    expect(performanceScore({ isAd: true, adDays: 7 })).toBe(0); // pas de vues → pas de score
     expect(adRunDays("2026-11-01T00:00:00Z", "2026-11-10T00:00:00Z", false)).toBe(10);
   });
 });

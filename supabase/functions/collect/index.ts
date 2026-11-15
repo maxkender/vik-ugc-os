@@ -396,6 +396,21 @@ serve(async (req, body, db) => {
       }
       return { ok: true, candidates: picked.length, created };
     }
+    case "fix_thumbnails": {
+      // Rattrapage : vidéos sans miniature stockée (premiers runs, ou téléchargement raté). Lots de 10 en parallèle.
+      requireAdmin(c);
+      const { data: rows } = await db.from("videos").select("id, platform, external_id, thumbnail_src").is("thumbnail_path", null)
+        .not("thumbnail_src", "is", null).limit(Number(body.limit ?? 150));
+      let fixed = 0, expired = 0;
+      for (let i = 0; i < (rows ?? []).length; i += 10) {
+        const batch = rows!.slice(i, i + 10);
+        const paths = await Promise.all(batch.map((r) => storeThumbnail(db, r as unknown as VideoRow)));
+        for (let j = 0; j < batch.length; j++) {
+          if (paths[j]) { await db.from("videos").update({ thumbnail_path: paths[j] }).eq("id", batch[j].id); fixed++; } else expired++;
+        }
+      }
+      return { ok: true, checked: rows?.length ?? 0, fixed, expired };
+    }
     case "poll":
       requireAdmin(c);
       return await poll(db);

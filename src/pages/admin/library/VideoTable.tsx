@@ -56,7 +56,7 @@ export function VideoTable({ rows, sort, asc, onSort, onOpen, competitorName, ca
       { key: "outlier", label: "Outlier", sort: "outlier", num: true, cell: (v: Video) => <span className={cn(Number(v.outlier) >= 10 && "font-medium text-[#c42a2d]")}>{times(v.outlier)}</span> },
       { key: "velocity", label: "Vues/j", sort: "velocity", num: true, cell: (v: Video) => compact(v.velocity) },
     ] as Col[] : []),
-    { key: "score", label: "Score", sort: "score", num: true, cell: (v) => <ScorePill score={v.score} /> },
+    { key: "score", label: "Score", sort: "score", num: true, cell: (v) => <ScorePill score={v.score} isAd={v.is_ad} /> },
     { key: "date", label: "Publiée", sort: "date", num: true, cell: (v) => (
       <div className="whitespace-nowrap">
         <p className="text-muted-foreground">{(() => { const d = v.is_ad ? v.ad_started_at : v.published_at; return d ? new Date(d).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "2-digit" }) : "—"; })()}</p>
@@ -97,7 +97,9 @@ export function VideoTable({ rows, sort, asc, onSort, onOpen, competitorName, ca
   );
 }
 
-export function ScorePill({ score }: { score: number }) {
+/** Score de performance. Une pub n'a pas de vues publiques : « n/a » (sa longévité est affichée à part). */
+export function ScorePill({ score, isAd }: { score: number; isAd?: boolean }) {
+  if (isAd) return <span className="inline-flex min-w-9 justify-center rounded-full bg-[#f1f3f7] px-2 py-0.5 text-xs font-medium text-subtle-foreground" title="Pas de vues publiques pour une pub">n/a</span>;
   const s = Math.round(score);
   const tone = s >= 80 ? "bg-tint-green text-[#0b7a3c]" : s >= 60 ? "bg-tint-blue text-[#0040d6]" : s >= 40 ? "bg-tint-yellow text-[#8a5a00]" : "bg-[#f1f3f7] text-muted-foreground";
   return <span className={cn("tabular inline-flex min-w-9 justify-center rounded-full px-2 py-0.5 text-xs font-semibold", tone)}>{s}</span>;
