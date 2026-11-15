@@ -123,17 +123,22 @@ export default function Onboarding() {
   const { data, isLoading } = useQuery({
     queryKey: ["onboarding"],
     queryFn: async () => {
-      const [apps, events, signIns] = await Promise.all([
+      const [apps, events, signIns, tests] = await Promise.all([
         supabase.from("applications").select("id, first_name, last_name, email, country, status, created_at, updated_at, decided_at, poster_id, posters(handles_status, handles_checked_at, ruul_status, ruul_done_at, tiktok_handle, instagram_handle), contracts(sent_at, signed_at, status)")
           .neq("status", "rejected").order("created_at", { ascending: false }).limit(1000),
         supabase.from("onboarding_events").select("application_id, poster_id, step, at, meta").order("at").limit(20000),
         supabase.rpc("posters_last_sign_in"),
+        supabase.from("profiles").select("id, email").eq("is_test", true),
       ]);
       if (apps.error) throw apps.error;
       const byApp = new Map<string, any[]>();
       for (const e of events.data ?? []) if (e.application_id) byApp.set(e.application_id, [...(byApp.get(e.application_id) ?? []), e]);
       const login = new Map<string, string | null>(((signIns.data ?? []) as any[]).map((r) => [r.poster_id, r.last_sign_in_at]));
-      return (apps.data ?? []).map((a: any) => computeRow(a, byApp.get(a.id) ?? [], a.poster_id ? login.get(a.poster_id) ?? null : null));
+      // Comptes de test (QA, démo) : hors pipeline et hors compteurs.
+      const testIds = new Set((tests.data ?? []).map((t: any) => t.id));
+      const testEmails = new Set((tests.data ?? []).map((t: any) => String(t.email).toLowerCase()));
+      const isTest = (a: any) => String(a.email).toLowerCase().endsWith("@vik-qa.test") || testEmails.has(String(a.email).toLowerCase()) || (a.poster_id && testIds.has(a.poster_id));
+      return (apps.data ?? []).filter((a: any) => !isTest(a)).map((a: any) => computeRow(a, byApp.get(a.id) ?? [], a.poster_id ? login.get(a.poster_id) ?? null : null));
     },
   });
 

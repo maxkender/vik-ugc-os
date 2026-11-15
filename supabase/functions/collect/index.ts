@@ -252,7 +252,8 @@ async function poll(db: SupabaseClient) {
 
 async function measureDue(db: SupabaseClient, cfg: ApifySettings, force = false) {
   if (!cfg.views_cron_enabled && !force) return { ok: true, skipped: "views_cron_disabled" };
-  const since = new Date(Date.now() - 10 * 86_400_000).toISOString();
+  // 21 jours : un J+7 manqué (run Apify en échec…) est encore rattrapé avant la paie du lundi suivant.
+  const since = new Date(Date.now() - 21 * 86_400_000).toISOString();
   const { data: rows } = await db.from("brief_assignments").select("id, posted_url, posted_at, views_d2_at, views_d7_at")
     .not("posted_url", "is", null).gte("posted_at", since).neq("status", "rejected").limit(cfg.hard_cap_per_run);
   const now = new Date();

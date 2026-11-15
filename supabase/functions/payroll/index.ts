@@ -17,11 +17,16 @@ import { addDays, lastCompletedWeek, mondayOf, shortWeekLabel } from "../_shared
 import { ruulStep } from "../_shared/logic/reminders.ts";
 import { formatMoney } from "../_shared/logic/zones.ts";
 
+/** Comptes de test (profiles.is_test) : jamais payés, validés ni exportés. */
+const notTest = (p: any) => !p.posters?.profiles?.is_test;
+
 async function compute(db: SupabaseClient, weekStart: string) {
   const { data: zones } = await db.from("zones").select("*");
   const { data: allPosters } = await db.from("posters").select("id, zone_code, status, profiles(is_test)");
   // Comptes de test exclus de la paie.
   const posters = (allPosters ?? []).filter((p: any) => !p.profiles?.is_test);
+  const testIds = (allPosters ?? []).filter((p: any) => p.profiles?.is_test).map((p: any) => p.id);
+  if (testIds.length) await db.from("payouts").delete().eq("week_start", weekStart).neq("status", "paid").in("poster_id", testIds);
   const from = `${addDays(weekStart, -8)}T00:00:00Z`, to = `${addDays(weekStart, 7)}T00:00:00Z`;
   const { data: assignments } = await db.from("brief_assignments").select("id, poster_id, status, posted_url, posted_at, views_d7, briefs(title)")
     .gte("posted_at", from).lt("posted_at", to);
@@ -122,9 +127,9 @@ serve(async (req, body, db) => {
     case "validate_all": {
       if (c.kind !== "user") throw new HttpError(403, "validation manuelle uniquement");
       const week = mondayOf(String(body.week_start ?? lastCompletedWeek()));
-      const { data: rows } = await db.from("payouts").select("id, status, review_status, lines").eq("week_start", week).eq("review_status", "to_review");
+      const { data: rows } = await db.from("payouts").select("id, status, review_status, lines, posters(profiles(is_test))").eq("week_start", week).eq("review_status", "to_review");
       let validated = 0, skipped = 0;
-      for (const p of rows ?? []) {
+      for (const p of (rows ?? []).filter(notTest)) {
         if (!canValidate({ status: p.status, review_status: p.review_status, lines: p.lines ?? [] }).ok) { skipped++; continue; }
         await db.from("payouts").update({ review_status: "validated", validated_at: new Date().toISOString(), validated_by: userId(c) }).eq("id", p.id);
         validated++;
@@ -134,9 +139,9 @@ serve(async (req, body, db) => {
     }
     case "ruul_csv": {
       const week = mondayOf(String(body.week_start ?? lastCompletedWeek()));
-      const { data } = await db.from("payouts").select("total, currency, week_start, status, review_status, posters(ruul_email, display_name, profiles(full_name))")
+      const { data } = await db.from("payouts").select("total, currency, week_start, status, review_status, posters(ruul_email, display_name, profiles(full_name, is_test))")
         .eq("week_start", week).neq("status", "void");
-      const rows = (data ?? []).filter((p: any) => p.review_status === "validated" || p.status === "paid").map((p: any) => ({
+      const rows = (data ?? []).filter(notTest).filter((p: any) => p.review_status === "validated" || p.status === "paid").map((p: any) => ({
         name: p.posters?.profiles?.full_name ?? p.posters?.display_name ?? "", ruul_email: p.posters?.ruul_email ?? null,
         total: Number(p.total), currency: p.currency, week_start: p.week_start,
       }));
@@ -163,8 +168,8 @@ serve(async (req, body, db) => {
     }
     case "csv": {
       const week = mondayOf(String(body.week_start ?? lastCompletedWeek()));
-      const { data } = await db.from("payouts").select("*, posters(ruul_email, country, profiles(email, full_name))").eq("week_start", week).neq("status", "void");
-      const csv = payoutsCsv((data ?? []).map((p: any) => ({
+      const { data } = await db.from("payouts").select("*, posters(ruul_email, country, profiles(email, full_name, is_test))").eq("week_start", week).neq("status", "void");
+      const csv = payoutsCsv((data ?? []).filter(notTest).map((p: any) => ({
         name: p.posters?.profiles?.full_name ?? "", email: p.posters?.profiles?.email ?? "", ruul_email: p.posters?.ruul_email, country: p.posters?.country,
         payout: { ...p, base_amount: Number(p.base_amount), bonus_amount: Number(p.bonus_amount), total: Number(p.total) } as Payout,
       })));

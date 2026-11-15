@@ -37,10 +37,12 @@ export default function AssistantLog() {
   const data = useQuery({
     queryKey: ["assistant-log"],
     queryFn: async () => {
-      const { data: convs, error } = await supabase.from("assistant_conversations")
+      let { data: convs, error } = await supabase.from("assistant_conversations")
         .select("id, poster_id, status, escalated_at, escalation_reason, created_at, updated_at, profiles(full_name, email, is_test)")
         .order("updated_at", { ascending: false }).limit(300);
       if (error) throw error;
+      // Conversations des comptes de test masquées (journal = vrais créateurs).
+      convs = (convs ?? []).filter((c: any) => !c.profiles?.is_test);
       const ids = (convs ?? []).map((c) => c.id);
       const posterIds = [...new Set((convs ?? []).map((c) => c.poster_id))];
       const [{ data: msgs }, { data: posters }, { count: today }] = await Promise.all([

@@ -44,7 +44,10 @@ export function viewsCheckpoint(
   now = new Date(),
 ): ViewsCheckpoint {
   if (!a.posted_at) return null;
-  const age = (now.getTime() - new Date(a.posted_at).getTime()) / DAY;
+  // Jours calendaires UTC (même règle que la paie et l'affichage « J+7 le … ») : le relevé du matin
+  // (06:40 UTC) prend les vidéos dont le J+7 tombe aujourd'hui, pas le lendemain.
+  const day = (d: Date | string) => Date.parse(new Date(d).toISOString().slice(0, 10));
+  const age = (day(now) - day(a.posted_at)) / DAY;
   if (age >= 7 && !a.views_d7_at) return "d7";
   if (age >= 2 && age < 7 && !a.views_d2_at) return "d2";
   return null;

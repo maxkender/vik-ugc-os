@@ -9,7 +9,7 @@ import { supabase, callFn } from "@/lib/supabase";
 import { usePosters, useZones } from "@/lib/hooks";
 import { addDays, lastCompletedWeek, mondayOf } from "@shared/dates.ts";
 import { formatMoney } from "@shared/zones.ts";
-import { missingD7 } from "@shared/payroll.ts";
+import { d7Status, missingD7 } from "@shared/payroll.ts";
 import { Badge, Button, Card, CardTitle, Dialog, Empty, Field, IconTile, Input, PageHeader, Spinner, Table, Td, Th, Tabs, useToast, type Tint } from "@/components/ui";
 import { cn, compact, dateFr, flag } from "@/lib/utils";
 
@@ -41,9 +41,18 @@ export default function Payroll() {
   const zones = useZones();
   const payouts = useQuery({
     queryKey: ["payouts", week],
-    queryFn: async () => (await supabase.from("payouts")
-      .select("*, posters(id, display_name, country, ruul_email, ruul_status, tiktok_handle, instagram_handle, profiles(full_name, email))")
-      .eq("week_start", week).neq("status", "void").order("total", { ascending: false })).data ?? [],
+    queryFn: async () => {
+      const rows = ((await supabase.from("payouts")
+        .select("*, posters(id, display_name, country, ruul_email, ruul_status, tiktok_handle, instagram_handle, profiles(full_name, email, is_test))")
+        .eq("week_start", week).neq("status", "void").order("total", { ascending: false })).data ?? [])
+        // Comptes de test : jamais dans la paie (la base les bloque aussi, ceci couvre l'historique).
+        .filter((p: any) => !p.posters?.profiles?.is_test);
+      // Vues J+7 actuelles des vidéos de la semaine, pour celles dont le bonus tombe une autre semaine.
+      const ids = [...new Set(rows.flatMap((p: any) => (p.lines ?? []).map((l: any) => l.assignment_id)))];
+      const views = new Map<string, number | null>();
+      if (ids.length) for (const a of (await supabase.from("brief_assignments").select("id, views_d7").in("id", ids)).data ?? []) views.set(a.id, a.views_d7);
+      return rows.map((p: any) => ({ ...p, _views: views }));
+    },
   });
   const run = async (key: string, fn: () => Promise<any>, ok?: string | ((r: any) => string)) => {
     setBusy(key);
@@ -254,7 +263,7 @@ function PayoutCard({ p, busy, onAdjust, onValidate, onPaid }: { p: any; busy: s
                 </td>
                 <td className="py-2 pr-3 text-muted-foreground">{dateFr(v.posted_at)}</td>
                 <td className="tabular py-2 pr-3 text-right">
-                  {!v.hasBonus ? <span className="text-subtle-foreground" title="Le J+7 de cette vidéo tombe la semaine suivante">semaine prochaine</span>
+                  {!v.hasBonus ? <D7Cell postedAt={v.posted_at} views={p._views?.get(v.id) ?? null} />
                     : v.views_d7 === null ? <span className="inline-flex items-center gap-1 font-medium text-[#8a5a00]"><AlertTriangle className="h-3.5 w-3.5" /> manquantes</span>
                     : <span className="inline-flex items-center gap-1"><Eye className="h-3 w-3 text-subtle-foreground" />{compact(v.views_d7)}</span>}
                 </td>
@@ -310,4 +319,15 @@ function PayKpi({ icon, tint, label, value, hint }: { icon: React.ReactNode; tin
       </div>
     </Card>
   );
+}
+
+/** Vidéo dont le bonus J+7 n'est pas dans cette semaine : relevé, à venir ou en retard. */
+function D7Cell({ postedAt, views }: { postedAt: string | null; views: number | null }) {
+  if (!postedAt) return <span className="text-subtle-foreground">—</span>;
+  const s = d7Status(postedAt, views);
+  const day = (d: string) => dateFr(`${d}T12:00:00Z`); // jour UTC, sans décalage de fuseau
+  const week = `bonus sem. du ${day(s.bonusWeek)}`;
+  if (s.kind === "measured") return <span className="inline-flex items-center gap-1" title={`J+7 le ${day(s.d7Day)}`}><Eye className="h-3 w-3 text-subtle-foreground" />{compact(s.views ?? 0)} <span className="text-xs text-subtle-foreground">· {week}</span></span>;
+  if (s.kind === "upcoming") return <span className="text-subtle-foreground" title={week}>J+7 le {day(s.d7Day)}</span>;
+  return <span className="inline-flex items-center gap-1 font-medium text-[#8a5a00]" title={`J+7 le ${day(s.d7Day)} : relevé en attente`}><AlertTriangle className="h-3.5 w-3.5" /> relevé en attente</span>;
 }

@@ -168,3 +168,30 @@ export function ruulCsv(rows: Array<{ name: string; ruul_email: string | null; t
     .map((r) => [r.name, r.ruul_email ?? "", r.total.toFixed(2), r.currency, weekReference(r.week_start)].map(esc).join(","));
   return [header.join(","), ...body].join("\n");
 }
+
+/**
+ * État des vues J+7 d'une vidéo, vu depuis la paie d'une semaine donnée.
+ * J+7 = jour calendaire UTC de posted_at + 7 ; le bonus est payé la semaine (lundi) qui contient ce jour.
+ *   - « measured » : vues relevées (bonus payé la semaine bonusWeek) ;
+ *   - « upcoming » : le J+7 n'est pas encore passé (aujourd'hui < J+7) ;
+ *   - « missing »  : J+7 passé mais vues pas encore relevées (le relevé doit rattraper).
+ */
+export interface D7Status {
+  kind: "measured" | "upcoming" | "missing";
+  d7Day: string;
+  bonusWeek: string;
+  views: number | null;
+}
+
+export function d7Status(postedAt: string, viewsD7: number | null | undefined, now: Date = new Date()): D7Status {
+  const d7Day = addDays(isoDay(postedAt), 7);
+  const bonusWeek = mondayOfDay(d7Day);
+  if (viewsD7 !== null && viewsD7 !== undefined) return { kind: "measured", d7Day, bonusWeek, views: viewsD7 };
+  return { kind: isoDay(now) < d7Day ? "upcoming" : "missing", d7Day, bonusWeek, views: null };
+}
+
+function mondayOfDay(day: string): string {
+  const x = new Date(`${day}T12:00:00Z`);
+  const dow = x.getUTCDay() || 7;
+  return addDays(day, -(dow - 1));
+}
