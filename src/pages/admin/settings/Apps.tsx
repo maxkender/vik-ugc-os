@@ -1,4 +1,8 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Target } from "lucide-react";
+import { Card } from "@/components/ui";
+import { callFn } from "@/lib/supabase";
 import { useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { supabase } from "@/lib/supabase";
@@ -52,6 +56,7 @@ export default function Apps() {
   return (
     <>
       <PageHeader title="Apps" description="Les apps que nos posteurs promeuvent. Micabo d'abord, multi-apps prévu." actions={<Button onClick={() => setEdit({ ...blank })}><Plus className="h-4 w-4" /> Nouvelle app</Button>} />
+      <RescoreCard />
       {isLoading ? <Spinner /> : !apps?.length ? <Empty title="Aucune app" /> : (
         <Table>
           <thead><tr><Th>Nom</Th><Th>Slug</Th><Th>Liens</Th><Th>Statut</Th><Th /></tr></thead>
@@ -134,5 +139,54 @@ function HandleSettings({ app, set }: { app: App; set: (k: keyof App, v: any) =>
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * « Recalculer la pertinence » : après avoir modifié la description ou la cible d'une app, relance le score IA
+ * de toute la bibliothèque (fal, Gemini flash). Coût estimé affiché avant ; corrections manuelles conservées ; s'arrête au plafond mensuel.
+ */
+function RescoreCard() {
+  const toast = useToast();
+  const status = useQuery({ queryKey: ["ai-status"], queryFn: () => callFn("ai", { action: "status" }) });
+  const [run, setRun] = useState<{ done: number; total: number; cost: number } | null>(null);
+  const d = status.data;
+  if (!d) return null;
+  const go = async () => {
+    if (!window.confirm(`Recalculer la pertinence de ${d.total} vidéos ?\nCoût estimé : ≈ ${d.rescore_estimate_usd.toFixed(2)} $ (plafond mensuel ${d.settings.monthly_cap_usd} $, déjà ${d.month_spent_usd.toFixed(2)} $ ce mois).\nLes corrections manuelles sont conservées.`)) return;
+    try {
+      const r = await callFn("ai", { action: "reset_scores" });
+      let state = { done: 0, total: r.queued as number, cost: 0 };
+      setRun(state);
+      for (let i = 0; i < 100; i++) {
+        const x = await callFn("ai", { action: "classify_pending", limit: 60 });
+        if (x.skipped) { toast(x.skipped === "monthly_cap_reached" ? "Plafond mensuel atteint : le reste sera traité le mois prochain ou après hausse du plafond" : `Arrêt : ${x.skipped}`, "danger"); break; }
+        state = { ...state, done: state.done + x.scored, cost: state.cost + x.cost_usd };
+        setRun(state);
+        if (!x.scored) break;
+      }
+      toast(`Pertinence recalculée : ${state.done} vidéos, ${state.cost.toFixed(2)} $`, "success");
+      status.refetch();
+    } catch (e) { toast((e as Error).message, "danger"); } finally { setRun(null); }
+  };
+  return (
+    <Card className="mb-6 flex flex-wrap items-center gap-4 p-5">
+      <Target className="h-5 w-5 text-accent" />
+      <div className="min-w-0 flex-1">
+        <p className="font-semibold text-foreground">Pertinence IA des vidéos</p>
+        <p className="text-[13px] text-muted-foreground">
+          Après avoir modifié la description ou la cible d'une app, recalcule le score de toute la bibliothèque ({d.total} vidéos, ≈ {d.rescore_estimate_usd.toFixed(2)} $).
+          Ce mois : {d.month_spent_usd.toFixed(2)} $ / {d.settings.monthly_cap_usd} $. Seuil « compatible » : {d.settings.compat_threshold}/100.
+          {!d.fal_configured && <span className="text-[#c42a2d]"> FAL_KEY absente : rien ne peut tourner.</span>}
+        </p>
+        {run && (
+          <div className="mt-2">
+            <div className="h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full bg-accent transition-all" style={{ width: `${Math.min(100, (100 * run.done) / Math.max(1, run.total))}%` }} /></div>
+            <p className="tabular mt-1 text-xs text-subtle-foreground">{run.done} / {run.total} · {run.cost.toFixed(3)} $</p>
+          </div>
+        )}
+      </div>
+      <Button onClick={go} loading={!!run} disabled={!d.fal_configured}>Recalculer la pertinence</Button>
+    </Card>
   );
 }

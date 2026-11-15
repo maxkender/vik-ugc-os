@@ -7,7 +7,8 @@ import { classifySystemPrompt, classifyUserPrompt, mergeAppScores, parseClassify
 const REF = "lnytuhsgzkqrkehemasu";
 const TOKEN = "sbp_" + "0".repeat(40); // valeur factice : le proxy pose la vraie clé
 const MODELS = ["google/gemini-2.5-flash", "anthropic/claude-sonnet-5.5"];
-const [max = "20", cap = "3", batchSize = "10"] = process.argv.slice(2);
+const [max = "20", cap = "3", batchSize = "10", mode = "pending"] = process.argv.slice(2);
+// mode : pending (pas encore notées) | rescore (tout, en remplaçant les scores IA) | dry (échantillon aléatoire, aucune écriture)
 const TAG = "q" + "v" + "q"; // délimiteur de chaîne SQL ($qvq$ … $qvq$)
 
 async function sql(query: string, tries = 6): Promise<any[]> {
@@ -43,7 +44,8 @@ const apps = await sql("select id, slug, name, description, audience from apps w
 const system = classifySystemPrompt(cats, apps);
 const catId = new Map<string, string>(cats.map((c: any) => [c.slug, c.id]));
 const videos = await sql(`select id, platform, caption, hashtags, sound_name, author_handle, ad_page_name, is_ad, language, duration_s, category_id, category_auto, app_scores
-  from videos where ai_scored_at is null order by first_seen_at desc limit ${Number(max)}`);
+  from videos ${mode === "pending" ? "where ai_scored_at is null order by first_seen_at desc" : mode === "dry" ? "order by random()" : "order by ai_scored_at nulls first, first_seen_at desc"} limit ${Number(max)}`);
+const dist = { compatible: 0, total: 0, gems: 0, buckets: [0, 0, 0, 0, 0] as number[] };
 console.log(`${videos.length} vidéos à classer, plafond ${cap} $`);
 let cost = 0, done = 0, categorized = 0;
 const B = Number(batchSize);
@@ -61,14 +63,20 @@ for (let i = 0; i < batches.length; i += 4) {
     const stmts = [`insert into ai_usage (kind, model, items, cost_usd) values ('classify', ${lit(r.model)}, ${batch.length}, ${r.cost})`];
     for (const x of res) {
       const v = batch.find((b) => b.id === x.id)!;
+      for (const a of Object.values(x.apps)) {
+        dist.total++; if (a.compatible) dist.compatible++; if (a.score >= 85) dist.gems++;
+        dist.buckets[Math.min(4, Math.floor(a.score / 20))]++;
+      }
       const scores = mergeAppScores(v.app_scores, x, apps, r.model, at);
       const setCat = x.category && (!v.category_id || v.category_auto) ? `, category_id = '${catId.get(x.category)}', category_auto = true` : "";
       if (setCat && !v.category_id) categorized++;
       stmts.push(`update videos set app_scores = ${lit(JSON.stringify(scores))}::jsonb, ai_scored_at = '${at}'${setCat} where id = '${v.id}'`);
       done++;
     }
+    if (mode === "dry") { stmts.length = 1; }
     await sql(stmts.join(";\n"));
   }));
   process.stdout.write(`\r${done} classées · ${cost.toFixed(4)} $`);
 }
+console.log(`\nDistribution : ${dist.compatible}/${dist.total} compatibles (${Math.round((100 * dist.compatible) / Math.max(1, dist.total))} %), ${dist.gems} pépites ≥ 85, tranches 0-19/20-39/40-59/60-79/80+ : ${dist.buckets.join(" / ")}`);
 console.log(`\nFini : ${done} vidéos, ${categorized} nouvelles catégories, coût réel ${cost.toFixed(4)} $`);
