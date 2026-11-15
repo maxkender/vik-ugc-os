@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { LANGS, uiLangForCountry } from "@/i18n";
 import { Logo } from "@/components/brand/Logo";
+import { AssistantBubble } from "@/components/assistant/AssistantBubble";
 
 /** Espace créateur : pensé pour le téléphone (barre d'onglets en bas), onglets en haut sur grand écran. */
 export default function CreatorLayout() {
@@ -58,6 +59,9 @@ export default function CreatorLayout() {
       </header>
 
       <main className="mx-auto max-w-2xl px-4 pb-28 pt-6 sm:pb-16 sm:pt-8"><Outlet /></main>
+
+      {/* Assistant posteurs : bulle flottante au-dessus de la barre d'onglets mobile */}
+      <AssistantBubble />
 
       {/* Barre d'onglets mobile */}
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md sm:hidden">

@@ -27,3 +27,6 @@ verify_jwt = false
 verify_jwt = false
 [functions.handles]
 verify_jwt = false
+
+[functions.assistant]
+verify_jwt = false
