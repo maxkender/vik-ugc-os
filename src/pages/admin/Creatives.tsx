@@ -312,7 +312,7 @@ export default function Creatives() {
           <option value="">Tous les pays</option>
           {openCountries.map((c: any) => <option key={c.code} value={c.code}>{flag(c.code)} {c.name}</option>)}
         </Select>
-        <Select className="h-8 py-0 w-40 rounded-full text-[13px]" value={f.language} onChange={(e) => setF({ ...f, language: e.target.value })} aria-label="Langue">
+        <Select className="h-8 py-0 w-48 rounded-full text-[13px]" value={f.language} onChange={(e) => setF({ ...f, language: e.target.value })} aria-label="Langue">
           <option value="">Toutes les langues</option>
           {(galleryLangs.length ? galleryLangs : CREATIVE_LANGS).map((l: string) => <option key={l} value={l}>{langName(l)}</option>)}
         </Select>
