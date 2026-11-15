@@ -49,3 +49,13 @@ export function uiLangForCountry(lang: string | null | undefined): string {
 }
 
 export default i18n;
+
+/** Langue et sens de lecture du document (arabe et hébreu de droite à gauche). */
+function syncDocumentLanguage(lng: string) {
+  if (typeof document === "undefined") return;
+  const base = (lng || "en").split("-")[0];
+  document.documentElement.lang = base;
+  document.documentElement.dir = ["ar", "he"].includes(base) ? "rtl" : "ltr";
+}
+i18n.on("languageChanged", syncDocumentLanguage);
+syncDocumentLanguage(i18n.resolvedLanguage ?? i18n.language);
