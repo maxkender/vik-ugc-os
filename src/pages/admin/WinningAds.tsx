@@ -204,8 +204,8 @@ const PLATFORM_SHORT: Record<string, string> = { facebook: "FB", instagram: "IG"
 function Platforms({ list, short }: { list: string[] | null | undefined; short?: boolean }) {
   if (!list?.length) return <span className="text-xs text-subtle-foreground">—</span>;
   if (short) return (
-    <span className="flex flex-wrap gap-1" title={list.map((p) => PLATFORM_NAME[p] ?? p).join(", ")}>
-      {list.map((p) => <span key={p} className="rounded-md bg-[#f1f3f7] px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">{PLATFORM_SHORT[p] ?? p.slice(0, 2).toUpperCase()}</span>)}
+    <span className="flex gap-1" title={list.map((p) => PLATFORM_NAME[p] ?? p).join(", ")}>
+      {list.map((p) => <span key={p} className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">{PLATFORM_SHORT[p] ?? p.slice(0, 2).toUpperCase()}</span>)}
     </span>
   );
   return <span className="text-xs text-subtle-foreground">{list.map((p) => PLATFORM_NAME[p] ?? p).join(" · ")}</span>;
@@ -245,7 +245,7 @@ function AdCard({ v, competitor, onOpen, onRecycle }: { v: Video; competitor?: s
         </span>
         <div className="absolute inset-x-0 bottom-0 flex flex-wrap gap-1 bg-gradient-to-t from-black/65 via-black/25 to-transparent p-2.5 pt-12">
           {variants > 1 && <MetricPill tone="dark" icon={<Layers />}>{variants} variantes</MetricPill>}
-          <MetricPill tone="dark" icon={<CalendarDays />}>{dateFr(v.ad_started_at, { day: "numeric", month: "short" })}</MetricPill>
+          <MetricPill tone="dark" icon={<CalendarDays />}>{dateFr(v.ad_started_at, { day: "numeric", month: "short", year: "2-digit" })}</MetricPill>
         </div>
       </button>
       <div className="mt-2.5 px-0.5">
@@ -277,13 +277,13 @@ function AdsTable({ rows, compName, onOpen, onRecycle, hideCompetitor }: { rows:
           return (
             <tr key={v.id} className="cursor-pointer" onClick={() => onOpen(v)}>
               <Td>
-                <div className="flex min-w-[220px] items-center gap-3">
+                <div className="flex min-w-[200px] items-center gap-3">
                   <div className="relative h-14 w-10 shrink-0 overflow-hidden rounded-md bg-muted ring-1 ring-border">
                     {thumb ? <img src={thumb} alt="" loading="lazy" className="h-full w-full object-cover" onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} /> : <ThumbPlaceholder v={v} size="sm" />}
                   </div>
                   <div className="min-w-0">
                     <p className="truncate text-[13px] font-medium text-foreground">{displayName(v)}</p>
-                    <p className="max-w-[240px] truncate text-xs text-subtle-foreground">{v.caption || "—"}</p>
+                    <p className="max-w-[200px] truncate text-xs text-subtle-foreground">{v.caption || "—"}</p>
                   </div>
                 </div>
               </Td>
@@ -293,9 +293,9 @@ function AdsTable({ rows, compName, onOpen, onRecycle, hideCompetitor }: { rows:
               <Td num>{variantsOf(v)}</Td>
               <Td className="whitespace-nowrap text-[13px]">{dateFr(v.ad_started_at, { day: "numeric", month: "short", year: "2-digit" })}</Td>
               <Td><Flags list={v.ad_countries} /></Td>
-              <Td><Platforms list={v.ad_platforms} short /></Td>
+              <Td className="whitespace-nowrap"><Platforms list={v.ad_platforms} short /></Td>
               <Td>
-                <Button size="sm" variant="secondary" title="Recycler en brief organique" onClick={(e) => { e.stopPropagation(); onRecycle(v); }}><Recycle className="h-3.5 w-3.5" /> Recycler</Button>
+                <Button size="sm" variant="secondary" title="Recycler en brief organique" aria-label="Recycler en brief organique" onClick={(e) => { e.stopPropagation(); onRecycle(v); }}><Recycle className="h-3.5 w-3.5" /></Button>
               </Td>
             </tr>
           );

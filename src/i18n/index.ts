@@ -1,4 +1,4 @@
-import i18n from "i18next";
+import i18n, { type Resource } from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import en from "./en";
@@ -18,7 +18,7 @@ export const LANGS: { code: string; label: string }[] = [
 
 export const SUPPORTED_LANGS: string[] = LANGS.map((l) => l.code);
 
-const resources: Record<string, { translation: unknown }> = {
+const resources: Resource = {
   en: { translation: en },
   es: { translation: es },
   fr: { translation: fr },
