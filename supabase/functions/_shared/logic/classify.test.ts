@@ -42,5 +42,5 @@ describe("classify", () => {
     expect(thresholdForShare([50, 40], 0.5)).toBe(60);
     expect(parseClassifyOutput(JSON.stringify({ results: [{ id: "v", apps: { micabo: { score: 78, compatible: true } } }] }), ["v"], [], ["micabo"], 82)[0].apps.micabo.compatible).toBe(false);
   });
-  it("estimation de coût", () => { expect(estimateClassifyCost(1500)).toBe(0.9); });
+  it("estimation de coût", () => { expect(estimateClassifyCost(1500)).toBe(0.6); });
 });

@@ -132,7 +132,7 @@ export function mergeAppScores(
   return out;
 }
 
-/** Coût prévisionnel affiché avant un lancement (Gemini flash ≈ 0,0003 $ par vidéo en lot de 10, marge ×2). */
-export function estimateClassifyCost(n: number, perVideoUsd = 0.0006): number {
+/** Coût prévisionnel affiché avant un lancement (mesuré : 0,59 $ pour 1 559 vidéos ≈ 0,00038 $ / vidéo). */
+export function estimateClassifyCost(n: number, perVideoUsd = 0.0004): number {
   return Math.round(n * perVideoUsd * 100) / 100;
 }
