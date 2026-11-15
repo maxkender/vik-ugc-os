@@ -15,7 +15,7 @@
 - **Secrets posés** (sauf `APP_URL`). Les fonctions déployées ont été retestées avec les vraies clés : collecte, archivage MP4, Meta, Brevo.
 - **Logos Vik Studios intégrés** : palette officielle, sidebar, espace posteur, landing, login, favicon, en-tête des emails.
 - **Pour démarrer : SETUP.md** (Vercel + `APP_URL`, première connexion = admin).
-- ⚠️ Le code n'est **pas encore sur GitHub** : push refusé (403), l'app GitHub Claude n'a pas accès à `maxkender/vik-ugc-os`. Il y a 9 commits locaux, plus une copie dans `vik-ugc-os.bundle` (racine du dossier).
+- ✅ Code poussé sur GitHub `maxkender/vik-ugc-os` (branche `main`, 15/11).
 
 ## Tester en 10 minutes (après SETUP.md §1–3)
 
@@ -122,7 +122,7 @@
 
 ## Ce qui reste / limites connues
 
-- **GitHub** : installer l'app Claude sur `maxkender/vik-ugc-os` (ou pousser depuis le bundle), puis brancher Vercel.
+- **Vercel** : importer `maxkender/vik-ugc-os` (preset Vite), variables `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY` (SETUP.md §2).
 - **`APP_URL`** à poser dans les secrets Supabase une fois Vercel déployé : liens des emails et logo dans l'en-tête.
 - **Pas vérifié dans un navigateur connecté** : écrans admin et espace posteur. Ils compilent et le build passe, mais la création d'un compte admin de test a été refusée par les permissions de la session. À cliquer avec ton compte.
 - Non validés en réel :

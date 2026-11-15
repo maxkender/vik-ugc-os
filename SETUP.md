@@ -20,11 +20,11 @@ Déjà posés : `CRON_SECRET` (généré pendant le build, aussi dans Vault) et 
 
 ## 2. Déployer le front sur Vercel
 
-1. Pousser le repo sur GitHub `maxkender/vik-ugc-os`. Le push depuis la session de build a été refusé : il faut installer l'app GitHub Claude sur le repo. En attendant, le code est aussi dans `vik-ugc-os.bundle` : `git clone vik-ugc-os.bundle vik-ugc-os`.
-2. Vercel → New Project → importer le repo. Framework **Vite** (déjà décrit dans `vercel.json`).
+1. Le code est sur GitHub : `maxkender/vik-ugc-os`, branche `main`.
+2. Vercel → Add New → Project → importer `maxkender/vik-ugc-os`. Application Preset **Vite**, Build Command `npm run build`, Output Directory `dist`, Install Command par défaut (`npm install`). Tout est déjà dans `vercel.json`, y compris les réécritures SPA.
 3. Variables d'environnement Vercel (publiques) :
    - `VITE_SUPABASE_URL` = `https://lnytuhsgzkqrkehemasu.supabase.co`
-   - `VITE_SUPABASE_ANON_KEY` = clé `anon` (Supabase → Project Settings → API)
+   - `VITE_SUPABASE_ANON_KEY` = clé **anon public**. Supabase → Project Settings → **API Keys** → onglet « Legacy API keys » → `anon` `public` (commence par `eyJ…`). C'est une clé publique : la sécurité vient de la RLS.
 4. Deploy, puis reporter l'URL dans le secret `APP_URL` (étape 1) et dans Réglages → Intégrations → Landing.
 5. Supabase → Authentication → URL Configuration : **Site URL** = l'URL Vercel ; **Redirect URLs** = `https://<url-vercel>/**` (+ `http://localhost:5173/**` pour le dev).
 
