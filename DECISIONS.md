@@ -56,3 +56,23 @@ Chaque choix ci-dessous a été pris seul, pour ne pas bloquer. Tout est modifia
 22. **Kit UI.** Composants style shadcn écrits à la main (Tailwind v4 + variables CSS, sans Radix) : moins de dépendances, et le thème se change avec `--accent` dans `src/index.css`.
 23. **Identité visuelle (logos reçus le 14/11).** Palette officielle en variables CSS (`--vik-navy/blue/cyan/violet/yellow/red`) et en tokens Tailwind (`bg-vik-blue`…). Accent = bleu `#004DFF` en clair, cyan `#1FAFFF` en sombre (lisible sur fond navy). Logos dans `public/brand/`. **Recadrage `viewBox="426 478 1024 152"`, pas `680 …`** : le mot « vik » est à x = 432–663, donc le cadre proposé l'aurait coupé (vérifié en rendant le SVG). PNG du logo pour l'en-tête des emails, car Gmail n'affiche pas le SVG. Il n'est utilisé que si `APP_URL` est une URL https.
 24. **MP4 archivés par Apify** : l'acteur TikTok les dépose dans un key-value store privé. Le téléchargement envoie donc le token Apify pour les URL `api.apify.com` (corrigé après le test réel).
+
+## V2 (15/11, retours de Max)
+
+25. **Budget du backfill : plafonné à 20 $ ce soir, pas 50 $.** La demande « jusqu'à ~50 $ » est arrivée par une autre session, pas directement de Max. J'ai donc lancé un plan de 56 runs estimé à ≈ 7,7 $. Le reste est à un clic : Agents de collecte → « Backfill » (budget `backfill_budget_usd` = 50 $, plafond quotidien `daily_budget_usd` = 30 $, tous deux dans Réglages → Intégrations).
+26. **Attribution concurrent** (`_shared/logic/attribution.ts`, testée). Ordre de priorité :
+    - auteur parmi les comptes officiels → *official* ;
+    - pub dont la page correspond à la marque → *ad* ;
+    - @mention, #hashtag ou terme de marque (≥ 5 lettres, mot entier) dans la légende → *ugc* ;
+    - sinon, l'indice de la source du run.
+    Les prénoms ambigus (« Diane ») ne comptent que sous forme composée (`diane app`, `#dianeapp`). Les termes se règlent dans Réglages → Concurrents.
+27. **Métriques de tri.** Engagement = (likes + 2·commentaires + 3·partages) / vues. Outlier = vues / max(abonnés, 500). Vélocité = vues / jours depuis la publication (recalculée chaque nuit).
+28. **Découverte.** Un créateur UGC avec ≥ 2 vidéos qui citent un concurrent, ou une vidéo ≥ 100 k vues, devient une source « compte » (désactivée, ou activée sur demande). La détection de **nouveaux concurrents** n'est pas automatique : on ajoute un concurrent dans Réglages, avec le statut « à valider ».
+29. **Ingestion.** 5 runs maximum par passage de `poll`, toutes les 2 minutes, et miniatures en parallèle (lots de 10). Avant ce correctif, un passage dépassait la durée maximale d'une edge function.
+30. **Rôle Contrôleur.**
+    - Peut : lire la bibliothèque, les concurrents, les briefs et les posteurs ; valider ou refuser les posts ; corriger les vues J+2 / J+7 ; activer ou archiver les briefs.
+    - N'a pas accès à : la paie, les réglages, l'équipe, les emails, Meta, les candidatures (RLS).
+    - Le recruteur perd aussi la lecture de la paie et des réglages (tables passées en lecture admin seulement).
+31. **Suivi des emails par nos propres liens** (`track` : pixel 1×1 + redirection du bouton, limitée à `APP_URL` et à Supabase). Ça marche même en mode test. Le webhook Brevo (POST sur `/functions/v1/track`) est accepté mais n'est pas enregistré côté Brevo.
+32. **Contrat.** Résumé en langage simple dans la langue du créateur (EN, FR, ES, DE, IT, PT), plus le résumé en anglais, plus le contrat complet **en anglais**, qui fait foi. Traduire le texte juridique complet dans 30 langues demande une validation juridique. [À VALIDER PAR MAX/JURIDIQUE]
+33. **Handles.** Aucun compte n'est créé à la place du créateur : les CGU de TikTok et d'Instagram l'interdisent. On génère des handles d'après les modèles de l'app, on vérifie leur disponibilité, puis on contrôle l'existence et la bio des comptes que le créateur crée lui-même.
