@@ -1,4 +1,58 @@
-# PROGRESS : état au matin du 15/11/2026
+# PROGRESS : état au 15/11/2026 (V2)
+
+## V2 : retours de Max (15/11)
+
+**Données concurrents (priorité 1)**
+- Backfill terminé : 56 runs, **4,96 $ réels** (5,28 $ depuis le début), **+1 267 vidéos**. Bibliothèque ≈ 1 700 vidéos.
+- Par concurrent (vidéos UGC / officielles / pubs) :
+  - Knowunity : 92 / 32 / 15
+  - Astra AI : 116 / 15 / 31
+  - Gizmo : 79 / 19 / 30
+  - Flashka : 74 / 2 / 30
+  - Diane : 76 / 18 / 30
+  - Studyflash : 88 UGC, 29 pubs
+  - Quizlet : 8 UGC
+- ≈ 740 vidéos génériques (« study app » dans ~30 langues) ne sont rattachées à aucun concurrent : utiles comme références de format.
+- **174 créateurs UGC découverts**, ajoutés comme sources « compte » **désactivées** (Agents de collecte → filtrer, puis activer les meilleurs).
+- Attribution automatique : officiel / UGC / pub. Nouvelles métriques : engagement, outlier (vues/abonnés), vélocité (vues/jour). Plafond Apify quotidien (30 $), budget backfill (50 $), coût par run et cumuls dans Agents.
+
+**Écrans**
+- **Bibliothèque** : 10 tris, filtres origine / créateur / concurrent, regroupement par concurrent, vue **Tableau** (colonnes triables, pagination, export CSV jusqu'à 5 000 lignes).
+- **Concurrents** (nouvelle page) : classement, top vidéos, top créateurs UGC, formats qui marchent.
+- **Design** : clair par défaut, sidebar par sections (Veille / Production / Recrutement / Finance / Réglages), fil d'Ariane, tableaux et écrans vides revus.
+
+**Recrutement**
+- **Rôles** : Contrôleur (valide les posts, corrige les vues, active ou archive les briefs ; pas de paie, réglages, équipe ni candidatures). **Équipe** : inviter par email, changer de rôle, retirer.
+- **Onboarding** : 12 étapes horodatées par créateur, bloqués > 48 h en orange, « Relancer » par étape et en masse, historique des emails. Ouvertures et clics suivis par nos propres liens (testé en réel).
+- **Contrat** : résumé simple dans la langue du créateur (EN / FR / ES / DE / IT / PT), puis le résumé en anglais, puis le contrat complet en anglais.
+- **Handles** (page « Ton compte » du créateur) :
+  - 3 handles proposés, disponibles sur TikTok ;
+  - bio, nom affiché, lien en bio et conseils photo à copier ;
+  - le créateur colle ses handles, puis vérification automatique de l'existence et de la bio (bouton + cron toutes les heures).
+  - Aucun compte n'est créé pour lui (CGU).
+
+**Créas et Meta**
+- **Créas** : 30 langues, 2 à 3 accroches par langue, génération en lot (pays × formats), galerie filtrable, validation en masse.
+- **Meta** :
+  - campagnes par pays ou par zone, avec budget par groupe ;
+  - éditeur de budget par ad set (clic admin), plafond par ad set + plafond global visible ;
+  - « Pousser les créas » en masse ; CPL et coût par signé.
+  - Tout est créé en PAUSED.
+  - Campagne de test V2 : « [TEST Vik UGC OS] zone A » (52585023827809, PAUSED).
+
+**Encore incomplet / à vérifier (V2)**
+- **Pas testé connecté** : je ne peux pas ouvrir de session admin d'ici (création de compte de test refusée). Max doit cliquer :
+  - Bibliothèque (tableau), Concurrents, Onboarding, Équipe, Ton compte, Créas, Campagnes ;
+  - plus le parcours créateur complet sur une vraie candidature.
+- **Traductions** des créas (30 langues) et des résumés de contrat : faites pendant le build, à faire relire par un natif avant de dépenser.
+- **Instagram** : la disponibilité d'un handle n'est pas fiable depuis le serveur (réponse 404 même pour un compte existant). Les suggestions s'appuient sur TikTok ; la vérification d'un compte IG créé passe par Apify.
+- **Webhook Brevo** : non enregistré (le suivi passe par nos liens) ; s'il faut l'ajouter, l'URL est `/functions/v1/track`.
+- **Nouveaux concurrents** : pas de détection automatique ; à ajouter dans Réglages → Concurrents.
+- **Backfill** : 4,96 $ dépensés sur les 50 $ autorisés. Pour aller plus loin : Agents de collecte → Backfill, ou activer les 174 sources découvertes.
+
+---
+
+# V1 : état au matin du 15/11/2026
 
 ## TL;DR
 
