@@ -4,7 +4,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { supabase } from "./supabase";
 import { Spinner } from "@/components/ui";
 
-export type Role = "admin" | "recruiter" | "poster";
+export type Role = "admin" | "recruiter" | "controller" | "poster";
 export interface Profile {
   id: string;
   email: string;
@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 }
 
 export const useAuth = () => useContext(Ctx);
-export const isStaff = (p: Profile | null) => p?.role === "admin" || p?.role === "recruiter";
+export const isStaff = (p: Profile | null) => p?.role === "admin" || p?.role === "recruiter" || p?.role === "controller";
 
 export function RequireRole({ roles, children }: { roles: Role[]; children: ReactNode }) {
   const { session, profile, loading } = useAuth();

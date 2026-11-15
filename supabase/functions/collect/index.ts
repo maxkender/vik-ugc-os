@@ -18,12 +18,15 @@ import {
 import { normalizeItem, type VideoRow } from "../_shared/logic/normalize.ts";
 import { heuristicClassify, type CategoryDef } from "../_shared/logic/categorize.ts";
 import { performanceScore } from "../_shared/logic/score.ts";
+import { attributeVideo, derivedMetrics, type CompetitorTerms } from "../_shared/logic/attribution.ts";
 import { viewsCheckpoint } from "../_shared/logic/reminders.ts";
 
 interface ApifySettings {
   hard_cap_per_run: number;
   default_max_results: number;
   monthly_budget_usd: number;
+  daily_budget_usd: number;
+  backfill_budget_usd: number;
   collect_cron_enabled: boolean;
   views_cron_enabled: boolean;
   actors: Record<string, string>;
@@ -34,20 +37,28 @@ async function apifySettings(db: SupabaseClient): Promise<ApifySettings> {
   return {
     hard_cap_per_run: s.hard_cap_per_run ?? 200,
     default_max_results: s.default_max_results ?? 30,
-    monthly_budget_usd: s.monthly_budget_usd ?? 30,
+    monthly_budget_usd: s.monthly_budget_usd ?? 300,
+    daily_budget_usd: s.daily_budget_usd ?? 30,
+    backfill_budget_usd: s.backfill_budget_usd ?? 50,
     collect_cron_enabled: s.collect_cron_enabled ?? false,
     views_cron_enabled: s.views_cron_enabled ?? true,
     actors: { tiktok: "clockworks~tiktok-scraper", instagram: "apify~instagram-scraper", facebook_ads: "apify~facebook-ads-scraper", ...(s.actors ?? {}) },
   };
 }
 
-async function monthSpend(db: SupabaseClient): Promise<number> {
-  const start = new Date();
-  start.setUTCDate(1);
-  start.setUTCHours(0, 0, 0, 0);
-  const { data } = await db.from("agent_runs").select("cost_usd, status, params").gte("started_at", start.toISOString());
-  // runs en cours : on compte leur estimation
-  return (data ?? []).reduce((s, r) => s + Number(r.cost_usd ?? (r.status === "running" ? r.params?.estimated_cost_usd ?? 0 : 0)), 0);
+/** Dépense Apify depuis une date (runs terminés : coût réel ; en cours : estimation). */
+async function spendSince(db: SupabaseClient, since: Date): Promise<number> {
+  const { data } = await db.from("agent_runs").select("cost_usd, status, params").gte("started_at", since.toISOString());
+  return (data ?? []).reduce((s, r) => s + Number(r.cost_usd ?? (["running", "queued"].includes(r.status) ? r.params?.estimated_cost_usd ?? 0 : 0)), 0);
+}
+async function budgetCheck(db: SupabaseClient, cfg: ApifySettings, est: number, trigger: string) {
+  const day = new Date(); day.setUTCHours(0, 0, 0, 0);
+  const month = new Date(day); month.setUTCDate(1);
+  const [d, m] = await Promise.all([spendSince(db, day), spendSince(db, month)]);
+  // Le backfill a son propre plafond (journée du backfill), sinon plafond quotidien.
+  const dayCap = trigger === "backfill" ? Math.max(cfg.daily_budget_usd, cfg.backfill_budget_usd) : cfg.daily_budget_usd;
+  if (d + est > dayCap) throw new HttpError(402, `Plafond Apify du jour atteint (${d.toFixed(2)} $ / ${dayCap} $)`);
+  if (m + est > cfg.monthly_budget_usd) throw new HttpError(402, `Budget Apify du mois atteint (${m.toFixed(2)} $ / ${cfg.monthly_budget_usd} $)`);
 }
 
 async function launch(
@@ -58,8 +69,7 @@ async function launch(
 ) {
   const n = capResults(spec.max_results || cfg.default_max_results, cfg.hard_cap_per_run);
   const est = estimateCostUsd(spec.platform, n);
-  const spent = await monthSpend(db);
-  if (spent + est > cfg.monthly_budget_usd) throw new HttpError(402, `Budget Apify du mois atteint (${spent.toFixed(2)} $ / ${cfg.monthly_budget_usd} $)`);
+  await budgetCheck(db, cfg, est, meta.trigger);
   const input = buildActorInput({ ...spec, max_results: n }, cfg.hard_cap_per_run);
   const actor = cfg.actors[spec.platform];
   const { data: run, error } = await db.from("agent_runs").insert({
@@ -109,6 +119,7 @@ async function ingestVideos(db: SupabaseClient, run: any, items: any[]) {
   const rows = items.map((x) => normalizeItem(platform, x, now)).filter((r): r is VideoRow => !!r);
   if (rows.length === 0) return { found: items.length, created: 0 };
   const { data: cats } = await db.from("categories").select("id, slug, keywords");
+  const { data: comps } = await db.from("competitors").select("id, name, brand_terms, official_handles").eq("active", true);
   const ids = rows.map((r) => r.external_id);
   const { data: existing } = await db.from("videos").select("id, external_id, category_id, category_auto, thumbnail_path, app_id, competitor_id, source_id")
     .eq("platform", platform).in("external_id", ids);
@@ -122,11 +133,14 @@ async function ingestVideos(db: SupabaseClient, run: any, items: any[]) {
     const keepCat = prev && prev.category_auto === false;
     const thumb = prev?.thumbnail_path ?? (await storeThumbnail(db, r));
     const { raw_type: _rt, ...cols } = r;
+    const attr = attributeVideo(r, (comps ?? []) as CompetitorTerms[], run.params?.competitor_id ?? null);
     upserts.push({
       ...cols,
+      ...derivedMetrics(r, now),
+      origin: attr.origin,
       thumbnail_path: thumb,
       app_id: prev?.app_id ?? run.app_id ?? null,
-      competitor_id: prev?.competitor_id ?? run.params?.competitor_id ?? null,
+      competitor_id: prev?.competitor_id ?? attr.competitor_id,
       source_id: prev?.source_id ?? run.source_id ?? null,
       category_id: keepCat ? prev!.category_id : cls.category_id ?? prev?.category_id ?? null,
       category_auto: keepCat ? false : true,
@@ -293,7 +307,7 @@ async function rescore(db: SupabaseClient, afterId: string | null) {
     let adDays = v.ad_days;
     if (v.is_ad && v.ad_active && v.ad_started_at) adDays = Math.max(1, Math.round((now.getTime() - new Date(v.ad_started_at).getTime()) / 86_400_000) + 1);
     const score = performanceScore({ views: v.views, likes: v.likes, comments: v.comments, shares: v.shares, followers: v.author_followers, publishedAt: v.published_at, isAd: v.is_ad, adDays, adActive: v.ad_active }, now);
-    await db.from("videos").update({ score, ad_days: adDays }).eq("id", v.id);
+    await db.from("videos").update({ score, ad_days: adDays, ...derivedMetrics(v, now) }).eq("id", v.id);
   }
   const last = data?.length ? data[data.length - 1].id : null;
   return { ok: true, rescored: data?.length ?? 0, next_after_id: data?.length === 1000 ? last : null };
@@ -333,6 +347,46 @@ serve(async (req, body, db) => {
         }
       }
       return { ok: true, started };
+    }
+    case "backfill": {
+      // Lot de runs ad hoc (plan fourni par l'admin ou par scripts/backfill.ts), plafonné par backfill_budget_usd.
+      requireAdmin(c);
+      const plan: any[] = Array.isArray(body.plan) ? body.plan.slice(0, 60) : [];
+      const { data: app } = await db.from("apps").select("id").eq("slug", body.app_slug ?? "micabo").maybeSingle();
+      const started: any[] = [];
+      for (const p of plan) {
+        try {
+          started.push({ ...p, ...(await launch(db, cfg, { platform: p.platform, kind: p.kind, value: String(p.value), max_results: Number(p.max_results ?? 40), countries: p.countries }, { app_id: app?.id ?? null, competitor_id: p.competitor_id ?? null, trigger: "backfill", created_by: userId(c) })) });
+        } catch (e) {
+          started.push({ ...p, error: String(e instanceof Error ? e.message : e) });
+          if (e instanceof HttpError && e.status === 402) break;
+        }
+      }
+      return { ok: true, started: started.filter((x) => !x.error).length, results: started };
+    }
+    case "discover": {
+      // Comptes UGC repérés (≥ min_videos vidéos qui citent un concurrent, ou une vidéo ≥ min_views) → nouvelles sources « compte ».
+      requireAdmin(c);
+      const minVideos = Number(body.min_videos ?? 2), minViews = Number(body.min_views ?? 100_000);
+      const { data: rows } = await db.from("videos").select("author_handle, platform, competitor_id, app_id, views").eq("origin", "ugc").not("author_handle", "is", null).limit(20000);
+      const agg = new Map<string, { handle: string; platform: string; competitor_id: string; app_id: string | null; n: number; max: number }>();
+      for (const r of rows ?? []) {
+        const k = `${r.platform}|${r.author_handle}`;
+        const a = agg.get(k) ?? { handle: r.author_handle, platform: r.platform, competitor_id: r.competitor_id, app_id: r.app_id, n: 0, max: 0 };
+        a.n++; a.max = Math.max(a.max, Number(r.views ?? 0));
+        agg.set(k, a);
+      }
+      const picked = [...agg.values()].filter((a) => a.platform !== "facebook_ads" && (a.n >= minVideos || a.max >= minViews));
+      const { data: app } = await db.from("apps").select("id").eq("slug", "micabo").maybeSingle();
+      let created = 0;
+      for (const a of picked) {
+        const { error } = await db.from("sources").insert({
+          app_id: a.app_id ?? app?.id, competitor_id: a.competitor_id, platform: a.platform, kind: "account", value: a.handle,
+          max_results: 30, frequency_hours: 168, enabled: body.enable === true,
+        });
+        if (!error) created++;
+      }
+      return { ok: true, candidates: picked.length, created };
     }
     case "poll":
       requireAdmin(c);

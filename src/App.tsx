@@ -13,6 +13,9 @@ const CreatorToday = lazy(() => import("./pages/creator/Today"));
 const CreatorStats = lazy(() => import("./pages/creator/Stats"));
 const CreatorPayments = lazy(() => import("./pages/creator/Payments"));
 const Library = lazy(() => import("./pages/admin/Library"));
+const Competitors = lazy(() => import("./pages/admin/Competitors"));
+const Onboarding = lazy(() => import("./pages/admin/Onboarding"));
+const CreatorAccount = lazy(() => import("./pages/creator/Account"));
 const WinningAds = lazy(() => import("./pages/admin/WinningAds"));
 const Agents = lazy(() => import("./pages/admin/Agents"));
 const Briefs = lazy(() => import("./pages/admin/Briefs"));
@@ -39,7 +42,8 @@ function Home() {
 }
 
 const Loading = () => <div className="flex h-full items-center justify-center"><Spinner /></div>;
-const staff = ["admin", "recruiter"] as const;
+const staff = ["admin", "recruiter", "controller"] as const;
+const recruiting = ["admin", "recruiter"] as const;
 const adminOnly = ["admin"] as const;
 
 export function App() {
@@ -58,16 +62,19 @@ export function App() {
           <Route index element={<CreatorToday />} />
           <Route path="stats" element={<CreatorStats />} />
           <Route path="payments" element={<CreatorPayments />} />
+          <Route path="account" element={<CreatorAccount />} />
         </Route>
 
         <Route path="/admin" element={<RequireRole roles={[...staff]}><AdminLayout /></RequireRole>}>
           <Route index element={<Navigate to="library" replace />} />
           <Route path="library" element={<Library />} />
           <Route path="winning-ads" element={<WinningAds />} />
+          <Route path="competitors" element={<Competitors />} />
           <Route path="agents" element={<RequireRole roles={[...adminOnly]}><Agents /></RequireRole>} />
           <Route path="briefs" element={<Briefs />} />
           <Route path="recruitment" element={<Navigate to="candidates" replace />} />
-          <Route path="recruitment/candidates" element={<Candidates />} />
+          <Route path="recruitment/candidates" element={<RequireRole roles={[...recruiting]}><Candidates /></RequireRole>} />
+          <Route path="recruitment/onboarding" element={<RequireRole roles={[...recruiting]}><Onboarding /></RequireRole>} />
           <Route path="recruitment/campaigns" element={<RequireRole roles={[...adminOnly]}><Campaigns /></RequireRole>} />
           <Route path="recruitment/creatives" element={<RequireRole roles={[...adminOnly]}><Creatives /></RequireRole>} />
           <Route path="posters" element={<Posters />} />

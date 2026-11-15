@@ -1,0 +1,394 @@
+[
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "knowunity",
+  "max_results": 50,
+  "competitor": "Knowunity"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "astra ai app",
+  "max_results": 50,
+  "competitor": "Astra AI"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "gizmo ai flashcards",
+  "max_results": 50,
+  "competitor": "Gizmo"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "flashka",
+  "max_results": 50,
+  "competitor": "Flashka"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "diane app flashcards",
+  "max_results": 50,
+  "competitor": "Diane"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "studyflash",
+  "max_results": 50,
+  "competitor": "Studyflash"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "hashtag",
+  "value": "knowunity",
+  "max_results": 40,
+  "competitor": "Knowunity"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "hashtag",
+  "value": "astraai",
+  "max_results": 40,
+  "competitor": "Astra AI"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "hashtag",
+  "value": "gizmoai",
+  "max_results": 40,
+  "competitor": "Gizmo"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "hashtag",
+  "value": "flashka",
+  "max_results": 40,
+  "competitor": "Flashka"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "hashtag",
+  "value": "dianeapp",
+  "max_results": 40,
+  "competitor": "Diane"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "hashtag",
+  "value": "studyflash",
+  "max_results": 40,
+  "competitor": "Studyflash"
+ },
+ {
+  "platform": "instagram",
+  "kind": "hashtag",
+  "value": "knowunity",
+  "max_results": 30,
+  "competitor": "Knowunity"
+ },
+ {
+  "platform": "instagram",
+  "kind": "hashtag",
+  "value": "astraai",
+  "max_results": 30,
+  "competitor": "Astra AI"
+ },
+ {
+  "platform": "instagram",
+  "kind": "hashtag",
+  "value": "gizmoai",
+  "max_results": 30,
+  "competitor": "Gizmo"
+ },
+ {
+  "platform": "instagram",
+  "kind": "hashtag",
+  "value": "studyflash",
+  "max_results": 30,
+  "competitor": "Studyflash"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "ai study app",
+  "max_results": 35,
+  "lang": "en"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "ai homework app",
+  "max_results": 35,
+  "lang": "en"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "flashcards app",
+  "max_results": 35,
+  "lang": "en"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "application pour réviser",
+  "max_results": 35,
+  "lang": "fr"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "ia devoirs",
+  "max_results": 35,
+  "lang": "fr"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "app para estudiar",
+  "max_results": 35,
+  "lang": "es"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "ia para hacer deberes",
+  "max_results": 35,
+  "lang": "es"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "lern app ki",
+  "max_results": 35,
+  "lang": "de"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "karteikarten app",
+  "max_results": 35,
+  "lang": "de"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "app per studiare",
+  "max_results": 35,
+  "lang": "it"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "app para estudar",
+  "max_results": 35,
+  "lang": "pt"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "studie app ai",
+  "max_results": 35,
+  "lang": "nl"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "aplikacja do nauki",
+  "max_results": 35,
+  "lang": "pl"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "aplicatie pentru invatat",
+  "max_results": 35,
+  "lang": "ro"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "aplikace na učení",
+  "max_results": 35,
+  "lang": "cs"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "aplikácia na učenie",
+  "max_results": 35,
+  "lang": "sk"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "tanulós app",
+  "max_results": 35,
+  "lang": "hu"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "εφαρμογή για διάβασμα",
+  "max_results": 35,
+  "lang": "el"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "приложение за учене",
+  "max_results": 35,
+  "lang": "bg"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "aplikacija za učenje",
+  "max_results": 35,
+  "lang": "hr"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "aplikacija za učenje",
+  "max_results": 35,
+  "lang": "sl"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "aplikacija za učenje",
+  "max_results": 35,
+  "lang": "sr"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "додаток для навчання",
+  "max_results": 35,
+  "lang": "uk"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "ders çalışma uygulaması",
+  "max_results": 35,
+  "lang": "tr"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "تطبيق للمذاكرة",
+  "max_results": 35,
+  "lang": "ar"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "אפליקציה ללמידה",
+  "max_results": 35,
+  "lang": "he"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "勉強アプリ",
+  "max_results": 35,
+  "lang": "ja"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "공부 앱",
+  "max_results": 35,
+  "lang": "ko"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "plugg app",
+  "max_results": 35,
+  "lang": "sv"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "app for å studere",
+  "max_results": 35,
+  "lang": "no"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "app til at studere",
+  "max_results": 35,
+  "lang": "da"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "opiskelu sovellus",
+  "max_results": 35,
+  "lang": "fi"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "õppimise äpp",
+  "max_results": 35,
+  "lang": "et"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "mācību lietotne",
+  "max_results": 35,
+  "lang": "lv"
+ },
+ {
+  "platform": "tiktok",
+  "kind": "keyword",
+  "value": "mokymosi programėlė",
+  "max_results": 35,
+  "lang": "lt"
+ },
+ {
+  "platform": "facebook_ads",
+  "kind": "page",
+  "value": "Astra AI",
+  "max_results": 30,
+  "competitor": "Astra AI"
+ },
+ {
+  "platform": "facebook_ads",
+  "kind": "page",
+  "value": "Gizmo AI",
+  "max_results": 30,
+  "competitor": "Gizmo"
+ },
+ {
+  "platform": "facebook_ads",
+  "kind": "page",
+  "value": "Flashka",
+  "max_results": 30,
+  "competitor": "Flashka"
+ },
+ {
+  "platform": "facebook_ads",
+  "kind": "page",
+  "value": "Diane app",
+  "max_results": 30,
+  "competitor": "Diane"
+ },
+ {
+  "platform": "facebook_ads",
+  "kind": "page",
+  "value": "Studyflash",
+  "max_results": 30,
+  "competitor": "Studyflash"
+ }
+]

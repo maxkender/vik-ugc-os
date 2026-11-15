@@ -9,6 +9,8 @@ import {
   sha256Hex, signatureNameMatches, signatureStep, viewsCheckpoint, zoneOfCountry, ageOn, detectLanguage,
   campaignPayload, adsetPayload, adPayload, assertPaused, missingVariables, performanceScore, renderEmail,
 } from "./index.ts";
+import { attributeVideo, derivedMetrics } from "./attribution.ts";
+import { mentionsOf } from "./normalize.ts";
 
 const zoneA = { code: "A", price_per_video: 5, rpm: 1, rpm_views: 1000, currency: "USD" };
 
@@ -294,5 +296,33 @@ describe("Meta : tout en PAUSED", () => {
   it("landing avec UTM", () => {
     const u = landingUrl("https://vik.example", { country: "FR", lang: "fr", campaign: "rec-fr", adset: "fr-a" });
     expect(u).toBe("https://vik.example/join/fr?lang=fr&utm_source=meta&utm_medium=paid_social&utm_campaign=rec-fr&utm_content=fr-a");
+  });
+});
+
+describe("attribution concurrents", () => {
+  const comps = [
+    { id: "ku", name: "Knowunity", brand_terms: ["knowunity"], official_handles: ["knowunity.fr", "knowunity"] },
+    { id: "as", name: "Astra AI", brand_terms: ["astra ai", "astraai"], official_handles: ["astra_ai_es"] },
+    { id: "di", name: "Diane", brand_terms: ["diane app", "dianeapp"], official_handles: ["diane.app.officiel"] },
+  ];
+  const v = (x: any) => ({ author_handle: "someone", caption: "", hashtags: [], mentions: [], is_ad: false, ...x });
+  it("compte officiel", () => expect(attributeVideo(v({ author_handle: "knowunity.fr" }), comps)).toMatchObject({ competitor_id: "ku", origin: "official" }));
+  it("UGC par mention, hashtag, légende", () => {
+    expect(attributeVideo(v({ mentions: ["knowunity.de"] }), comps)).toMatchObject({ competitor_id: "ku", origin: "ugc" });
+    expect(attributeVideo(v({ hashtags: ["astraai"] }), comps)).toMatchObject({ competitor_id: "as", origin: "ugc" });
+    expect(attributeVideo(v({ caption: "I tried Astra AI for my exams" }), comps)).toMatchObject({ competitor_id: "as", origin: "ugc" });
+  });
+  it("pas de faux positif sur un prénom", () => {
+    expect(attributeVideo(v({ caption: "Diane m'a aidée à réviser" }), comps).competitor_id).toBeNull();
+  });
+  it("pub : page de la marque ; sinon indice de la source", () => {
+    expect(attributeVideo(v({ is_ad: true, ad_page_name: "Knowunity" }), comps)).toMatchObject({ competitor_id: "ku", origin: "ad" });
+    expect(attributeVideo(v({ caption: "random" }), comps, "di")).toMatchObject({ competitor_id: "di", origin: "ugc" });
+    expect(attributeVideo(v({ is_ad: true, ad_page_name: "Other" }), comps).origin).toBe("ad");
+  });
+  it("mentions et métriques dérivées", () => {
+    expect(mentionsOf([{ userUniqueId: "Knowunity.FR" }], null, "merci @astra_ai_es !")).toEqual(["knowunity.fr", "astra_ai_es"]);
+    const m = derivedMetrics({ views: 10000, likes: 500, comments: 50, shares: 100, author_followers: 1000, published_at: "2026-11-05T00:00:00Z" }, new Date("2026-11-15T00:00:00Z"));
+    expect(m).toEqual({ engagement: 0.09, outlier: 10, velocity: 1000 });
   });
 });

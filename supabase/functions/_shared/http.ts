@@ -25,7 +25,7 @@ export function admin(): SupabaseClient {
 
 export type Caller =
   | { kind: "cron" }
-  | { kind: "user"; id: string; email: string; role: "admin" | "recruiter" | "poster"; countries: string[] }
+  | { kind: "user"; id: string; email: string; role: "admin" | "recruiter" | "controller" | "poster"; countries: string[] }
   | { kind: "anon" };
 
 /** Identifie l'appelant : secret cron, JWT utilisateur (rôle lu dans profiles), ou anonyme. */
@@ -57,8 +57,15 @@ export function requireAdmin(c: Caller, allowCron = true): void {
 
 export function requireStaff(c: Caller): void {
   if (c.kind === "cron") return;
-  if (c.kind === "user" && (c.role === "admin" || c.role === "recruiter")) return;
+  if (c.kind === "user" && (c.role === "admin" || c.role === "recruiter" || c.role === "controller")) return;
   throw new HttpError(403, "staff_only");
+}
+
+/** Recrutement (candidatures, contrats) : admin ou recruteur, jamais le contrôleur. */
+export function requireRecruiter(c: Caller): void {
+  if (c.kind === "cron") return;
+  if (c.kind === "user" && (c.role === "admin" || c.role === "recruiter")) return;
+  throw new HttpError(403, "recruiter_only");
 }
 
 export function userId(c: Caller): string | null {

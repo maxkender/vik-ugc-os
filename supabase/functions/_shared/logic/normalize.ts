@@ -33,6 +33,7 @@ export interface VideoRow {
   ad_page_name: string | null;
   ad_countries: string[] | null;
   raw_type: string | null;
+  mentions: string[];
 }
 
 type Any = Record<string, any>;
@@ -51,6 +52,20 @@ export function hashtagsFromText(text: string | null | undefined): string[] {
   if (!text) return [];
   const out = new Set<string>();
   for (const m of text.matchAll(/#([\p{L}\p{N}_]+)/gu)) out.add(m[1].toLowerCase());
+  return [...out];
+}
+
+/** @mentions : champs de la plateforme + @… dans la légende, en minuscules sans @. */
+export function mentionsOf(a: unknown, b: unknown, text: string | null): string[] {
+  const out = new Set<string>();
+  for (const list of [a, b]) {
+    if (!Array.isArray(list)) continue;
+    for (const m of list) {
+      const h = typeof m === "string" ? m : (m?.userUniqueId ?? m?.username ?? m?.nickName ?? m?.name ?? "");
+      if (h) out.add(String(h).replace(/^@/, "").toLowerCase());
+    }
+  }
+  for (const m of (text ?? "").matchAll(/@([A-Za-z0-9._]{2,30})/g)) out.add(m[1].toLowerCase().replace(/\.$/, ""));
   return [...out];
 }
 
@@ -85,6 +100,7 @@ export function normalizeTikTok(x: Any): VideoRow | null {
     is_ad: false, // x.isAd = contenu marqué pub sur TikTok ; on garde l'info dans raw
     ad_started_at: null, ad_ended_at: null, ad_active: null, ad_days: null, ad_page_name: null, ad_countries: null,
     raw_type: x.isSlideshow ? "slideshow" : null,
+    mentions: mentionsOf(x.mentions, x.detailedMentions, caption),
   };
 }
 
@@ -117,6 +133,7 @@ export function normalizeInstagram(x: Any): VideoRow | null {
     is_ad: false,
     ad_started_at: null, ad_ended_at: null, ad_active: null, ad_days: null, ad_page_name: null, ad_countries: null,
     raw_type: str(x.productType) ?? str(x.type),
+    mentions: mentionsOf(x.mentions, x.taggedUsers, caption),
   };
 }
 
@@ -171,6 +188,7 @@ export function normalizeFacebookAd(x: Any, now = new Date()): VideoRow | null {
     ad_page_name: pageName,
     ad_countries: Array.isArray(x.targetedOrReachedCountries) ? x.targetedOrReachedCountries : Array.isArray(x.reachedCountries) ? x.reachedCountries : null,
     raw_type: str(snap.displayFormat),
+    mentions: mentionsOf(null, null, body),
   };
 }
 

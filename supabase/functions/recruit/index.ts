@@ -2,7 +2,7 @@
 //   decide { application_id, decision: accept|reject|review|new, notes? }   staff (recruteur : ses pays)
 //   resend_contract { application_id }                                     staff
 //   cron                                                                  cron : relances J+1/J+3/J+6, expiration J+7, refus différés
-import { appUrl, audit, caller, getSetting, HttpError, requireAdmin, requireStaff, serve, userId } from "../_shared/http.ts";
+import { appUrl, audit, caller, getSetting, HttpError, requireAdmin, requireRecruiter as requireStaff, serve, userId } from "../_shared/http.ts";
 import { queueEmail } from "../_shared/outbox.ts";
 import { createContract } from "../_shared/contracts.ts";
 import { signatureStep } from "../_shared/logic/reminders.ts";
