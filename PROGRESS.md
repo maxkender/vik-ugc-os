@@ -1,5 +1,45 @@
 # PROGRESS : état au 15/11/2026 (V2)
 
+## V2.1 : refonte visuelle + tests connectés (15/11, après-midi)
+
+**Design** (retour de Max : « genre blanc », « beau dashboard ») :
+- thème tout blanc, bordures fines, accent bleu Vik utilisé avec parcimonie, teintes douces ;
+- nouveau **tableau de bord `/admin`** : 6 KPI avec tendance, vidéos/jour par concurrent, funnel, top vidéos, « À traiter », classement ;
+- toutes les pages refaites : Bibliothèque (filtres en puces, grille 9:16, tableau), Concurrents, Onboarding (stepper 12 étapes), Candidats, Briefs, Posteurs, Agents, Campagnes, Créas, Paie, Réglages ;
+- espace créateur mobile (onglets en bas) ; landing, candidature et signature refaites.
+
+Captures :
+- avant : `docs/screenshots/before/`
+- après, en local : `docs/screenshots/after/`
+- après, **en prod** : `docs/screenshots/prod/`
+
+**Comptes de test** (accord de Max) : `qa-admin`, `qa-controller`, `qa-poster`, `qa-candidate` @vik-qa.test. Ils sont marqués `is_test` et exclus de la paie, des emails (annulés, jamais envoyés) et des KPI. Suppression : SETUP.md §10.
+
+**Parcours E2E connecté** (`scripts/e2e-journey.cjs`, vrai navigateur, Supabase de prod) :
+1. Candidature : formulaire + upload vidéo.
+2. Acceptation par l'admin dans Candidats (touche A).
+3. Signature sur la page publique : PDF généré, compte posteur créé avec le rôle poster.
+4. Espace posteur sur mobile : brief reçu par répartition, lien soumis, « Ton compte » (3 handles proposés), email Ruul.
+5. Contrôleur : post validé ; Paie, Équipe et Candidats refusés.
+6. Admin : paie calculée, le compte de test bien exclu.
+
+Aucune erreur JavaScript ni API pendant le parcours.
+
+**Bugs trouvés et corrigés pendant ces tests** :
+1. Spend Meta du tableau de bord : comptait tout le compte pub Sophia. Il est maintenant limité aux campagnes UGC OS.
+2. Les KPI et le funnel comptaient la candidature de démonstration. Comptes de test exclus partout.
+3. **Attribution des pubs** : 123 pubs sans rapport (la recherche Ad Library par mot-clé est bruitée) étaient rattachées à des concurrents. Elles sont détachées, et une pub n'est désormais rattachée que si sa page correspond à la marque.
+4. L'espace créateur s'affichait en anglais pour un candidat français. Il prend désormais la langue de la candidature, sauf si le créateur en choisit une autre.
+5. Un compte créé à la signature avec une adresse de test n'était pas marqué `is_test`. Corrigé par un trigger.
+6. Corrigés pendant la refonte : nombre de vidéos inexact dans Agents (1 186 au lieu de 1 525), menus déroulants tronqués, stepper qui ne prenait pas toute la largeur, textes qui débordaient dans Briefs.
+
+**Reste à noter** :
+- Les miniatures et vidéos TikTok sont bloquées dans mon environnement (zones grises sur certaines captures) ; elles s'affichent en prod chez Max.
+- Les prix des créas s'affichent au format de chaque pays (« 5 $US » en France, « $5 » aux États-Unis).
+- La paie de démonstration « Zoé Martin-E2E » reste visible tant que `scripts/cleanup-e2e.sql` n'est pas lancé.
+
+---
+
 ## V2 : retours de Max (15/11)
 
 **Données concurrents (priorité 1)**
