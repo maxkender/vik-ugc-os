@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pause, Play, Plus, RefreshCw, ShieldAlert } from "lucide-react";
+import { Pause, Play, Plus, RefreshCw, ShieldAlert, Upload } from "lucide-react";
 import { supabase, callFn } from "@/lib/supabase";
 import { useCountries, useSetting } from "@/lib/hooks";
 import { costPer } from "@shared/meta.ts";
@@ -16,6 +16,7 @@ export default function Campaigns() {
   const landing = useSetting<any>("landing");
   const countries = useCountries();
   const cap = Number(meta.data?.max_daily_budget ?? 50);
+  const globalCap = Number(meta.data?.global_daily_cap ?? 100);
   const [open, setOpen] = useState(false);
   const [adFor, setAdFor] = useState<any | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -56,12 +57,39 @@ export default function Campaigns() {
   };
   const pause = (level: string, row: any) => act(`pause-${row.id}`, () => callFn("meta", { action: "pause", level, id: row.id }), "Mis en pause");
 
-  // Métriques par pays
+  const committed = useMemo(() => (camps.data ?? []).flatMap((c: any) => c.meta_adsets ?? [])
+    .filter((a: any) => ["ACTIVE", "PAUSED"].includes(a.status)).reduce((sum: number, a: any) => sum + Number(a.daily_budget), 0), [camps.data]);
+  const activeBudget = useMemo(() => (camps.data ?? []).flatMap((c: any) => c.meta_adsets ?? [])
+    .filter((a: any) => a.status === "ACTIVE").reduce((sum: number, a: any) => sum + Number(a.daily_budget), 0), [camps.data]);
+  const setBudget = (a: any, amount: number) => {
+    if (!(amount > 0)) return toast("Budget invalide", "danger");
+    if (!window.confirm(`Passer « ${a.name} » de ${a.daily_budget} € à ${amount} €/jour ?\nPlafond par ad set : ${cap} € · plafond global : ${globalCap} €/jour.`)) return;
+    act(`budget-${a.id}`, () => callFn("meta", { action: "set_budget", adset_id: a.id, daily_budget: amount }), "Budget mis à jour sur Meta");
+  };
+  const pushCreatives = (c: any) => {
+    if (!window.confirm(`Créer des pubs (PAUSED) avec les créas validées de chaque pays de « ${c.name} » ? (6 max par ad set)`)) return;
+    act(`push-${c.id}`, async () => {
+      const r = await callFn<any>("meta", { action: "create_ads_bulk", campaign_id: c.id });
+      if (r.created === 0) throw new Error("Aucune créa validée pour les pays de cette campagne (Recrutement → Créas)");
+      const failed = (r.results ?? []).filter((x: any) => x.error);
+      if (failed.length) toast(`${failed.length} échec(s) : ${failed[0].error}`, "danger");
+      return r;
+    }, "Pubs créées en PAUSED");
+  };
+  const adsetLabel = (a: any) => a.country ?? `Zone ${a.zone_code ?? "?"}`;
+  const adsetCountries = (a: any): string[] => (a.country ? [a.country] : a.targeting?.countries ?? []);
+
+  // Métriques par pays (ou par zone pour les ad sets de zone)
   const metrics = useMemo(() => {
     const byCountry = new Map<string, { spend: number; clicks: number; impressions: number; apps: number; metaApps: number; signed: number }>();
     const get = (c: string) => byCountry.get(c) ?? (byCountry.set(c, { spend: 0, clicks: 0, impressions: 0, apps: 0, metaApps: 0, signed: 0 }), byCountry.get(c)!);
     const adsetCountry = new Map<string, string>();
-    for (const c of camps.data ?? []) for (const a of (c as any).meta_adsets ?? []) if (a.meta_id && a.country) adsetCountry.set(a.meta_id, a.country);
+    const countryKey = new Map<string, string>();
+    for (const c of camps.data ?? []) for (const a of (c as any).meta_adsets ?? []) {
+      if (!a.meta_id) continue;
+      adsetCountry.set(a.meta_id, adsetLabel(a));
+      for (const x of adsetCountries(a)) countryKey.set(x, adsetLabel(a));
+    }
     for (const r of insights.data ?? []) {
       const c = adsetCountry.get(r.meta_id);
       if (!c) continue;
@@ -71,8 +99,9 @@ export default function Campaigns() {
       m.impressions += Number(r.impressions);
     }
     for (const a of apps.data ?? []) {
-      if (!adsetCountry.size || ![...adsetCountry.values()].includes(a.country)) continue;
-      const m = get(a.country);
+      const key = countryKey.get(a.country);
+      if (!key) continue;
+      const m = get(key);
       m.apps++;
       if ((a.utm as any)?.utm_source === "meta") m.metaApps++;
       if (["signed", "active"].includes(a.status)) m.signed++;
@@ -93,13 +122,19 @@ export default function Campaigns() {
       <div className="mb-6 flex items-start gap-3 rounded-lg border border-warning/50 bg-warning/10 p-4 text-sm">
         <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0" />
         <div>
-          <p className="font-semibold">Tout est créé en PAUSED. Activation manuelle réservée à l'admin, plafond budget/jour : {cap} €</p>
-          <p className="text-muted-foreground">Aucune campagne, ad set ou pub n'est jamais activé automatiquement. Le plafond se règle dans Réglages → Intégrations.</p>
+          <p className="font-semibold">Tout est créé en PAUSED. Activation et budgets : clic admin uniquement. Plafond {cap} €/jour par ad set, {globalCap} €/jour au total.</p>
+          <p className="text-muted-foreground">Aucune campagne, ad set ou pub n'est jamais activé automatiquement. Les plafonds se règlent dans Réglages → Intégrations → Meta.</p>
+          <div className="mt-3 max-w-xl">
+            <div className="mb-1 flex justify-between text-xs"><span>Budgets engagés (ad sets actifs + en pause) : <b>{committed} €</b> / {globalCap} €/jour</span><span className="text-muted-foreground">dont actifs : {activeBudget} €</span></div>
+            <div className="h-2 overflow-hidden rounded-full bg-background">
+              <div className={`h-full ${committed > globalCap * 0.9 ? "bg-danger" : "bg-accent"}`} style={{ width: `${Math.min(100, (committed / Math.max(globalCap, 1)) * 100)}%` }} />
+            </div>
+          </div>
         </div>
       </div>
 
       {camps.isLoading ? <Spinner /> : (camps.data ?? []).length === 0 ? (
-        <Empty title="Aucune campagne">Crée une campagne : un ad set par pays, tout en PAUSED.</Empty>
+        <Empty title="Aucune campagne">Crée une campagne : un ad set par pays (ou par zone A/B/C), budget réglable, tout en PAUSED. Génère d'abord des créas dans Recrutement → Créas, puis « Pousser les créas ».</Empty>
       ) : (
         <div className="space-y-4">
           {(camps.data ?? []).map((c: any) => {
@@ -112,6 +147,7 @@ export default function Campaigns() {
                     <p className="text-xs text-muted-foreground">Meta {c.meta_id} · créée {dateFr(c.created_at)} · {c.countries.map(flag).join(" ")} · budget total {total} €/j</p>
                   </div>
                   <div className="flex gap-2">
+                    <Button size="sm" variant="outline" loading={busy === `push-${c.id}`} onClick={() => pushCreatives(c)}><Upload className="h-3.5 w-3.5" /> Pousser les créas</Button>
                     {c.status === "ACTIVE"
                       ? <Button size="sm" variant="outline" loading={busy === `pause-${c.id}`} onClick={() => pause("campaign", c)}><Pause className="h-3.5 w-3.5" /> Pause</Button>
                       : <Button size="sm" variant="outline" loading={busy === `act-${c.id}`} onClick={() => activate("campaign", c, total)}><Play className="h-3.5 w-3.5" /> Activer</Button>}
@@ -121,8 +157,9 @@ export default function Campaigns() {
                   {(c.meta_adsets ?? []).map((a: any) => (
                     <div key={a.id} className="rounded-md border p-3">
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div className="text-sm"><span className="mr-1">{flag(a.country)}</span><span className="font-medium">{a.name}</span> <Badge tone={statusTone(a.status)}>{a.status}</Badge> <span className="text-muted-foreground">· {a.daily_budget} €/j · zone {a.zone_code ?? "?"}</span></div>
-                        <div className="flex gap-2">
+                        <div className="text-sm"><span className="mr-1">{a.country ? flag(a.country) : adsetCountries(a).map(flag).join("")}</span><span className="font-medium">{a.name}</span> <Badge tone={statusTone(a.status)}>{a.status}</Badge> <span className="text-muted-foreground">· zone {a.zone_code ?? "?"}</span></div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <BudgetEditor value={Number(a.daily_budget)} max={cap} busy={busy === `budget-${a.id}`} onApply={(v) => setBudget(a, v)} />
                           <Button size="sm" variant="ghost" onClick={() => setAdFor(a)}><Plus className="h-3.5 w-3.5" /> Ajouter une pub</Button>
                           {a.status === "ACTIVE"
                             ? <Button size="sm" variant="outline" loading={busy === `pause-${a.id}`} onClick={() => pause("adset", a)}>Pause</Button>
@@ -152,11 +189,11 @@ export default function Campaigns() {
 
       <h2 className="mb-3 mt-10 text-lg font-semibold">Métriques par pays (7 derniers jours)</h2>
       <Table>
-        <thead><tr><Th>Pays</Th><Th>Dépense</Th><Th>Impressions</Th><Th>Clics</Th><Th>CPC</Th><Th>Candidatures</Th><Th>dont Meta (UTM)</Th><Th>Signés</Th><Th>Coût / candidature</Th><Th>Coût / signé</Th></tr></thead>
+        <thead><tr><Th>Pays / zone</Th><Th>Dépense</Th><Th>Impressions</Th><Th>Clics</Th><Th>CPC</Th><Th>Candidatures</Th><Th>dont Meta (UTM)</Th><Th>Signés</Th><Th>CPL</Th><Th>Coût / signé</Th></tr></thead>
         <tbody>
           {metrics.length === 0 ? <tr><Td colSpan={10} className="text-center text-muted-foreground">Pas encore de métriques. Synchronise après diffusion.</Td></tr> : metrics.map(([c, m]) => (
             <tr key={c}>
-              <Td>{flag(c)} {c}</Td><Td>{m.spend.toFixed(2)} €</Td><Td>{m.impressions}</Td><Td>{m.clicks}</Td>
+              <Td>{/^[A-Z]{2}$/.test(c) ? `${flag(c)} ${c}` : c}</Td><Td>{m.spend.toFixed(2)} €</Td><Td>{m.impressions}</Td><Td>{m.clicks}</Td>
               <Td>{m.clicks ? (m.spend / m.clicks).toFixed(2) + " €" : "—"}</Td><Td>{m.apps}</Td><Td>{m.metaApps}</Td><Td>{m.signed}</Td>
               <Td>{costPer(m.spend, m.metaApps || m.apps) ?? "—"}{costPer(m.spend, m.metaApps || m.apps) !== null && " €"}</Td>
               <Td>{costPer(m.spend, m.signed) ?? "—"}{costPer(m.spend, m.signed) !== null && " €"}</Td>
@@ -164,6 +201,8 @@ export default function Campaigns() {
           ))}
         </tbody>
       </Table>
+
+      <p className="mt-2 text-xs text-muted-foreground">CPL = dépense / candidatures venues de Meta (UTM utm_source=meta), ou toutes les candidatures du pays si aucune UTM. Coût / signé = dépense / créateurs signés.</p>
 
       <NewCampaignDialog open={open} onClose={() => setOpen(false)} cap={cap} countries={(countries.data ?? []).filter((c: any) => c.open)}
         defaultLanding={landing.data?.base_url || location.origin}
@@ -173,22 +212,44 @@ export default function Campaigns() {
   );
 }
 
+function BudgetEditor({ value, max, busy, onApply }: { value: number; max: number; busy: boolean; onApply: (v: number) => void }) {
+  const [v, setV] = useState(value);
+  return (
+    <span className="flex items-center gap-1">
+      <Input type="number" min={1} max={max} step="0.5" className="h-8 w-20 text-xs" value={v} onChange={(e) => setV(Number(e.target.value))} />
+      <span className="text-xs text-muted-foreground">€/j</span>
+      <Button size="sm" variant="outline" disabled={v === value || v <= 0 || v > max} loading={busy} onClick={() => onApply(v)}>Appliquer</Button>
+    </span>
+  );
+}
+
 function NewCampaignDialog({ open, onClose, cap, countries, defaultLanding, onCreated }: { open: boolean; onClose: () => void; cap: number; countries: any[]; defaultLanding: string; onCreated: () => void }) {
   const toast = useToast();
   const [name, setName] = useState("Recrutement créateurs");
   const [sel, setSel] = useState<string[]>([]);
+  const [mode, setMode] = useState<"country" | "zone">("country");
   const [budget, setBudget] = useState(5);
+  const [budgets, setBudgets] = useState<Record<string, number>>({});
   const [landing, setLanding] = useState("");
   const [busy, setBusy] = useState(false);
   const [q, setQ] = useState("");
+  const zoneOf = (code: string) => countries.find((c) => c.code === code)?.zone_code ?? "?";
+  const groups = mode === "zone" ? [...new Set(sel.map(zoneOf))].sort() : sel;
+  const budgetOf = (k: string) => budgets[k] ?? budget;
+  const total = groups.reduce((sum, k) => sum + budgetOf(k), 0);
   const submit = async () => {
     if (!sel.length) return toast("Choisis au moins un pays", "danger");
-    if (budget <= 0 || budget > cap) return toast(`Budget entre 0 et ${cap} €`, "danger");
+    const bad = groups.find((k) => budgetOf(k) <= 0 || budgetOf(k) > cap);
+    if (bad) return toast(`Budget ${bad} : entre 0 et ${cap} €`, "danger");
     setBusy(true);
     try {
-      await callFn("meta", { action: "create_campaign", name, countries: sel, daily_budget: budget, landing_base_url: landing || defaultLanding });
+      await callFn("meta", {
+        action: "create_campaign", name, countries: sel, daily_budget: budget, by_zone: mode === "zone",
+        budgets: Object.fromEntries(groups.map((k) => [k, budgetOf(k)])), landing_base_url: landing || defaultLanding,
+      });
       toast("Campagne créée en PAUSED", "success");
       setSel([]);
+      setBudgets({});
       onCreated();
     } catch (e) {
       toast((e as Error).message, "danger");
@@ -198,22 +259,49 @@ function NewCampaignDialog({ open, onClose, cap, countries, defaultLanding, onCr
   };
   const shown = countries.filter((c) => !q || `${c.name} ${c.code}`.toLowerCase().includes(q.toLowerCase()));
   return (
-    <Dialog open={open} onClose={onClose} title="Nouvelle campagne (PAUSED)" footer={<><Button variant="outline" onClick={onClose}>Annuler</Button><Button loading={busy} onClick={submit}>Créer en PAUSED</Button></>}>
-      <div className="space-y-4">
-        <Field label="Nom"><Input value={name} onChange={(e) => setName(e.target.value)} /></Field>
-        <Field label={`Pays (${sel.length})`} hint="Un ad set par pays, ciblage 18–65 (catégorie Emploi : âge fin et intérêts interdits par Meta).">
-          <Input placeholder="Filtrer…" value={q} onChange={(e) => setQ(e.target.value)} className="mb-2" />
-          <div className="grid max-h-56 grid-cols-2 gap-1 overflow-y-auto rounded-md border p-2 text-sm">
-            {shown.map((c) => (
-              <label key={c.code} className="flex items-center gap-2 rounded px-1 py-0.5 hover:bg-muted">
-                <input type="checkbox" checked={sel.includes(c.code)} onChange={(e) => setSel(e.target.checked ? [...sel, c.code] : sel.filter((x) => x !== c.code))} />
-                {flag(c.code)} {c.name} <span className="text-xs text-muted-foreground">{c.zone_code}</span>
-              </label>
-            ))}
-          </div>
-        </Field>
-        <Field label="Budget journalier par pays (€)" hint={`Plafond : ${cap} €`}><Input type="number" min={1} max={cap} step="0.5" value={budget} onChange={(e) => setBudget(Number(e.target.value))} /></Field>
-        <Field label="URL de base de la landing" hint="Les pubs pointent vers /join/<pays> avec UTM."><Input placeholder={defaultLanding} value={landing} onChange={(e) => setLanding(e.target.value)} /></Field>
+    <Dialog open={open} onClose={onClose} title="Nouvelle campagne (PAUSED)" wide footer={<><Button variant="outline" onClick={onClose}>Annuler</Button><Button loading={busy} onClick={submit}>Créer en PAUSED · {total} €/j</Button></>}>
+      <div className="grid gap-5 md:grid-cols-2">
+        <div className="space-y-4">
+          <Field label="Nom"><Input value={name} onChange={(e) => setName(e.target.value)} /></Field>
+          <Field label="Découpage">
+            <div className="flex gap-4 text-sm">
+              <label className="flex items-center gap-2"><input type="radio" checked={mode === "country"} onChange={() => setMode("country")} /> Un ad set par pays</label>
+              <label className="flex items-center gap-2"><input type="radio" checked={mode === "zone"} onChange={() => setMode("zone")} /> Un ad set par zone (A/B/C)</label>
+            </div>
+          </Field>
+          <Field label={`Pays (${sel.length})`} hint="Ciblage 18–65 (catégorie Emploi : âge fin et intérêts interdits par Meta).">
+            <div className="mb-2 flex flex-wrap gap-1.5">
+              {["A", "B", "C"].map((z) => <Button key={z} size="sm" variant="outline" onClick={() => setSel([...new Set([...sel, ...countries.filter((c) => c.zone_code === z).map((c) => c.code)])])}>+ Zone {z}</Button>)}
+              <Button size="sm" variant="ghost" onClick={() => setSel([])}>Aucun</Button>
+            </div>
+            <Input placeholder="Filtrer…" value={q} onChange={(e) => setQ(e.target.value)} className="mb-2" />
+            <div className="grid max-h-48 grid-cols-2 gap-1 overflow-y-auto rounded-md border p-2 text-sm">
+              {shown.map((c) => (
+                <label key={c.code} className="flex items-center gap-2 rounded px-1 py-0.5 hover:bg-muted">
+                  <input type="checkbox" checked={sel.includes(c.code)} onChange={(e) => setSel(e.target.checked ? [...sel, c.code] : sel.filter((x) => x !== c.code))} />
+                  {flag(c.code)} {c.name} <span className="text-xs text-muted-foreground">{c.zone_code}</span>
+                </label>
+              ))}
+            </div>
+          </Field>
+        </div>
+        <div className="space-y-4">
+          <Field label="Budget par défaut (€/jour par ad set)" hint={`Plafond : ${cap} € par ad set`}><Input type="number" min={1} max={cap} step="0.5" value={budget} onChange={(e) => setBudget(Number(e.target.value))} /></Field>
+          <Field label={`Budget par ${mode === "zone" ? "zone" : "pays"}`}>
+            {groups.length === 0 ? <p className="text-xs text-muted-foreground">Choisis des pays.</p> : (
+              <div className="max-h-56 space-y-1 overflow-y-auto rounded-md border p-2">
+                {groups.map((k) => (
+                  <div key={k} className="flex items-center justify-between gap-2 text-sm">
+                    <span>{mode === "zone" ? `Zone ${k} (${sel.filter((x) => zoneOf(x) === k).length} pays)` : `${flag(k)} ${k}`}</span>
+                    <span className="flex items-center gap-1"><Input type="number" min={1} max={cap} step="0.5" className="h-7 w-20 text-xs" value={budgetOf(k)} onChange={(e) => setBudgets({ ...budgets, [k]: Number(e.target.value) })} /> €</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Field>
+          <p className="text-sm">Total : <b>{total} €/jour</b> (tout reste en PAUSED jusqu'à ton clic « Activer »)</p>
+          <Field label="URL de base de la landing" hint="Les pubs pointent vers /join/<pays> avec UTM."><Input placeholder={defaultLanding} value={landing} onChange={(e) => setLanding(e.target.value)} /></Field>
+        </div>
       </div>
     </Dialog>
   );
@@ -223,9 +311,12 @@ function AddAdDialog({ adset, onClose, onCreated }: { adset: any | null; onClose
   const toast = useToast();
   const [busy, setBusy] = useState<string | null>(null);
   const creatives = useQuery({
-    queryKey: ["creatives_approved", adset?.country],
+    queryKey: ["creatives_approved", adset?.id],
     enabled: !!adset,
-    queryFn: async () => (await supabase.from("recruitment_creatives").select("*").eq("status", "approved").eq("country", adset.country)).data ?? [],
+    queryFn: async () => {
+      const list: string[] = adset.country ? [adset.country] : adset.targeting?.countries ?? [];
+      return (await supabase.from("recruitment_creatives").select("*").eq("status", "approved").in("country", list)).data ?? [];
+    },
   });
   const pick = async (cr: any) => {
     setBusy(cr.id);
@@ -240,7 +331,7 @@ function AddAdDialog({ adset, onClose, onCreated }: { adset: any | null; onClose
     }
   };
   return (
-    <Dialog open={!!adset} onClose={onClose} title={`Ajouter une pub — ${adset?.country ?? ""}`} wide>
+    <Dialog open={!!adset} onClose={onClose} title={`Ajouter une pub — ${adset?.country ?? `zone ${adset?.zone_code ?? ""}`}`} wide>
       {creatives.isLoading ? <Spinner /> : (creatives.data ?? []).length === 0 ? (
         <Empty title="Aucune créa validée pour ce pays">Génère et valide des créas dans Recrutement → Créas.</Empty>
       ) : (

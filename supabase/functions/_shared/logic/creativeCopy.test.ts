@@ -1,0 +1,25 @@
+import { describe, expect, it } from "vitest";
+import { CREATIVE_COPY, CREATIVE_LANGS, creativeCopy } from "./creativeCopy.ts";
+
+const COUNTRY_LANGS = "en fr es de it pt nl pl ro cs sk hu el bg hr sl sr uk tr ar he ja ko sv no da fi et lv lt".split(" ");
+
+describe("textes des créas", () => {
+  it("toutes les langues des pays couverts, tous les champs, prix présent", () => {
+    for (const l of COUNTRY_LANGS) {
+      expect(CREATIVE_LANGS).toContain(l);
+      for (const hook of ["student", "earn"] as const) {
+        const c = CREATIVE_COPY[l][hook];
+        expect(c.headline.length, `${l}/${hook}`).toBeGreaterThan(5);
+        expect(c.subline.length).toBeGreaterThan(5);
+        expect(c.cta.length).toBeGreaterThan(1);
+        expect(c.headline + c.subline, `${l}/${hook} sans {{price}}`).toContain("{{price}}");
+      }
+    }
+  });
+  it("prix inséré, replis langue et hook", () => {
+    expect(creativeCopy("fr", "student", "5 $").headline).toBe("Étudiant·e ? Gagne 5 $ par vidéo");
+    expect(creativeCopy("de", "nofollow", "5 $").headline).toContain("5 $");
+    expect(creativeCopy("xx", "earn", "2 $").lang).toBe("en");
+    expect(creativeCopy("es-419", "earn", "2 $").lang).toBe("es");
+  });
+});

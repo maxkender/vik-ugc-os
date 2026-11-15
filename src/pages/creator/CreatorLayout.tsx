@@ -39,6 +39,7 @@ export default function CreatorLayout() {
         <nav className="mx-auto max-w-3xl px-4 pb-3">
           <div className="inline-flex rounded-lg bg-muted p-1">
             <NavLink end to="/creator" className={tab}>{t("creator.nav.today")}</NavLink>
+            <NavLink to="/creator/account" className={tab}>{t("account.nav")}</NavLink>
             <NavLink to="/creator/stats" className={tab}>{t("creator.nav.stats")}</NavLink>
             <NavLink to="/creator/payments" className={tab}>{t("creator.nav.payments")}</NavLink>
           </div>

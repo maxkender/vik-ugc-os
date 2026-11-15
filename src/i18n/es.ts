@@ -1,5 +1,26 @@
 import type { Dict } from "./en";
 const es: Dict = {
+  account: {
+    nav: "Tu cuenta",
+    title: "Tus cuentas de creador/a",
+    intro: "Tú creas tus cuentas de TikTok e Instagram (no podemos hacerlo por ti: las normas de TikTok e Instagram lo prohíben, y la cuenta debe ser tuya). Te lo ponemos fácil: elige un nombre, copia la bio y listo.",
+    step1: "1. Elige tu nombre de usuario",
+    step1Hint: "Estos nombres parecían libres en TikTok e Instagram cuando los comprobamos. ¡Coge uno rápido!",
+    regenerate: "Otras ideas",
+    generating: "Comprobando disponibilidad…",
+    noSuggestion: "Aún no hay sugerencias. Haz clic en «Otras ideas».",
+    available: "libre", taken: "ocupado", unknown: "dudoso",
+    copy: "Copiar", copied: "Copiado ✓",
+    step2: "2. Prepara tu perfil",
+    displayName: "Nombre visible", bio: "Bio", linkInBio: "Enlace en la bio", photo: "Foto de perfil",
+    bioWarn: "Deja la bio tal cual: comprobamos que mencione {{app}}.",
+    step3: "3. Dinos tus nombres de usuario",
+    tiktok: "Tu usuario de TikTok", instagram: "Tu usuario de Instagram (opcional)",
+    save: "Guardar", verify: "Comprobar mis cuentas", checking: "Comprobando…",
+    status: { none: "Sin empezar", proposed: "Nombres sugeridos", submitted: "Pendiente de comprobación", verified: "Cuentas OK ✓", failed: "Falta algo" },
+    exists: "cuenta encontrada", missing: "cuenta no encontrada", bioOk: "bio OK", bioMissing: "la bio no menciona {{app}}", notChecked: "aún sin comprobar",
+    saved: "Guardado ✓",
+  },
   common: { loading: "Cargando…", save: "Guardar", cancel: "Cancelar", logout: "Cerrar sesión", error: "Algo ha fallado", language: "Idioma" },
   landing: {
     badge: "Programa de creadores remunerado",

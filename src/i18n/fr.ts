@@ -1,5 +1,26 @@
 import type { Dict } from "./en";
 const fr: Dict = {
+  account: {
+    nav: "Ton compte",
+    title: "Tes comptes créateur·rice",
+    intro: "C'est toi qui crées tes comptes TikTok et Instagram (on n'a pas le droit de le faire pour toi : les règles de TikTok et d'Instagram l'interdisent, et le compte doit être à toi). On te mâche le travail : choisis un nom, copie la bio, c'est fini.",
+    step1: "1. Choisis ton nom d'utilisateur",
+    step1Hint: "Ces noms semblaient libres sur TikTok et Instagram au moment de la vérification. Prends-en un vite !",
+    regenerate: "Autres idées",
+    generating: "Vérification de la disponibilité…",
+    noSuggestion: "Pas encore de suggestion. Clique sur « Autres idées ».",
+    available: "libre", taken: "pris", unknown: "incertain",
+    copy: "Copier", copied: "Copié ✓",
+    step2: "2. Prépare ton profil",
+    displayName: "Nom affiché", bio: "Bio", linkInBio: "Lien en bio", photo: "Photo de profil",
+    bioWarn: "Garde la bio telle quelle : on vérifie qu'elle mentionne {{app}}.",
+    step3: "3. Donne-nous tes noms d'utilisateur",
+    tiktok: "Ton nom TikTok", instagram: "Ton nom Instagram (facultatif)",
+    save: "Enregistrer", verify: "Vérifier mes comptes", checking: "Vérification…",
+    status: { none: "Pas commencé", proposed: "Noms proposés", submitted: "En attente de vérification", verified: "Comptes OK ✓", failed: "Il manque quelque chose" },
+    exists: "compte trouvé", missing: "compte introuvable", bioOk: "bio OK", bioMissing: "la bio ne mentionne pas {{app}}", notChecked: "pas encore vérifié",
+    saved: "Enregistré ✓",
+  },
   common: { loading: "Chargement…", save: "Enregistrer", cancel: "Annuler", logout: "Se déconnecter", error: "Une erreur est survenue", language: "Langue" },
   landing: {
     badge: "Programme créateurs rémunéré",

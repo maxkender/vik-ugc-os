@@ -4,9 +4,18 @@ import { Plus } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useApps } from "@/lib/hooks";
 import { Badge, Button, Dialog, Empty, Field, Input, PageHeader, Spinner, Switch, Table, Td, Textarea, Th, useToast } from "@/components/ui";
+import { bioFor, displayNameFor, generateHandles } from "@shared/handles.ts";
 
-type App = { id?: string; slug: string; name: string; description: string | null; website: string | null; ios_url: string | null; android_url: string | null; active: boolean };
-const blank: App = { slug: "", name: "", description: "", website: "", ios_url: "", android_url: "", active: true };
+type App = {
+  id?: string; slug: string; name: string; description: string | null; website: string | null; ios_url: string | null; android_url: string | null; active: boolean;
+  handle_patterns: string[]; bio_templates: Record<string, string>; display_name_pattern: string; link_in_bio: string | null; profile_photo_tips: string | null;
+};
+const blank: App = {
+  slug: "", name: "", description: "", website: "", ios_url: "", android_url: "", active: true,
+  handle_patterns: ["{app}.{first}", "{first}.studies", "{first}{app}", "{first}.{last1}.{app}"], bio_templates: { en: "{App} ambassador 📚 Study smarter with AI ✨" },
+  display_name_pattern: "{First} | {App}", link_in_bio: "", profile_photo_tips: "",
+};
+const BIO_LANGS = ["en", "fr", "es", "de", "it", "pt"];
 
 export default function Apps() {
   const { data: apps, isLoading } = useApps();
@@ -19,7 +28,12 @@ export default function Apps() {
     if (!edit) return;
     if (!edit.name.trim() || !/^[a-z0-9-]+$/.test(edit.slug)) return toast("Nom et slug (minuscules, chiffres, tirets) obligatoires", "danger");
     setBusy(true);
-    const row = { ...edit, description: edit.description || null, website: edit.website || null, ios_url: edit.ios_url || null, android_url: edit.android_url || null };
+    const row = {
+      ...edit, description: edit.description || null, website: edit.website || null, ios_url: edit.ios_url || null, android_url: edit.android_url || null,
+      link_in_bio: edit.link_in_bio || null, profile_photo_tips: edit.profile_photo_tips || null,
+      handle_patterns: edit.handle_patterns.map((x) => x.trim()).filter(Boolean),
+      bio_templates: Object.fromEntries(Object.entries(edit.bio_templates).filter(([, v]) => v.trim())),
+    };
     const { error } = edit.id ? await supabase.from("apps").update(row).eq("id", edit.id) : await supabase.from("apps").insert(row);
     setBusy(false);
     if (error) return toast(error.message, "danger");
@@ -52,13 +66,13 @@ export default function Apps() {
                   {a.android_url && <a className="text-accent hover:underline" href={a.android_url} target="_blank" rel="noreferrer">Android</a>}
                 </Td>
                 <Td>{a.active ? <Badge tone="success">Active</Badge> : <Badge>Inactive</Badge>}</Td>
-                <Td className="text-right"><Button size="sm" variant="ghost" onClick={() => setEdit(a)}>Modifier</Button><Button size="sm" variant="ghost" className="text-danger" onClick={() => remove(a)}>Supprimer</Button></Td>
+                <Td className="text-right"><Button size="sm" variant="ghost" onClick={() => setEdit({ ...blank, ...a, bio_templates: a.bio_templates ?? {}, handle_patterns: a.handle_patterns ?? blank.handle_patterns })}>Modifier</Button><Button size="sm" variant="ghost" className="text-danger" onClick={() => remove(a)}>Supprimer</Button></Td>
               </tr>
             ))}
           </tbody>
         </Table>
       )}
-      <Dialog open={!!edit} onClose={() => setEdit(null)} title={edit?.id ? "Modifier l'app" : "Nouvelle app"}
+      <Dialog open={!!edit} onClose={() => setEdit(null)} title={edit?.id ? "Modifier l'app" : "Nouvelle app"} wide
         footer={<><Button variant="outline" onClick={() => setEdit(null)}>Annuler</Button><Button loading={busy} onClick={save}>Enregistrer</Button></>}>
         {edit && (
           <div className="grid gap-4 sm:grid-cols-2">
@@ -69,9 +83,55 @@ export default function Apps() {
             <Field label="App Store (iOS)"><Input value={edit.ios_url ?? ""} onChange={(e) => set("ios_url", e.target.value)} /></Field>
             <Field label="Google Play"><Input value={edit.android_url ?? ""} onChange={(e) => set("android_url", e.target.value)} /></Field>
             <div className="flex items-center gap-3 pt-6"><Switch checked={edit.active} onChange={(v) => set("active", v)} /> <span className="text-sm">Active</span></div>
+            <HandleSettings app={edit} set={set} />
           </div>
         )}
       </Dialog>
     </>
+  );
+}
+
+/** Réglages de l'étape « Ton compte » du créateur : handles, nom affiché, bio par langue, lien, photo. */
+function HandleSettings({ app, set }: { app: App; set: (k: keyof App, v: any) => void }) {
+  const [sample, setSample] = useState("Zoé Martin");
+  const [newLang, setNewLang] = useState("");
+  const [first, ...rest] = sample.trim().split(/\s+/);
+  const ctx = { app: app.name || "App", first: first || "zoe", last: rest.join(" ") };
+  const preview = generateHandles(app.handle_patterns, ctx, 6);
+  const langs = [...new Set([...BIO_LANGS, ...Object.keys(app.bio_templates ?? {})])];
+  return (
+    <div className="space-y-4 border-t pt-4 sm:col-span-2">
+      <div>
+        <p className="font-medium">Étape « Ton compte » du créateur</p>
+        <p className="text-xs text-muted-foreground">On ne crée jamais de compte TikTok/Instagram (interdit par leurs CGU) : on propose des handles libres, le nom, la bio et le lien, puis on vérifie les comptes créés par le créateur (la bio doit citer {app.name || "l'app"}).</p>
+      </div>
+      <Field label="Modèles de handles (un par ligne)" hint="Variables : {app} {first} {last} {last1} · nettoyés automatiquement (a-z, 0-9, . _ ; 24 caractères max)">
+        <Textarea rows={4} value={app.handle_patterns.join("\n")} onChange={(e) => set("handle_patterns", e.target.value.split("\n"))} className="font-mono text-xs" />
+      </Field>
+      <div className="rounded-lg bg-muted p-3">
+        <div className="mb-2 flex items-center gap-2 text-xs"><span className="text-muted-foreground">Aperçu pour</span><Input className="h-7 w-44 text-xs" value={sample} onChange={(e) => setSample(e.target.value)} /></div>
+        <div className="flex flex-wrap gap-1.5">{preview.map((h) => <Badge key={h} tone="outline">@{h}</Badge>)}</div>
+        <p className="mt-2 text-xs">Nom affiché : <span className="font-medium">{displayNameFor(app.display_name_pattern, ctx)}</span></p>
+        <p className="text-xs">Bio (fr) : <span className="font-medium">{bioFor(app.bio_templates, "fr", ctx) || "—"}</span></p>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Nom affiché" hint="{First} {App} {last1}"><Input value={app.display_name_pattern} onChange={(e) => set("display_name_pattern", e.target.value)} /></Field>
+        <Field label="Lien en bio"><Input value={app.link_in_bio ?? ""} onChange={(e) => set("link_in_bio", e.target.value)} placeholder="https://…" /></Field>
+        <Field label="Consignes photo de profil" className="sm:col-span-2"><Textarea rows={2} value={app.profile_photo_tips ?? ""} onChange={(e) => set("profile_photo_tips", e.target.value)} /></Field>
+      </div>
+      <div className="space-y-2">
+        <p className="text-sm font-medium">Bio par langue <span className="text-xs font-normal text-muted-foreground">(langue du créateur, sinon anglais · variables {"{App}"} {"{first}"})</span></p>
+        {langs.map((l) => (
+          <div key={l} className="flex items-start gap-2">
+            <span className="mt-2 w-8 font-mono text-xs uppercase text-muted-foreground">{l}</span>
+            <Textarea rows={2} className="text-sm" value={app.bio_templates[l] ?? ""} onChange={(e) => set("bio_templates", { ...app.bio_templates, [l]: e.target.value })} />
+          </div>
+        ))}
+        <div className="flex items-center gap-2">
+          <Input className="h-8 w-24 text-xs" placeholder="ex. nl" value={newLang} onChange={(e) => setNewLang(e.target.value.toLowerCase().slice(0, 5))} />
+          <Button size="sm" variant="outline" disabled={!newLang} onClick={() => { set("bio_templates", { ...app.bio_templates, [newLang]: app.bio_templates[newLang] ?? "" }); setNewLang(""); }}>+ Langue</Button>
+        </div>
+      </div>
+    </div>
   );
 }
