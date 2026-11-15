@@ -29,7 +29,7 @@ export function usePools() {
   return useQuery({ queryKey: ["pools"], queryFn: async () => (await supabase.from("pools").select("*, pool_members(poster_id)").order("name")).data ?? [] });
 }
 export function usePosters() {
-  return useQuery({ queryKey: ["posters"], queryFn: async () => (await supabase.from("posters").select("*, profiles(email, full_name)").order("created_at", { ascending: false })).data ?? [] });
+  return useQuery({ queryKey: ["posters"], queryFn: async () => (await supabase.from("posters").select("*, profiles(email, full_name, is_test)").order("created_at", { ascending: false })).data ?? [] });
 }
 export function useSetting<T = any>(key: string) {
   return useQuery({ queryKey: ["setting", key], queryFn: async () => ((await supabase.from("settings").select("value").eq("key", key).maybeSingle()).data?.value ?? {}) as T });

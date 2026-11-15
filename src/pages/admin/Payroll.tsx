@@ -94,8 +94,9 @@ export default function Payroll() {
     videos: all.reduce((s: number, p: any) => s + p.videos_count, 0),
     currency: all[0]?.currency ?? "USD",
   }), [all]);
-  const toAdd = (posters.data ?? []).filter((p: any) => p.ruul_status === "email_given");
-  const problems = (posters.data ?? []).filter((p: any) => p.ruul_status === "added" && p.ruul_reminders >= 4);
+  const real = (posters.data ?? []).filter((p: any) => !p.profiles?.is_test); // comptes de test exclus
+  const toAdd = real.filter((p: any) => p.ruul_status === "email_given");
+  const problems = real.filter((p: any) => p.ruul_status === "added" && p.ruul_reminders >= 4);
   const zoneOf = (code: string | null) => (zones.data ?? []).find((z: any) => z.code === code);
   const isLast = week === lastCompletedWeek();
 
