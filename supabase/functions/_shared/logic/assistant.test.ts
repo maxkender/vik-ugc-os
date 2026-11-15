@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  assistantLang, assistantText, buildAssistantContext, checkDailyCap, contextBlock, finalizeOutput,
+  DEFAULT_ASSISTANT_SETTINGS, assistantLang, assistantText, buildAssistantContext, checkDailyCap, contextBlock, finalizeOutput,
   parseAssistantOutput, resolveSettings, staticSystemPrompt, toApiMessages, weekStartOf,
 } from "./assistant.ts";
 
@@ -15,7 +15,7 @@ describe("assistant : plafond quotidien", () => {
     expect(checkDailyCap(45, 30).remaining).toBe(0);
   });
   it("réglages : défauts et valeurs invalides", () => {
-    expect(resolveSettings(null)).toEqual({ enabled: true, daily_cap: 30, model: "claude-sonnet-5-5" });
+    expect(resolveSettings(null)).toEqual(DEFAULT_ASSISTANT_SETTINGS);
     expect(resolveSettings({ daily_cap: -2, enabled: false })).toMatchObject({ daily_cap: 30, enabled: false });
     expect(resolveSettings({ daily_cap: 5 }).daily_cap).toBe(5);
   });

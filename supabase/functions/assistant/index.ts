@@ -4,17 +4,24 @@
 //   admin_reply { conversation_id, content, status? }   admin / recruteur : réponse « équipe » visible du posteur
 //   set_status { conversation_id, status }   admin / recruteur : open | escalated | closed
 //
-// Modèle : API Anthropic Messages, appelée UNIQUEMENT ici, clé lue dans le secret ANTHROPIC_API_KEY.
-// Sans clé, la fonction répond un message clair « assistant pas encore configuré » (jamais d'erreur).
+//   config                                   admin / recruteur : fournisseur effectif et clés présentes (jamais leur valeur)
+//
+// Fournisseurs (Réglages → assistant.provider, « auto » par défaut) :
+//   - fal : endpoint OpenAI-compatible openrouter/router (https://fal.run/openrouter/router/openai/v1/chat/completions),
+//     clé FAL_KEY (en-tête « Authorization: Key … »), modèle fal_model puis repli fal_fallback_model ;
+//   - anthropic : API Messages, clé ANTHROPIC_API_KEY.
+// « auto » = fal si FAL_KEY est posé, sinon Anthropic. Sans clé : message clair « pas encore configuré » (jamais d'erreur).
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { audit, caller, getSetting, HttpError, requireRecruiter, serve, type Caller } from "../_shared/http.ts";
 import {
   ASSISTANT_OUTPUT_SCHEMA, assistantLang, assistantText, buildAssistantContext, checkDailyCap, contextBlock,
-  finalizeOutput, parseAssistantOutput, resolveSettings, startOfUtcDay, staticSystemPrompt, toApiMessages,
+  finalizeOutput, parseAssistantOutput, pickProvider, resolveSettings, startOfUtcDay, staticSystemPrompt, toApiMessages,
   type AssistantLang, type AssistantSettings, type StoredMessage,
 } from "../_shared/logic/assistant.ts";
 
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
+const FAL_URL = "https://fal.run/openrouter/router/openai/v1/chat/completions";
+const keys = () => ({ fal: !!Deno.env.get("FAL_KEY"), anthropic: !!Deno.env.get("ANTHROPIC_API_KEY") });
 const ANTHROPIC_VERSION = "2026-10-21";
 const MAX_MESSAGE_CHARS = 2000;
 const STATIC_SYSTEM = staticSystemPrompt();
@@ -127,6 +134,35 @@ async function callModel(key: string, model: string, system: string, messages: {
   };
 }
 
+/** fal (OpenRouter via fal, format OpenAI chat completions). La sortie JSON est demandée par le prompt et relue par parseAssistantOutput. */
+async function callFal(key: string, models: string[], system: string, messages: { role: string; content: string }[]): Promise<ModelResult> {
+  let last = "";
+  for (const model of models) {
+    const res = await fetch(FAL_URL, {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Key ${key}` },
+      body: JSON.stringify({
+        model, max_tokens: 1200, temperature: 0.3,
+        messages: [{ role: "system", content: `${STATIC_SYSTEM}\n\n${system}` }, ...messages],
+      }),
+      signal: AbortSignal.timeout(60_000),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      // Jamais la clé dans les logs : statut, modèle et message d'erreur court.
+      last = `fal ${res.status} ${model} ${String(err?.error?.message ?? err?.detail ?? "").slice(0, 160)}`.trim();
+      console.error(last);
+      continue; // modèle indisponible ou refusé : on tente le repli
+    }
+    const j = await res.json();
+    const choice = j.choices?.[0];
+    const content = choice?.message?.content;
+    const text = typeof content === "string" ? content : Array.isArray(content) ? content.map((b: any) => b.text ?? "").join("") : "";
+    return { text, tokensIn: j.usage?.prompt_tokens ?? 0, tokensOut: j.usage?.completion_tokens ?? 0, refused: choice?.finish_reason === "content_filter" };
+  }
+  throw new Error(last || "fal: no model");
+}
+
 async function send(db: SupabaseClient, c: Extract<Caller, { kind: "user" }>, body: any) {
   const message = String(body.message ?? "").trim().slice(0, MAX_MESSAGE_CHARS);
   if (!message) throw new HttpError(400, "message_required");
@@ -140,8 +176,8 @@ async function send(db: SupabaseClient, c: Extract<Caller, { kind: "user" }>, bo
   const conv = await currentConversation(db, c.id, true);
   const userMsg = await addMessage(db, { conversation_id: conv!.id, role: "user", content: message });
 
-  const key = Deno.env.get("ANTHROPIC_API_KEY");
-  if (!key) {
+  const provider = pickProvider(cfg, keys());
+  if (!provider) {
     const reply = assistantText("not_configured", lang);
     const sys = await addMessage(db, { conversation_id: conv!.id, role: "system", content: reply });
     return { ok: true, configured: false, conversation_id: conv!.id, status: conv!.status, remaining: cap.remaining - 1, reply, messages: [userMsg, sys] };
@@ -155,7 +191,9 @@ async function send(db: SupabaseClient, c: Extract<Caller, { kind: "user" }>, bo
   let out;
   let tokensIn = 0, tokensOut = 0;
   try {
-    const r = await callModel(key, cfg.model, contextBlock(ctx), toApiMessages(history));
+    const r = provider === "fal"
+      ? await callFal(Deno.env.get("FAL_KEY")!, [cfg.fal_model, cfg.fal_fallback_model].filter((m, i, a) => m && a.indexOf(m) === i), contextBlock(ctx), toApiMessages(history))
+      : await callModel(Deno.env.get("ANTHROPIC_API_KEY")!, cfg.model, contextBlock(ctx), toApiMessages(history));
     tokensIn = r.tokensIn;
     tokensOut = r.tokensOut;
     out = r.refused ? { reply: "", escalate: true, reason: "model refusal" } : parseAssistantOutput(r.text);
@@ -181,7 +219,7 @@ async function history(db: SupabaseClient, c: Extract<Caller, { kind: "user" }>)
   const cfg = await settings(db);
   const conv = await currentConversation(db, c.id, false);
   const cap = checkDailyCap(await usedToday(db, c.id), cfg.daily_cap);
-  const base = { ok: true, configured: !!Deno.env.get("ANTHROPIC_API_KEY"), enabled: cfg.enabled, remaining: cap.remaining, cap: cap.cap };
+  const base = { ok: true, configured: !!pickProvider(cfg, keys()), enabled: cfg.enabled, remaining: cap.remaining, cap: cap.cap };
   if (!conv) return { ...base, conversation: null, messages: [] };
   const { data } = await db.from("assistant_messages").select("id, role, content, created_at").eq("conversation_id", conv.id)
     .order("created_at", { ascending: false }).limit(50);
@@ -213,6 +251,13 @@ async function setStatus(db: SupabaseClient, c: Caller, body: any) {
   return { ok: true, status };
 }
 
+async function config(db: SupabaseClient, c: Caller) {
+  requireRecruiter(c);
+  const cfg = await settings(db);
+  const k = keys();
+  return { ok: true, settings: cfg, keys: k, provider: pickProvider(cfg, k) };
+}
+
 serve(async (req, body, db) => {
   const c = await caller(req, db);
   switch (body.action) {
@@ -220,6 +265,7 @@ serve(async (req, body, db) => {
     case "history": return history(db, requireUser(c));
     case "admin_reply": return adminReply(db, c, body);
     case "set_status": return setStatus(db, c, body);
+    case "config": return config(db, c);
     default: throw new HttpError(400, "unknown_action");
   }
 });

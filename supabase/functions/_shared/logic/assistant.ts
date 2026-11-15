@@ -11,21 +11,45 @@
 
 export type AssistantLang = "en" | "fr" | "es" | "de" | "pt" | "it";
 
+export type AssistantProvider = "fal" | "anthropic";
+
 export interface AssistantSettings {
   enabled: boolean;
   daily_cap: number;
+  /** « auto » : fal si FAL_KEY est posé, sinon Anthropic si ANTHROPIC_API_KEY est posé. */
+  provider: "auto" | AssistantProvider;
+  /** Modèle Anthropic (API Messages). */
   model: string;
+  /** Modèle fal (endpoint openrouter/router, identifiants OpenRouter) et repli si le premier échoue. */
+  fal_model: string;
+  fal_fallback_model: string;
 }
 
-export const DEFAULT_ASSISTANT_SETTINGS: AssistantSettings = { enabled: true, daily_cap: 30, model: "claude-sonnet-5-5" };
+export const DEFAULT_ASSISTANT_SETTINGS: AssistantSettings = {
+  enabled: true, daily_cap: 30, provider: "auto", model: "claude-sonnet-5-5",
+  fal_model: "anthropic/claude-sonnet-5.5", fal_fallback_model: "google/gemini-2.5-flash",
+};
+
+const str = (x: unknown, d: string) => (typeof x === "string" && x.trim() ? x.trim() : d);
 
 export function resolveSettings(raw: Partial<AssistantSettings> | null | undefined): AssistantSettings {
   const cap = Number(raw?.daily_cap);
+  const D = DEFAULT_ASSISTANT_SETTINGS;
   return {
     enabled: raw?.enabled !== false,
-    daily_cap: Number.isFinite(cap) && cap > 0 ? Math.floor(cap) : DEFAULT_ASSISTANT_SETTINGS.daily_cap,
-    model: typeof raw?.model === "string" && raw.model.trim() ? raw.model.trim() : DEFAULT_ASSISTANT_SETTINGS.model,
+    daily_cap: Number.isFinite(cap) && cap > 0 ? Math.floor(cap) : D.daily_cap,
+    provider: raw?.provider === "fal" || raw?.provider === "anthropic" ? raw.provider : "auto",
+    model: str(raw?.model, D.model),
+    fal_model: str(raw?.fal_model, D.fal_model),
+    fal_fallback_model: str(raw?.fal_fallback_model, D.fal_fallback_model),
   };
+}
+
+/** Fournisseur effectif selon le réglage et les clés présentes (null : aucun configuré). */
+export function pickProvider(cfg: Pick<AssistantSettings, "provider">, keys: { fal: boolean; anthropic: boolean }): AssistantProvider | null {
+  if (cfg.provider === "fal") return keys.fal ? "fal" : null;
+  if (cfg.provider === "anthropic") return keys.anthropic ? "anthropic" : null;
+  return keys.fal ? "fal" : keys.anthropic ? "anthropic" : null;
 }
 
 /** Langue de réponse à partir de la langue du posteur / locale du profil ("fr", "fr-FR", "es_ES"…). */

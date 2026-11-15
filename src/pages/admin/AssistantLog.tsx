@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { AlertTriangle, CheckCircle2, MessageCircle, MessagesSquare, RotateCcw, Send, Sparkles, Users } from "lucide-react";
-import { Badge, Button, Card, Chip, Drawer, Empty, KpiCard, PageHeader, Spinner, Textarea, useToast } from "@/components/ui";
+import { Badge, Button, Card, Chip, Drawer, Empty, Input, KpiCard, PageHeader, Select, Spinner, Textarea, useToast } from "@/components/ui";
+import { saveSetting } from "@/lib/hooks";
 import { callFn, supabase } from "@/lib/supabase";
 import { ago, cn, dateFr, flag } from "@/lib/utils";
 
@@ -93,6 +94,7 @@ export default function AssistantLog() {
   return (
     <div className="space-y-6">
       <PageHeader title="Assistant posteurs" description="Les questions posées à l'assistant de l'espace créateur. Les conversations escaladées attendent une réponse de l'équipe." />
+      <ProviderCard />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <KpiCard label="Conversations aujourd'hui" value={kpi.today} icon={<MessagesSquare className="h-4 w-4" />} tint="blue" />
@@ -250,5 +252,52 @@ function Thread({ conv, msgs, poster }: { conv: Conversation; msgs: Msg[]; poste
         </div>
       </form>
     </>
+  );
+}
+
+/** Fournisseur du modèle : fal (OpenRouter via fal) ou Anthropic. Les clés restent dans les secrets Supabase. */
+function ProviderCard() {
+  const toast = useToast();
+  const qc = useQueryClient();
+  const cfg = useQuery({ queryKey: ["assistant-config"], queryFn: () => callFn("assistant", { action: "config" }) });
+  const [draft, setDraft] = useState<any | null>(null);
+  useEffect(() => { if (cfg.data?.settings) setDraft(cfg.data.settings); }, [cfg.data]);
+  const [busy, setBusy] = useState(false);
+  if (!draft) return null;
+  const k = cfg.data?.keys ?? {};
+  const eff = cfg.data?.provider as "fal" | "anthropic" | null;
+  const save = async () => {
+    setBusy(true);
+    try { await saveSetting("assistant", draft); toast("Réglages de l'assistant enregistrés", "success"); qc.invalidateQueries({ queryKey: ["assistant-config"] }); }
+    catch (e) { toast((e as Error).message, "danger"); } finally { setBusy(false); }
+  };
+  const set = (patch: any) => setDraft((d: any) => ({ ...d, ...patch }));
+  return (
+    <Card className="mb-6 p-5">
+      <div className="flex flex-wrap items-center gap-3">
+        <Sparkles className="h-4 w-4 text-accent" />
+        <p className="font-semibold text-foreground">Modèle</p>
+        {eff ? <Badge tone="success">Actif : {eff === "fal" ? `fal · ${draft.fal_model}` : `Anthropic · ${draft.model}`}</Badge>
+          : <Badge tone="warning">Aucune clé : l'assistant répond « pas encore configuré »</Badge>}
+        <span className="text-xs text-subtle-foreground">FAL_KEY {k.fal ? "✓" : "absente"} · ANTHROPIC_API_KEY {k.anthropic ? "✓" : "absente"} (secrets Supabase)</span>
+      </div>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <label className="text-xs text-muted-foreground">Fournisseur
+          <Select className="mt-1" value={draft.provider} onChange={(e) => set({ provider: e.target.value })}>
+            <option value="auto">Auto (fal si FAL_KEY, sinon Anthropic)</option>
+            <option value="fal">fal</option>
+            <option value="anthropic">Anthropic</option>
+          </Select>
+        </label>
+        <label className="text-xs text-muted-foreground">Modèle fal<Input className="mt-1" value={draft.fal_model} onChange={(e) => set({ fal_model: e.target.value })} /></label>
+        <label className="text-xs text-muted-foreground">Repli fal<Input className="mt-1" value={draft.fal_fallback_model} onChange={(e) => set({ fal_fallback_model: e.target.value })} /></label>
+        <label className="text-xs text-muted-foreground">Modèle Anthropic<Input className="mt-1" value={draft.model} onChange={(e) => set({ model: e.target.value })} /></label>
+        <label className="text-xs text-muted-foreground">Messages / posteur / jour<Input className="mt-1" type="number" min={1} value={draft.daily_cap} onChange={(e) => set({ daily_cap: Number(e.target.value) })} /></label>
+      </div>
+      <div className="mt-4 flex items-center justify-between gap-3">
+        <label className="flex items-center gap-2 text-[13px] text-foreground"><input type="checkbox" checked={draft.enabled} onChange={(e) => set({ enabled: e.target.checked })} className="h-4 w-4 accent-[var(--color-accent)]" /> Assistant activé</label>
+        <Button size="sm" onClick={save} loading={busy}>Enregistrer</Button>
+      </div>
+    </Card>
   );
 }
