@@ -72,7 +72,10 @@ async function createAd(db: SupabaseClient, cfg: MetaCfg, adset: any, cr: any, o
   for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
   const img = await graph(cfg, `${cfg.ad_account_id}/adimages`, { method: "POST", params: { bytes: btoa(bin) } });
   const hash = Object.values(img.images ?? {})[0] as any;
-  const base = adset.meta_campaigns?.landing_url || Deno.env.get("APP_URL") || "https://example.com";
+  // URL de la landing « job » : campagne > réglage landing.base_url > secret APP_URL. Jamais d'URL par défaut fictive.
+  const landingCfg = await getSetting(db, "landing");
+  const base = adset.meta_campaigns?.landing_url || landingCfg.base_url || Deno.env.get("APP_URL");
+  if (!base || !/^https:\/\//.test(base)) throw new HttpError(409, "URL de landing manquante : Réglages → Intégrations → Landing (base_url)");
   const link = landingUrl(base, { country: cr.country ?? adset.country, lang: cr.language, campaign: adset.meta_campaigns?.name ?? "recruit", adset: adset.meta_id, ad: cr.id });
   const creative = await graph(cfg, `${cfg.ad_account_id}/adcreatives`, {
     method: "POST",
