@@ -80,7 +80,7 @@ export function Badge({ tone, className, children }: VariantProps<typeof badgeVa
 }
 
 export function Card({ className, children, ...p }: { className?: string; children: ReactNode } & React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("rounded-xl border bg-card p-6 shadow-xs", className)} {...p}>{children}</div>;
+  return <div className={cn("glass rounded-2xl p-6", className)} {...p}>{children}</div>;
 }
 
 export function Spinner({ className }: { className?: string }) {
@@ -90,7 +90,7 @@ export function Spinner({ className }: { className?: string }) {
 /** État vide explicatif : icône, titre, explication, action facultative. */
 export function Empty({ title, children, icon, action, className }: { title: string; children?: ReactNode; icon?: ReactNode; action?: ReactNode; className?: string }) {
   return (
-    <div className={cn("flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border-strong bg-white px-6 py-14 text-center", className)}>
+    <div className={cn("glass flex flex-col items-center justify-center gap-2 rounded-2xl border-dashed px-6 py-14 text-center", className)}>
       <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-tint-blue text-accent">{icon ?? <Inbox className="h-5 w-5" />}</div>
       <p className="text-sm font-semibold text-foreground">{title}</p>
       {children && <div className="max-w-md text-sm text-muted-foreground">{children}</div>}
@@ -149,8 +149,8 @@ export function PageHeader({ title, description, actions, breadcrumbs }: { title
       <Breadcrumbs items={crumbs} />
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
-          <h1 className="text-2xl font-semibold leading-tight tracking-[-0.02em] text-foreground">{title}</h1>
-          {description && <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">{description}</p>}
+          <h1 className="text-[28px] font-semibold leading-[1.15] tracking-[-0.025em] text-foreground">{title}</h1>
+          {description && <p className="mt-2 max-w-3xl text-[15px] leading-relaxed text-muted-foreground">{description}</p>}
         </div>
         {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
       </div>
@@ -161,7 +161,7 @@ export function PageHeader({ title, description, actions, breadcrumbs }: { title
 /** Bloc de réglages : titre, description, contenu. */
 export function Section({ title, description, children, actions, className }: { title: string; description?: ReactNode; children: ReactNode; actions?: ReactNode; className?: string }) {
   return (
-    <section className={cn("rounded-xl border bg-card shadow-xs", className)}>
+    <section className={cn("glass rounded-2xl", className)}>
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-separator px-6 py-5">
         <div>
           <h2 className="text-[15px] font-semibold text-foreground">{title}</h2>
@@ -229,7 +229,7 @@ export function Drawer({ open, onClose, title, children }: { open: boolean; onCl
 
 export function Tabs<T extends string>({ value, onChange, items }: { value: T; onChange: (v: T) => void; items: { value: T; label: ReactNode }[] }) {
   return (
-    <div className="inline-flex rounded-lg bg-[#f1f3f7] p-1">
+    <div className="inline-flex rounded-xl bg-[rgba(16,24,40,0.05)] p-1 backdrop-blur-sm">
       {items.map((i) => (
         <button key={i.value} onClick={() => onChange(i.value)}
           className={cn("rounded-md px-3 py-1.5 text-sm font-medium transition-colors", value === i.value ? "bg-white text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground")}>
@@ -278,7 +278,7 @@ export const useToast = () => useContext(ToastCtx);
 
 export function Table({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className={cn("overflow-x-auto rounded-xl border bg-card shadow-xs", className)}>
+    <div className={cn("overflow-x-auto rounded-2xl border border-[rgba(16,24,40,0.07)] bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04),0_8px_24px_-14px_rgba(16,24,40,0.12)]", className)}>
       <table className="w-full border-collapse text-sm [&_tbody_tr]:transition-colors [&_tbody_tr:hover]:bg-muted [&_tbody_tr:last-child_td]:border-b-0">{children}</table>
     </div>
   );
@@ -303,11 +303,20 @@ const TINTS = {
   red: "bg-tint-red text-vik-red",
   green: "bg-tint-green text-success",
 } as const;
+/** Pastilles d'icônes en dégradé (v3 : « un peu plus de couleurs »). */
+const GRADIENTS = {
+  blue: "bg-gradient-to-br from-[#2f6bff] to-[#004dff] text-white shadow-[0_6px_16px_-6px_rgba(0,77,255,0.55)]",
+  violet: "bg-gradient-to-br from-[#a66bff] to-[#8c43ff] text-white shadow-[0_6px_16px_-6px_rgba(140,67,255,0.55)]",
+  cyan: "bg-gradient-to-br from-[#4fc3ff] to-[#1fafff] text-white shadow-[0_6px_16px_-6px_rgba(31,175,255,0.55)]",
+  yellow: "bg-gradient-to-br from-[#ffcd6b] to-[#ffb020] text-white shadow-[0_6px_16px_-6px_rgba(255,176,32,0.55)]",
+  red: "bg-gradient-to-br from-[#ff7a79] to-[#fe504f] text-white shadow-[0_6px_16px_-6px_rgba(254,80,79,0.55)]",
+  green: "bg-gradient-to-br from-[#2fc36d] to-[#12a150] text-white shadow-[0_6px_16px_-6px_rgba(18,161,80,0.5)]",
+} as const;
 export type Tint = keyof typeof TINTS;
 
 /** Pastille d'icône sur fond teinté doux. */
-export function IconTile({ icon, tint = "blue", className }: { icon: ReactNode; tint?: Tint; className?: string }) {
-  return <span className={cn("inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg [&_svg]:h-[18px] [&_svg]:w-[18px]", TINTS[tint], className)}>{icon}</span>;
+export function IconTile({ icon, tint = "blue", className, solid = true }: { icon: ReactNode; tint?: Tint; className?: string; solid?: boolean }) {
+  return <span className={cn("inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl [&_svg]:h-[18px] [&_svg]:w-[18px]", solid ? GRADIENTS[tint] : TINTS[tint], className)}>{icon}</span>;
 }
 
 /** Mini-courbe (SVG pur). */
@@ -332,13 +341,14 @@ export function KpiCard({ label, value, hint, icon, tint = "blue", series, delta
 }) {
   const color = { blue: "#004dff", violet: "#8c43ff", cyan: "#1fafff", yellow: "#ffbb43", red: "#fe504f", green: "#12a150" }[tint];
   const body = (
-    <Card className={cn("flex h-full flex-col gap-3 p-5", to && "transition-shadow hover:shadow-card")}>
+    <Card className={cn("relative flex h-full flex-col gap-3 overflow-hidden p-5", to && "transition-transform duration-200 hover:-translate-y-0.5")}>
+      <span aria-hidden className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full opacity-[0.14] blur-2xl" style={{ background: color }} />
       <div className="flex items-center gap-3">
         {icon && <IconTile icon={icon} tint={tint} />}
         <p className="text-[13px] font-medium text-muted-foreground">{label}</p>
       </div>
       <div className="flex items-end justify-between gap-3">
-        <p className="tabular text-[28px] font-semibold leading-none tracking-[-0.02em] text-foreground">{value}</p>
+        <p className="tabular text-[32px] font-semibold leading-none tracking-[-0.03em] text-foreground">{value}</p>
         {delta !== undefined && delta !== null && (
           <span className={cn("rounded-full px-1.5 py-0.5 text-[11px] font-semibold", delta >= 0 ? "bg-tint-green text-[#0b7a3c]" : "bg-tint-red text-[#c42a2d]")}>
             {delta >= 0 ? "↑" : "↓"} {Math.abs(Math.round(delta))} %

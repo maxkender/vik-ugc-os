@@ -125,3 +125,59 @@
 }
 
 @utility tabular { font-variant-numeric: tabular-nums; }
+
+/* ───────── Design v3 : glassmorphisme clair (15/11) ───────── */
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.66);
+  --glass-bg-strong: rgba(255, 255, 255, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.7);
+  --glass-ring: rgba(16, 24, 40, 0.06);
+  --glass-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px -12px rgba(16, 24, 40, 0.12);
+  /* Couleur par section de la navigation */
+  --sec-watch: #004dff;      /* Veille */
+  --sec-production: #8c43ff; /* Production */
+  --sec-recruit: #0a95e0;    /* Recrutement (cyan lisible) */
+  --sec-finance: #12a150;    /* Finance */
+  --sec-settings: #5b6478;
+}
+.dark {
+  --glass-bg: rgba(11, 21, 48, 0.6);
+  --glass-bg-strong: rgba(11, 21, 48, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-ring: rgba(255, 255, 255, 0.06);
+}
+
+@utility glass {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 0 0 1px var(--glass-ring), var(--glass-shadow);
+}
+@utility glass-strong {
+  background: var(--glass-bg-strong);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 0 0 1px var(--glass-ring), var(--glass-shadow);
+}
+
+/* Fond de l'application : dégradé très doux + halos flous aux couleurs Vik (8–12 %). Un seul calque fixe (performances). */
+.app-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, #fbfcff 0%, #f6f8ff 45%, #fbf9ff 100%);
+  overflow: hidden;
+}
+.app-backdrop::before, .app-backdrop::after, .app-backdrop > i {
+  content: "";
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(110px);
+}
+.app-backdrop::before { width: 620px; height: 620px; left: -120px; top: -180px; background: rgba(0, 77, 255, 0.11); }
+.app-backdrop::after { width: 560px; height: 560px; right: -140px; top: 22%; background: rgba(140, 67, 255, 0.10); }
+.app-backdrop > i { width: 520px; height: 520px; left: 30%; bottom: -220px; background: rgba(31, 175, 255, 0.10); }
+.dark .app-backdrop { background: linear-gradient(180deg, #071233, #0b1530); }

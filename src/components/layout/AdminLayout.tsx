@@ -10,7 +10,7 @@ import { applyTheme, currentTheme } from "@/lib/theme";
 import { Logo } from "@/components/brand/Logo";
 
 type NavItem = { to: string; label: string; icon: any; roles: Role[] };
-type NavSection = { title: string; items: NavItem[] };
+type NavSection = { title: string; items: NavItem[]; color?: string };
 
 const ALL: Role[] = ["admin", "recruiter", "controller"];
 const ADMIN: Role[] = ["admin"];
@@ -22,25 +22,25 @@ const SECTIONS: NavSection[] = [
   { title: "", items: [
     { to: "/admin", label: "Tableau de bord", icon: Home, roles: ALL },
   ] },
-  { title: "Veille", items: [
+  { title: "Veille", color: "var(--sec-watch)", items: [
     { to: "/admin/library", label: "Bibliothèque", icon: LayoutGrid, roles: WATCH },
     { to: "/admin/competitors", label: "Concurrents", icon: Trophy, roles: WATCH },
     { to: "/admin/winning-ads", label: "Pubs gagnantes", icon: Flame, roles: WATCH },
     { to: "/admin/agents", label: "Agents de collecte", icon: Bot, roles: ADMIN },
   ] },
-  { title: "Production", items: [
+  { title: "Production", color: "var(--sec-production)", items: [
     { to: "/admin/briefs", label: "Briefs", icon: Clapperboard, roles: ALL },
     { to: "/admin/creators", label: "Créateurs", icon: Contact, roles: ALL },
     { to: "/admin/posters", label: "Posteurs", icon: Users, roles: ALL },
     { to: "/admin/assistant", label: "Assistant posteurs", icon: MessageCircle, roles: RECRUIT },
   ] },
-  { title: "Recrutement", items: [
+  { title: "Recrutement", color: "var(--sec-recruit)", items: [
     { to: "/admin/recruitment/candidates", label: "Candidats", icon: UserPlus, roles: RECRUIT },
     { to: "/admin/recruitment/onboarding", label: "Onboarding", icon: ListChecks, roles: RECRUIT },
     { to: "/admin/recruitment/campaigns", label: "Campagnes Meta", icon: BarChart3, roles: ADMIN },
     { to: "/admin/recruitment/creatives", label: "Créas", icon: Image, roles: ADMIN },
   ] },
-  { title: "Finance", items: [
+  { title: "Finance", color: "var(--sec-finance)", items: [
     { to: "/admin/payroll", label: "Paie", icon: Wallet, roles: ADMIN },
     { to: "/admin/paid-ads", label: "Paid Ads", icon: Megaphone, roles: ADMIN },
   ] },
@@ -87,7 +87,7 @@ export function AdminLayout() {
   };
 
   const sidebar = (
-    <aside className="flex h-full w-[260px] shrink-0 flex-col border-r bg-white">
+    <aside className="glass-strong relative z-10 flex h-full w-[260px] shrink-0 flex-col !rounded-none !border-y-0 !border-l-0">
       <div className="flex h-16 items-center gap-2.5 px-6">
         <Logo className="h-[22px]" />
         <span className="rounded-md bg-accent-soft px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent">UGC OS</span>
@@ -98,14 +98,14 @@ export function AdminLayout() {
           if (!items.length) return null;
           return (
             <div key={sec.title}>
-              {sec.title && <p className="mb-1.5 px-3 text-[11px] font-medium uppercase tracking-[0.08em] text-subtle-foreground">{sec.title}</p>}
+              {sec.title && <p className="mb-1.5 flex items-center gap-2 px-3 text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: sec.color }}><i className="h-1.5 w-1.5 rounded-full" style={{ background: sec.color }} />{sec.title}</p>}
               <div className="space-y-0.5">
                 {items.map((i) => (
-                  <NavLink key={i.to} to={i.to} end={i.to === "/admin"} className={itemClass}>
+                  <NavLink key={i.to} to={i.to} end={i.to === "/admin"} className={itemClass} style={({ isActive }) => (isActive && sec.color ? { color: sec.color, background: `color-mix(in oklch, ${sec.color} 10%, white)` } : undefined)}>
                     {({ isActive }) => (
                       <>
                         {isActive && <Indicator />}
-                        <i.icon strokeWidth={1.75} className={cn("h-[18px] w-[18px]", isActive ? "text-accent" : "text-subtle-foreground group-hover:text-muted-foreground")} />
+                        <i.icon strokeWidth={1.75} className={cn("h-[18px] w-[18px]", isActive ? "" : "text-subtle-foreground group-hover:text-muted-foreground")} style={isActive && sec.color ? { color: sec.color } : undefined} />
                         {i.label}
                       </>
                     )}
@@ -151,7 +151,8 @@ export function AdminLayout() {
   );
 
   return (
-    <div className="flex h-full bg-white text-sm">
+    <div className="relative flex h-full text-sm">
+      <div className="app-backdrop" aria-hidden><i /></div>
       <div className="hidden md:flex">{sidebar}</div>
       {open && (
         <div className="fixed inset-0 z-40 flex md:hidden">
@@ -161,8 +162,8 @@ export function AdminLayout() {
           <div className="flex-1 bg-[#0b1530]/20" onClick={() => setOpen(false)} />
         </div>
       )}
-      <main className="flex-1 overflow-y-auto">
-        <div className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-white/90 px-4 backdrop-blur md:hidden">
+      <main className="relative z-[1] flex-1 overflow-y-auto">
+        <div className="glass-strong sticky top-0 z-30 flex h-14 items-center gap-2 !rounded-none !border-x-0 !border-t-0 px-4 md:hidden">
           <button onClick={() => setOpen(true)} className="rounded p-1.5 hover:bg-muted" aria-label="Ouvrir le menu"><Menu className="h-5 w-5" /></button>
           <Logo className="h-5" />
         </div>
