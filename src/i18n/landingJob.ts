@@ -12,6 +12,8 @@ export interface LandingJob {
   payTitle: string; payCountry: string; payZone: string; payPerVideo: string; payRpm: string; payRpmDetail: string; payCap: string;
   payExample: string; payNote: string;
   warning: string;
+  /** Bouton collant : « {{price}} per video » (ordre des mots propre à chaque langue). */
+  pricePerVideo: string;
 }
 
 export const LANDING_JOB: Record<string, LandingJob> = {
@@ -27,6 +29,7 @@ export const LANDING_JOB: Record<string, LandingJob> = {
     payExample: "Example: 1 validated video with {{views}} views = {{base}} + {{bonus}}",
     payNote: "Views are counted 7 days after posting. Only validated videos are paid. Weekly payment via Ruul.",
     warning: "PLEASE: IF THE REMUNERATION DOESN'T SUIT YOU, OR THE PROJECT DOESN'T FIT YOU, PLEASE DON'T GO ANY FURTHER.",
+    pricePerVideo: "{{price}} per video",
   },
   fr: {
     heroTitle: "Job : créateur·rice de contenu UGC pour une app mobile",
@@ -40,6 +43,7 @@ export const LANDING_JOB: Record<string, LandingJob> = {
     payExample: "Exemple : 1 vidéo validée avec {{views}} vues = {{base}} + {{bonus}}",
     payNote: "Les vues sont comptées 7 jours après la publication. Seules les vidéos validées sont payées. Paiement chaque semaine via Ruul.",
     warning: "S'IL TE PLAÎT : SI LA RÉMUNÉRATION NE TE CONVIENT PAS, OU SI LE PROJET NE TE CORRESPOND PAS, NE VA PAS PLUS LOIN.",
+    pricePerVideo: "{{price}} par vidéo",
   },
   es: {
     heroTitle: "Trabajo: creador/a de contenido UGC para una app móvil",
@@ -53,6 +57,7 @@ export const LANDING_JOB: Record<string, LandingJob> = {
     payExample: "Ejemplo: 1 video validado con {{views}} vistas = {{base}} + {{bonus}}",
     payNote: "Las vistas se cuentan 7 días después de publicar. Solo se pagan los videos validados. Pago semanal a través de Ruul.",
     warning: "POR FAVOR: SI LA REMUNERACIÓN NO TE CONVIENE, O EL PROYECTO NO ES PARA TI, NO SIGAS ADELANTE.",
+    pricePerVideo: "{{price}} por video",
   },
   ...LANDING_JOB_GENERATED,
 };

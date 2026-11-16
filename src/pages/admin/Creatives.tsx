@@ -65,13 +65,15 @@ async function renderCard(cr: any): Promise<Blob> {
   ctx.fillStyle = "#FFBB43";
   ctx.fillRect(0, 0, W, H);
   const rtl = RTL_LANGS.has(String(cr.language ?? "").split("-")[0]);
-  const cw = W * (tall ? 0.86 : 0.84);
+  const cw = W * (tall ? 0.88 : 0.84);
   const cx = (W - cw) / 2;
-  const pad = cw * 0.075;
+  const pad = cw * (tall ? 0.065 : 0.075);
   const inner = cw - 2 * pad;
   // 9:16 : tailles plus grandes pour remplir la zone utile (stories / reels lus en plein écran).
   const avatar = W * (tall ? 0.11 : 0.075);
-  const metaS = Math.round(W * (tall ? 0.038 : 0.03)), lineS = Math.round(W * (tall ? 0.047 : 0.032)), ctaS = Math.round(W * (tall ? 0.054 : 0.036)), footS = Math.round(W * (tall ? 0.034 : 0.026));
+  const metaS = Math.round(W * (tall ? 0.038 : 0.03));
+  let lineS = Math.round(W * (tall ? 0.047 : 0.032));
+  const ctaS = Math.round(W * (tall ? 0.054 : 0.036)), footS = Math.round(W * (tall ? 0.034 : 0.026));
   const maxCardH = tall ? H * 0.66 : H * 0.84;
   const measure = (titleS: number) => {
     ctx.font = `700 ${titleS}px Inter`;
@@ -83,9 +85,13 @@ async function renderCard(cr: any): Promise<Blob> {
       + ctaS * 1.6 + pad * 0.6 + footS * 2.4 + pad * 0.3;
     return { tl, ll, h };
   };
-  let titleS = Math.round(W * (tall ? 0.09 : 0.062));
+  // 9:16 : le titre reste au moins aussi grand qu'en 1:1 ; on réduit d'abord les lignes, puis le titre.
+  let titleS = Math.round(W * (tall ? 0.085 : 0.062));
   let M = measure(titleS);
-  while (titleS > 30 && M.h > maxCardH) { titleS -= 2; M = measure(titleS); }
+  const minLine = Math.round(W * (tall ? 0.038 : 0.026)), minTitle = Math.round(W * (tall ? 0.066 : 0.03));
+  while (M.h > maxCardH && lineS > minLine) { lineS -= 1; M = measure(titleS); }
+  while (M.h > maxCardH && titleS > minTitle) { titleS -= 2; M = measure(titleS); }
+  while (M.h > maxCardH && titleS > 30) { titleS -= 2; lineS = Math.max(20, lineS - 1); M = measure(titleS); }
   const ch = M.h;
   const cy = tall ? H * 0.14 + (H * 0.66 - ch) / 2 : (H - ch) / 2;
   // carte

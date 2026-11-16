@@ -20,7 +20,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Bonusloft pr. video",
     "payExample": "Eksempel: 1 godkendt video med {{views}} visninger = {{base}} + {{bonus}}",
     "payNote": "Visninger tælles 7 dage efter opslaget. Kun godkendte videoer bliver betalt. Ugentlig udbetaling via Ruul.",
-    "warning": "VÆR NU SNILD: HVIS BETALINGEN IKKE PASSER DIG, ELLER PROJEKTET IKKE PASSER TIL DIG, SÅ GÅ IKKE VIDERE."
+    "warning": "VÆR NU SNILD: HVIS BETALINGEN IKKE PASSER DIG, ELLER PROJEKTET IKKE PASSER TIL DIG, SÅ GÅ IKKE VIDERE.",
+    "pricePerVideo": "{{price}} pr. video"
   },
   "bg": {
     "heroTitle": "Работа: UGC създател на съдържание за мобилно приложение",
@@ -40,7 +41,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Максимален бонус за видео",
     "payExample": "Пример: 1 одобрено видео с {{views}} гледания = {{base}} + {{bonus}}",
     "payNote": "Гледанията се броят 7 дни след публикуването. Плащат се само одобрените видеа. Плащане всяка седмица през Ruul.",
-    "warning": "МОЛЯ ТЕ: АКО ВЪЗНАГРАЖДЕНИЕТО НЕ ТИ ПОДХОЖДА, ИЛИ ПРОЕКТЪТ НЕ ТИ СЕ ВЪЗПРИЕМА, НЕ ПРОДЪЛЖАВАЙ НАПРЕД."
+    "warning": "МОЛЯ ТЕ: АКО ВЪЗНАГРАЖДЕНИЕТО НЕ ТИ ПОДХОЖДА, ИЛИ ПРОЕКТЪТ НЕ ТИ СЕ ВЪЗПРИЕМА, НЕ ПРОДЪЛЖАВАЙ НАПРЕД.",
+    "pricePerVideo": "{{price}} за видео"
   },
   "cs": {
     "heroTitle": "Práce: UGC tvůrce/tvůrkyně obsahu pro mobilní aplikaci",
@@ -60,7 +62,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Maximální bonus za video",
     "payExample": "Příklad: 1 schválené video s {{views}} zhlédnutími = {{base}} + {{bonus}}",
     "payNote": "Zhlédnutí se počítají 7 dní po zveřejnění. Platí se jen schválená videa. Platba každý týden přes Ruul.",
-    "warning": "PROSÍM: POKUD TI ODMĚNA NEVYHOVUJE, NEBO TI PROJEKT NESEDÍ, NEPOKRAČUJ DÁL."
+    "warning": "PROSÍM: POKUD TI ODMĚNA NEVYHOVUJE, NEBO TI PROJEKT NESEDÍ, NEPOKRAČUJ DÁL.",
+    "pricePerVideo": "{{price}} za video"
   },
   "de": {
     "heroTitle": "Job: UGC Content Creator für eine mobile App",
@@ -80,7 +83,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Bonus-Obergrenze pro Video",
     "payExample": "Beispiel: 1 validiertes Video mit {{views}} Views = {{base}} + {{bonus}}",
     "payNote": "Views werden 7 Tage nach dem Posten gezählt. Nur validierte Videos werden bezahlt. Wöchentliche Zahlung über Ruul.",
-    "warning": "BITTE: WENN DIE VERGÜTUNG NICHT ZU DIR PASST ODER DAS PROJEKT NICHT DEINEN VORSTELLUNGEN ENTSPRICHT, GEHE BITTE NICHT WEITER."
+    "warning": "BITTE: WENN DIE VERGÜTUNG NICHT ZU DIR PASST ODER DAS PROJEKT NICHT DEINEN VORSTELLUNGEN ENTSPRICHT, GEHE BITTE NICHT WEITER.",
+    "pricePerVideo": "{{price}} pro Video"
   },
   "ar": {
     "heroTitle": "وظيفة: صانع/ة محتوى UGC لتطبيق جوال",
@@ -100,7 +104,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "الحد الأقصى للمكافأة لكل فيديو",
     "payExample": "مثال: فيديو واحد معتمد بعدد {{views}} مشاهدة = {{base}} + {{bonus}}",
     "payNote": "تُحتسب المشاهدات بعد 7 أيام من النشر. لا يُدفع إلا مقابل الفيديوهات المعتمدة. الدفع أسبوعيًا عبر Ruul.",
-    "warning": "من فضلك: إذا كان الأجر لا يناسبك، أو المشروع لا يناسبك، فلا تتابع أكثر من ذلك."
+    "warning": "من فضلك: إذا كان الأجر لا يناسبك، أو المشروع لا يناسبك، فلا تتابع أكثر من ذلك.",
+    "pricePerVideo": "{{price}} لكل فيديو"
   },
   "el": {
     "heroTitle": "Θέση εργασίας: Δημιουργός περιεχομένου UGC για εφαρμογή κινητού",
@@ -120,7 +125,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Ανώτατο όριο μπόνους ανά βίντεο",
     "payExample": "Παράδειγμα: 1 επικυρωμένο βίντεο με {{views}} προβολές = {{base}} + {{bonus}}",
     "payNote": "Οι προβολές μετρούνται 7 ημέρες μετά τη δημοσίευση. Μόνο τα επικυρωμένα βίντεο πληρώνονται. Εβδομαδιαία πληρωμή μέσω Ruul.",
-    "warning": "ΠΑΡΑΚΑΛΩ: ΕΑΝ Η ΑΜΟΙΒΗ ΔΕΝ ΣΟΥ ΤΑΙΡΙΑΖΕΙ, Ή ΤΟ ΕΡΓΟ ΔΕΝ ΣΟΥ ΤΑΙΡΙΑΖΕΙ, ΠΑΡΑΚΑΛΩ ΜΗΝ ΠΡΟΧΩΡΗΣΕΙΣ ΠΕΡΑ."
+    "warning": "ΠΑΡΑΚΑΛΩ: ΕΑΝ Η ΑΜΟΙΒΗ ΔΕΝ ΣΟΥ ΤΑΙΡΙΑΖΕΙ, Ή ΤΟ ΕΡΓΟ ΔΕΝ ΣΟΥ ΤΑΙΡΙΑΖΕΙ, ΠΑΡΑΚΑΛΩ ΜΗΝ ΠΡΟΧΩΡΗΣΕΙΣ ΠΕΡΑ.",
+    "pricePerVideo": "{{price}} ανά βίντεο"
   },
   "it": {
     "heroTitle": "Lavoro: creator di contenuti UGC per un'app mobile",
@@ -140,7 +146,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Tetto massimo del bonus per video",
     "payExample": "Esempio: 1 video validato con {{views}} visualizzazioni = {{base}} + {{bonus}}",
     "payNote": "Le visualizzazioni vengono conteggiate 7 giorni dopo la pubblicazione. Vengono pagati solo i video validati. Pagamento settimanale tramite Ruul.",
-    "warning": "PER FAVORE: SE IL COMPENSO NON FA PER TE, O SE IL PROGETTO NON FA PER TE, NON ANDARE AVANTI."
+    "warning": "PER FAVORE: SE IL COMPENSO NON FA PER TE, O SE IL PROGETTO NON FA PER TE, NON ANDARE AVANTI.",
+    "pricePerVideo": "{{price}} a video"
   },
   "fi": {
     "heroTitle": "Työ: UGC-sisällöntuottaja mobiilisovellukselle",
@@ -160,7 +167,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Bonuksen yläraja videota kohden",
     "payExample": "Esimerkki: 1 hyväksytty video, jolla on {{views}} katselukertaa = {{base}} + {{bonus}}",
     "payNote": "Katselukerrat lasketaan 7 päivää julkaisun jälkeen. Vain hyväksytyistä videoista maksetaan. Maksu viikoittain Ruulin kautta.",
-    "warning": "PYYDÄN: JOS PALKKIO EI SOVI SINULLE TAI PROJEKTI EI SOPI SINULLE, ÄLÄ JATKA PIDEMMÄLLE."
+    "warning": "PYYDÄN: JOS PALKKIO EI SOVI SINULLE TAI PROJEKTI EI SOPI SINULLE, ÄLÄ JATKA PIDEMMÄLLE.",
+    "pricePerVideo": "{{price}} per video"
   },
   "et": {
     "heroTitle": "Töö: UGC sisuloojana mobiilirakendusele",
@@ -180,7 +188,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Boonuse ülempiir video kohta",
     "payExample": "Näide: 1 kinnitatud video {{views}} vaatamisega = {{base}} + {{bonus}}",
     "payNote": "Vaatamisi loetakse 7 päeva pärast postitamist. Tasu makstakse ainult kinnitatud videote eest. Igal nädalal makstakse Ruuli kaudu.",
-    "warning": "PALUN: KUI TASU SIND EI RAHULDA VÕI PROJEKT SINULE SOBI, SIIS PALUN ÄRA LIIGU EDASI."
+    "warning": "PALUN: KUI TASU SIND EI RAHULDA VÕI PROJEKT SINULE SOBI, SIIS PALUN ÄRA LIIGU EDASI.",
+    "pricePerVideo": "{{price}} video kohta"
   },
   "hu": {
     "heroTitle": "Munka: UGC tartalomkészítő egy mobilalkalmazáshoz",
@@ -200,7 +209,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Videónkénti bónuszplafon",
     "payExample": "Példa: 1 jóváhagyott videó {{views}} megtekintéssel = {{base}} + {{bonus}}",
     "payNote": "A megtekintéseket a posztolás után 7 nappal számoljuk. Csak a jóváhagyott videókért fizetünk. Heti fizetés a Ruulon keresztül.",
-    "warning": "KÉRLEK: HA A DÍJAZÁS NEM FELEL MEG NEKED, VAGY A PROJEKT NEM ILLIK HOZZÁD, KÉRLEK, NE MENJ TOVÁBB."
+    "warning": "KÉRLEK: HA A DÍJAZÁS NEM FELEL MEG NEKED, VAGY A PROJEKT NEM ILLIK HOZZÁD, KÉRLEK, NE MENJ TOVÁBB.",
+    "pricePerVideo": "{{price}} videónként"
   },
   "he": {
     "heroTitle": "משרה: יוצר/ת תוכן UGC לאפליקציית מובייל",
@@ -220,7 +230,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "תקרת בונוס לסרטון",
     "payExample": "דוגמה: סרטון אחד שאושר עם {{views}} צפיות = {{base}} + {{bonus}}",
     "payNote": "הצפיות נספרות 7 ימים אחרי הפרסום. רק סרטונים שאושרו מקבלים תשלום. תשלום שבועי דרך Ruul.",
-    "warning": "בבקשה: אם התשלום לא מתאים לכם, או שהפרויקט לא מתאים לכם, אל תמשיכו הלאה."
+    "warning": "בבקשה: אם התשלום לא מתאים לכם, או שהפרויקט לא מתאים לכם, אל תמשיכו הלאה.",
+    "pricePerVideo": "{{price}} לכל סרטון"
   },
   "hr": {
     "heroTitle": "Posao: UGC kreator sadržaja za mobilnu aplikaciju",
@@ -240,7 +251,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Gornja granica bonusa po videu",
     "payExample": "Primjer: 1 validirani video s {{views}} pregleda = {{base}} + {{bonus}}",
     "payNote": "Pregledi se broje 7 dana nakon objave. Plaćaju se samo validirani videozapisi. Tjedno plaćanje putem Ruul-a.",
-    "warning": "MOLIMO: AKO TI NAKNADA NE ODGOVARA, ILI TI PROJEKT NE ODGOVARA, NEMOJ IĆI DALJE."
+    "warning": "MOLIMO: AKO TI NAKNADA NE ODGOVARA, ILI TI PROJEKT NE ODGOVARA, NEMOJ IĆI DALJE.",
+    "pricePerVideo": "{{price}} po videu"
   },
   "nl": {
     "heroTitle": "Job: UGC-contentcreator voor een mobiele app",
@@ -260,7 +272,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Maximale bonus per video",
     "payExample": "Voorbeeld: 1 goedgekeurde video met {{views}} views = {{base}} + {{bonus}}",
     "payNote": "Views worden geteld 7 dagen na het plaatsen. Alleen goedgekeurde video's worden betaald. Wekelijkse betaling via Ruul.",
-    "warning": "LET OP: ALS DE VERGOEDING NIET BIJ JE PAST, OF ALS HET PROJECT NIET BIJ JE PAST, GA DAN NIET VERDER."
+    "warning": "LET OP: ALS DE VERGOEDING NIET BIJ JE PAST, OF ALS HET PROJECT NIET BIJ JE PAST, GA DAN NIET VERDER.",
+    "pricePerVideo": "{{price}} per video"
   },
   "ja": {
     "heroTitle": "お仕事:モバイルアプリのUGCクリエイター",
@@ -280,7 +293,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "1本あたりのボーナス上限",
     "payExample": "例:再生数{{views}}回の承認済み動画1本 = {{base}} + {{bonus}}",
     "payNote": "再生数は投稿から7日後にカウントされます。承認された動画のみが報酬の対象です。報酬は毎週Ruul経由でお支払いします。",
-    "warning": "お願いです:報酬が合わない場合や、プロジェクトが自分に合わないと感じた場合は、これ以上進まないでください。"
+    "warning": "お願いです:報酬が合わない場合や、プロジェクトが自分に合わないと感じた場合は、これ以上進まないでください。",
+    "pricePerVideo": "1本あたり{{price}}"
   },
   "ko": {
     "heroTitle": "직업: 모바일 앱 UGC 콘텐츠 크리에이터",
@@ -300,7 +314,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "영상당 보너스 상한",
     "payExample": "예시: 검수 통과 영상 1개, 조회수 {{views}}회 = {{base}} + {{bonus}}",
     "payNote": "조회수는 게시 7일 후에 집계돼요. 검수를 통과한 영상만 보수가 지급돼요. 매주 Ruul을 통해 지급돼요.",
-    "warning": "부탁드립니다: 보수가 맞지 않거나 프로젝트가 나와 맞지 않는다면, 더 이상 진행하지 마세요."
+    "warning": "부탁드립니다: 보수가 맞지 않거나 프로젝트가 나와 맞지 않는다면, 더 이상 진행하지 마세요.",
+    "pricePerVideo": "영상당 {{price}}"
   },
   "no": {
     "heroTitle": "Jobb: UGC-skaper for en mobilapp",
@@ -320,7 +335,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Bonustak per video",
     "payExample": "Eksempel: 1 godkjent video med {{views}} visninger = {{base}} + {{bonus}}",
     "payNote": "Visningene telles 7 dager etter publisering. Bare godkjente videoer blir betalt. Utbetaling hver uke via Ruul.",
-    "warning": "VÆR SNILL: HVIS BETALINGEN IKKE PASSER FOR DEG, ELLER PROSJEKTET IKKE PASSER FOR DEG, IKKE GÅ LENGER."
+    "warning": "VÆR SNILL: HVIS BETALINGEN IKKE PASSER FOR DEG, ELLER PROSJEKTET IKKE PASSER FOR DEG, IKKE GÅ LENGER.",
+    "pricePerVideo": "{{price}} per video"
   },
   "lv": {
     "heroTitle": "Darbs: UGC satura veidotājs/-a mobilajai lietotnei",
@@ -340,7 +356,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Bonusa limits par video",
     "payExample": "Piemērs: 1 apstiprināts video ar {{views}} skatījumiem = {{base}} + {{bonus}}",
     "payNote": "Skatījumus skaita 7 dienas pēc publicēšanas. Tiek apmaksāti tikai apstiprinātie video. Samaksa katru nedēļu caur Ruul.",
-    "warning": "LŪDZU: JA ATLĪDZĪBA TEV NEATBILST VAI PROJEKTS TEV NEPIEDER, LŪDZU, NEVIRZI PROCESU TĀLĀK."
+    "warning": "LŪDZU: JA ATLĪDZĪBA TEV NEATBILST VAI PROJEKTS TEV NEPIEDER, LŪDZU, NEVIRZI PROCESU TĀLĀK.",
+    "pricePerVideo": "{{price}} par video"
   },
   "lt": {
     "heroTitle": "Darbas: UGC turinio kūrimas mobiliajai programėlei",
@@ -360,7 +377,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Maksimali premija už vaizdo įrašą",
     "payExample": "Pavyzdys: 1 patvirtintas vaizdo įrašas su {{views}} peržiūrų = {{base}} + {{bonus}}",
     "payNote": "Peržiūros skaičiuojamos praėjus 7 dienoms po paskelbimo. Mokama tik už patvirtintus vaizdo įrašus. Mokėjimas kas savaitę per Ruul.",
-    "warning": "PRAŠAU: JEI ATLYGIS TAVĘS NEATITINKA ARBA PROJEKTAS TAU NETINKA, TOLIAU NEIK."
+    "warning": "PRAŠAU: JEI ATLYGIS TAVĘS NEATITINKA ARBA PROJEKTAS TAU NETINKA, TOLIAU NEIK.",
+    "pricePerVideo": "{{price}} už vaizdo įrašą"
   },
   "pt": {
     "heroTitle": "Vaga: criador(a) de conteúdo UGC para um app de celular",
@@ -380,7 +398,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Limite do bônus por vídeo",
     "payExample": "Exemplo: 1 vídeo validado com {{views}} visualizações = {{base}} + {{bonus}}",
     "payNote": "As visualizações são contabilizadas 7 dias após a publicação. Só os vídeos validados são pagos. Pagamento semanal via Ruul.",
-    "warning": "POR FAVOR: SE A REMUNERAÇÃO NÃO FOR ADEQUADA PARA VOCÊ, OU SE O PROJETO NÃO COMBINAR COM VOCÊ, NÃO PROSSIGA."
+    "warning": "POR FAVOR: SE A REMUNERAÇÃO NÃO FOR ADEQUADA PARA VOCÊ, OU SE O PROJETO NÃO COMBINAR COM VOCÊ, NÃO PROSSIGA.",
+    "pricePerVideo": "{{price}} por vídeo"
   },
   "pl": {
     "heroTitle": "Praca: twórca/twórczyni treści UGC dla aplikacji mobilnej",
@@ -400,7 +419,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Limit bonusu za film",
     "payExample": "Przykład: 1 zaakceptowany film z {{views}} wyświetleniami = {{base}} + {{bonus}}",
     "payNote": "Wyświetlenia liczymy 7 dni po publikacji. Płacimy tylko za zaakceptowane filmy. Płatność co tydzień przez Ruul.",
-    "warning": "PROSZĘ: JEŚLI WYNAGRODZENIE CI NIE ODPOWIADA LUB PROJEKT DO CIEBIE NIE PASUJE, NIE IDŹ DALEJ."
+    "warning": "PROSZĘ: JEŚLI WYNAGRODZENIE CI NIE ODPOWIADA LUB PROJEKT DO CIEBIE NIE PASUJE, NIE IDŹ DALEJ.",
+    "pricePerVideo": "{{price}} za wideo"
   },
   "sk": {
     "heroTitle": "Práca: tvorca/tvorkyňa UGC obsahu pre mobilnú aplikáciu",
@@ -420,7 +440,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Maximálny bonus za video",
     "payExample": "Príklad: 1 schválené video s {{views}} zhliadnutiami = {{base}} + {{bonus}}",
     "payNote": "Zhliadnutia sa počítajú 7 dní po zverejnení. Platíme iba za schválené videá. Platba každý týždeň cez Ruul.",
-    "warning": "PROSÍM: AK TI ODMENA NEVYHOVUJE, ALEBO AK TO NIE JE PROJEKT PRE TEBA, NEPOKRAČUJ ĎALEJ."
+    "warning": "PROSÍM: AK TI ODMENA NEVYHOVUJE, ALEBO AK TO NIE JE PROJEKT PRE TEBA, NEPOKRAČUJ ĎALEJ.",
+    "pricePerVideo": "{{price}} za video"
   },
   "sl": {
     "heroTitle": "Delo: ustvarjalec/ustvarjalka UGC vsebin za mobilno aplikacijo",
@@ -440,7 +461,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Zgornja meja bonusa na video",
     "payExample": "Primer: 1 potrjen video z {{views}} ogledi = {{base}} + {{bonus}}",
     "payNote": "Ogledi se štejejo 7 dni po objavi. Plačani so samo potrjeni videi. Plačilo vsak teden prek Ruula.",
-    "warning": "PROSIMO: ČE TI PLAČILO NE USTREZA ALI ČE PROJEKT NI ZA TEBE, NE NADALJUJ."
+    "warning": "PROSIMO: ČE TI PLAČILO NE USTREZA ALI ČE PROJEKT NI ZA TEBE, NE NADALJUJ.",
+    "pricePerVideo": "{{price}} na videoposnetek"
   },
   "sr": {
     "heroTitle": "Posao: kreator/ka UGC sadržaja za mobilnu aplikaciju",
@@ -460,7 +482,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Maksimum bonusa po videu",
     "payExample": "Primer: 1 odobren video sa {{views}} pregleda = {{base}} + {{bonus}}",
     "payNote": "Pregledi se računaju 7 dana nakon objave. Plaćaju se samo odobreni video-snimci. Plaćanje svake nedelje preko Ruul-a.",
-    "warning": "MOLIMO TE: AKO TI NAKNADA NE ODGOVARA, ILI AKO PROJEKAT NIJE ZA TEBE, NEMOJ DA IDEŠ DALJE."
+    "warning": "MOLIMO TE: AKO TI NAKNADA NE ODGOVARA, ILI AKO PROJEKAT NIJE ZA TEBE, NEMOJ DA IDEŠ DALJE.",
+    "pricePerVideo": "{{price}} po videu"
   },
   "ro": {
     "heroTitle": "Job: Creator de conținut UGC pentru o aplicație mobilă",
@@ -480,7 +503,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Plafon bonus per videoclip",
     "payExample": "Exemplu: 1 videoclip validat cu {{views}} vizualizări = {{base}} + {{bonus}}",
     "payNote": "Vizualizările sunt contorizate la 7 zile după postare. Doar videoclipurile validate sunt plătite. Plată săptămânală prin Ruul.",
-    "warning": "TE RUGĂM: DACĂ REMUNERAȚIA NU ȚI SE POTRIVEȘTE, SAU PROIECTUL NU ESTE PENTRU TINE, TE RUGĂM SĂ NU MERGI MAI DEPARTE."
+    "warning": "TE RUGĂM: DACĂ REMUNERAȚIA NU ȚI SE POTRIVEȘTE, SAU PROIECTUL NU ESTE PENTRU TINE, TE RUGĂM SĂ NU MERGI MAI DEPARTE.",
+    "pricePerVideo": "{{price}} per videoclip"
   },
   "sv": {
     "heroTitle": "Jobb: UGC-skapare för en mobilapp",
@@ -500,7 +524,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Bonustak per video",
     "payExample": "Exempel: 1 godkänd video med {{views}} visningar = {{base}} + {{bonus}}",
     "payNote": "Visningarna räknas 7 dagar efter publicering. Bara godkända videor betalas. Utbetalning varje vecka via Ruul.",
-    "warning": "SNÄLLA: OM ERSÄTTNINGEN INTE PASSAR DIG, ELLER OM PROJEKTET INTE PASSAR DIG, GÅ INTE LÄNGRE."
+    "warning": "SNÄLLA: OM ERSÄTTNINGEN INTE PASSAR DIG, ELLER OM PROJEKTET INTE PASSAR DIG, GÅ INTE LÄNGRE.",
+    "pricePerVideo": "{{price}} per video"
   },
   "uk": {
     "heroTitle": "Робота: UGC-креатор контенту для мобільного застосунку",
@@ -520,7 +545,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Ліміт бонусу за відео",
     "payExample": "Приклад: 1 схвалене відео з {{views}} переглядами = {{base}} + {{bonus}}",
     "payNote": "Перегляди рахуються через 7 днів після публікації. Оплачуються лише схвалені відео. Виплата щотижня через Ruul.",
-    "warning": "БУДЬ ЛАСКА: ЯКЩО ОПЛАТА ТОБІ НЕ ПІДХОДИТЬ АБО ПРОЄКТ ТОБІ НЕ ПІДХОДИТЬ, НЕ ЙДИ ДАЛІ."
+    "warning": "БУДЬ ЛАСКА: ЯКЩО ОПЛАТА ТОБІ НЕ ПІДХОДИТЬ АБО ПРОЄКТ ТОБІ НЕ ПІДХОДИТЬ, НЕ ЙДИ ДАЛІ.",
+    "pricePerVideo": "{{price}} за відео"
   },
   "tr": {
     "heroTitle": "İş: Mobil uygulama için UGC içerik üreticisi",
@@ -540,7 +566,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Video başına bonus sınırı",
     "payExample": "Örnek: {{views}} izlenmeye sahip 1 onaylı video = {{base}} + {{bonus}}",
     "payNote": "İzlenmeler paylaşımdan 7 gün sonra sayılır. Yalnızca onaylanan videolar için ödeme yapılır. Ödeme her hafta Ruul üzerinden yapılır.",
-    "warning": "LÜTFEN: KAZANÇ SANA UYMUYORSA YA DA PROJE SANA UYGUN DEĞİLSE, LÜTFEN DAHA FAZLA İLERLEME."
+    "warning": "LÜTFEN: KAZANÇ SANA UYMUYORSA YA DA PROJE SANA UYGUN DEĞİLSE, LÜTFEN DAHA FAZLA İLERLEME.",
+    "pricePerVideo": "Video başına {{price}}"
   },
   "is": {
     "heroTitle": "Starf: UGC efnishöfundur fyrir snjallsímaforrit",
@@ -560,7 +587,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Hámark bónuss fyrir hvert myndband",
     "payExample": "Dæmi: 1 samþykkt myndband með {{views}} áhorfum = {{base}} + {{bonus}}",
     "payNote": "Áhorf eru talin 7 dögum eftir birtingu. Aðeins samþykkt myndbönd eru greidd. Greitt vikulega í gegnum Ruul.",
-    "warning": "ÉG BIÐ ÞIG: EF LAUNIN HENTA ÞÉR EKKI, EÐA VERKEFNIÐ PASSAR EKKI FYRIR ÞIG, FARÐU ÞÁ EKKI LENGRA."
+    "warning": "ÉG BIÐ ÞIG: EF LAUNIN HENTA ÞÉR EKKI, EÐA VERKEFNIÐ PASSAR EKKI FYRIR ÞIG, FARÐU ÞÁ EKKI LENGRA.",
+    "pricePerVideo": "{{price}} fyrir hvert myndband"
   },
   "ka": {
     "heroTitle": "სამუშაო: UGC კონტენტ-კრეატორი მობილური აპლიკაციისთვის",
@@ -580,7 +608,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "ბონუსის ლიმიტი თითო ვიდეოზე",
     "payExample": "მაგალითი: 1 დადასტურებული ვიდეო {{views}} ნახვით = {{base}} + {{bonus}}",
     "payNote": "ნახვები ითვლება გამოქვეყნებიდან 7 დღის შემდეგ. მხოლოდ დადასტურებული ვიდეოები ანაზღაურდება. ანაზღაურება ყოველკვირეულად, Ruul-ის საშუალებით.",
-    "warning": "გთხოვ: თუ ანაზღაურება არ გაწყობს, ან პროექტი არ გახლავს შესაფერისი, ნუ გააგრძელებ."
+    "warning": "გთხოვ: თუ ანაზღაურება არ გაწყობს, ან პროექტი არ გახლავს შესაფერისი, ნუ გააგრძელებ.",
+    "pricePerVideo": "{{price}} ვიდეოში"
   },
   "hy": {
     "heroTitle": "Աշխատանք՝ UGC կոնտենտ ստեղծող բջջային հավելվածի համար",
@@ -600,7 +629,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Բոնուսի առավելագույն սահմանը մեկ տեսանյութի համար",
     "payExample": "Օրինակ՝ 1 հաստատված տեսանյութ {{views}} դիտումով = {{base}} + {{bonus}}",
     "payNote": "Դիտումները հաշվվում են հրապարակումից 7 օր հետո։ Վճարվում են միայն հաստատված տեսանյութերը։ Վճարումը՝ ամեն շաբաթ Ruul-ի միջոցով։",
-    "warning": "ԽՆԴՐՈՒՄ ԵՆՔ՝ ԵԹԵ ՎԱՐՁԱՏՐՈՒԹՅՈՒՆԸ ՔԵԶ ՉԻ ՀԱՄԱՊԱՏԱՍԽԱՆՈՒՄ, ԿԱՄ ՆԱԽԱԳԻԾԸ ՔԵԶ ՉԻ ԸՆԴՀԱՆՈՒՄ, ԽՆԴՐՈՒՄ ԵՆՔ ԱՎԵԼԻ ՀԵՌՈՒ ՉԳԱԼ։"
+    "warning": "ԽՆԴՐՈՒՄ ԵՆՔ՝ ԵԹԵ ՎԱՐՁԱՏՐՈՒԹՅՈՒՆԸ ՔԵԶ ՉԻ ՀԱՄԱՊԱՏԱՍԽԱՆՈՒՄ, ԿԱՄ ՆԱԽԱԳԻԾԸ ՔԵԶ ՉԻ ԸՆԴՀԱՆՈՒՄ, ԽՆԴՐՈՒՄ ԵՆՔ ԱՎԵԼԻ ՀԵՌՈՒ ՉԳԱԼ։",
+    "pricePerVideo": "{{price}} յուրաքանչյուր տեսանյութի համար"
   },
   "id": {
     "heroTitle": "Lowongan: Kreator konten UGC untuk aplikasi mobile",
@@ -620,7 +650,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Batas maksimum bonus per video",
     "payExample": "Contoh: 1 video yang divalidasi dengan {{views}} views = {{base}} + {{bonus}}",
     "payNote": "Views dihitung 7 hari setelah video diunggah. Hanya video yang divalidasi yang dibayar. Pembayaran mingguan lewat Ruul.",
-    "warning": "MOHON: JIKA IMBALANNYA TIDAK COCOK UNTUKMU, ATAU PROYEKNYA TIDAK SESUAI DENGANMU, JANGAN LANJUT LEBIH JAUH."
+    "warning": "MOHON: JIKA IMBALANNYA TIDAK COCOK UNTUKMU, ATAU PROYEKNYA TIDAK SESUAI DENGANMU, JANGAN LANJUT LEBIH JAUH.",
+    "pricePerVideo": "{{price}} per video"
   },
   "ms": {
     "heroTitle": "Kerja: pencipta kandungan UGC untuk aplikasi mudah alih",
@@ -640,7 +671,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Had bonus setiap video",
     "payExample": "Contoh: 1 video yang disahkan dengan {{views}} tontonan = {{base}} + {{bonus}}",
     "payNote": "Tontonan dikira 7 hari selepas disiarkan. Hanya video yang disahkan akan dibayar. Bayaran mingguan melalui Ruul.",
-    "warning": "HARAP MAKLUM: JIKA BAYARAN TIDAK SESUAI DENGAN KAMU, ATAU PROJEK INI TIDAK SESUAI DENGAN KAMU, SILA JANGAN TERUSKAN."
+    "warning": "HARAP MAKLUM: JIKA BAYARAN TIDAK SESUAI DENGAN KAMU, ATAU PROJEK INI TIDAK SESUAI DENGAN KAMU, SILA JANGAN TERUSKAN.",
+    "pricePerVideo": "{{price}} setiap video"
   },
   "vi": {
     "heroTitle": "Việc làm: Content creator UGC cho một ứng dụng di động",
@@ -660,7 +692,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Mức thưởng tối đa cho mỗi video",
     "payExample": "Ví dụ: 1 video được duyệt với {{views}} lượt xem = {{base}} + {{bonus}}",
     "payNote": "Lượt xem được tính sau khi đăng 7 ngày. Chỉ những video được duyệt mới được trả tiền. Thanh toán hằng tuần qua Ruul.",
-    "warning": "XIN BẠN LƯU Ý: NẾU MỨC THÙ LAO KHÔNG PHÙ HỢP VỚI BẠN, HOẶC DỰ ÁN KHÔNG PHÙ HỢP VỚI BẠN, XIN ĐỪNG TIẾP TỤC."
+    "warning": "XIN BẠN LƯU Ý: NẾU MỨC THÙ LAO KHÔNG PHÙ HỢP VỚI BẠN, HOẶC DỰ ÁN KHÔNG PHÙ HỢP VỚI BẠN, XIN ĐỪNG TIẾP TỤC.",
+    "pricePerVideo": "{{price}} mỗi video"
   },
   "th": {
     "heroTitle": "งาน: ครีเอเตอร์คอนเทนต์ UGC สำหรับแอปมือถือ",
@@ -680,7 +713,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "เพดานโบนัสต่อวิดีโอ",
     "payExample": "ตัวอย่าง: 1 วิดีโอที่ผ่านการอนุมัติ ยอดวิว {{views}} = {{base}} + {{bonus}}",
     "payNote": "ยอดวิวจะนับหลังโพสต์ 7 วัน และจ่ายเฉพาะวิดีโอที่ผ่านการอนุมัติเท่านั้น จ่ายทุกสัปดาห์ผ่าน Ruul",
-    "warning": "ขอร้องนะ: ถ้าค่าตอบแทนไม่เหมาะกับคุณ หรือโปรเจกต์นี้ไม่ตรงกับคุณ กรุณาอย่าดำเนินการต่อ"
+    "warning": "ขอร้องนะ: ถ้าค่าตอบแทนไม่เหมาะกับคุณ หรือโปรเจกต์นี้ไม่ตรงกับคุณ กรุณาอย่าดำเนินการต่อ",
+    "pricePerVideo": "{{price}} ต่อวิดีโอ"
   },
   "kk": {
     "heroTitle": "Жұмыс: мобильді қосымшаға арналған UGC контент жасаушы",
@@ -700,7 +734,8 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "Бір бейне үшін бонус шегі",
     "payExample": "Мысалы: {{views}} қарауы бар 1 расталған бейне = {{base}} + {{bonus}}",
     "payNote": "Қарау саны жарияланғаннан кейін 7 күннен соң есептеледі. Тек расталған бейнелерге ақы төленеді. Төлем апта сайын Ruul арқылы жүзеге асады.",
-    "warning": "ӨТІНЕМІН: ЕГЕР ТӨЛЕМ САҒАН ЫҢҒАЙЛЫ БОЛМАСА НЕМЕСЕ ЖОБА САҒАН СЫЙМАСА, ӘРІ ҚАРАЙ ЖАЛҒАСТЫРМА."
+    "warning": "ӨТІНЕМІН: ЕГЕР ТӨЛЕМ САҒАН ЫҢҒАЙЛЫ БОЛМАСА НЕМЕСЕ ЖОБА САҒАН СЫЙМАСА, ӘРІ ҚАРАЙ ЖАЛҒАСТЫРМА.",
+    "pricePerVideo": "Бір бейне үшін {{price}}"
   },
   "hi": {
     "heroTitle": "नौकरी: मोबाइल ऐप के लिए UGC कंटेंट क्रिएटर",
@@ -720,6 +755,7 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payCap": "प्रति वीडियो बोनस की सीमा",
     "payExample": "उदाहरण: {{views}} व्यूज़ वाला 1 मान्य वीडियो = {{base}} + {{bonus}}",
     "payNote": "व्यूज़ पोस्ट करने के 7 दिन बाद गिने जाते हैं। केवल मान्य वीडियो का ही भुगतान किया जाता है। Ruul के माध्यम से साप्ताहिक भुगतान।",
-    "warning": "कृपया: यदि पारिश्रमिक आपको सूट नहीं करता है, या परियोजना आपको फिट नहीं बैठती है, तो कृपया आगे न बढ़ें।"
+    "warning": "कृपया: यदि पारिश्रमिक आपको सूट नहीं करता है, या परियोजना आपको फिट नहीं बैठती है, तो कृपया आगे न बढ़ें।",
+    "pricePerVideo": "प्रति वीडियो {{price}}"
   }
 };

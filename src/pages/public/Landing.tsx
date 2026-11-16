@@ -247,7 +247,7 @@ export default function Landing() {
       {/* CTA collant mobile */}
       {open && (
         <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-white/95 p-3 pb-[calc(env(safe-area-inset-bottom)+12px)] backdrop-blur-md sm:hidden">
-          <Link to={applyHref}><Button size="lg" className="h-12 w-full text-[15px]">{tt("landing.cta")} · {price} / {t("landing.perVideo")}</Button></Link>
+          <Link to={applyHref}><Button size="lg" className="h-12 w-full text-[15px]">{tt("landing.cta")} · {fillVars(lj.pricePerVideo, { price })}</Button></Link>
         </div>
       )}
     </div>
