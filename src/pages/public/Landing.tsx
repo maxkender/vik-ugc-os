@@ -94,8 +94,8 @@ export default function Landing() {
   // Titre au format offre d'emploi (16/11) ; une surcharge admin reste prioritaire.
   const heroTitle = ov["landing.title"] ? tt("landing.title", { brand: BRAND }) : lj.heroTitle;
   const heroSubtitle = ov["landing.subtitle"] ? tt("landing.subtitle", { price }) : lj.heroSubtitle;
-  const faqs = (t("landing.faqs", { returnObjects: true }) as unknown as string[][]).map(([q, a], i) =>
-    [ov[`landing.faq.${i}.q`] ?? q, ov[`landing.faq.${i}.a`] ?? a]);
+  const faqs = [[lj.faqIphoneQ, lj.faqIphoneA], ...(t("landing.faqs", { returnObjects: true }) as unknown as string[][]).map(([q, a], i) =>
+    [ov[`landing.faq.${i}.q`] ?? q, ov[`landing.faq.${i}.a`] ?? a])];
   const openCountries = useMemo(() => (countries ?? []).filter((c) => c.open && c.zone_code).sort((a, b) => countryName(a.code, lang).localeCompare(countryName(b.code, lang), lang)), [countries, lang]);
   const applyHref = `/apply/${code.toLowerCase()}${kept}`;
 
@@ -206,6 +206,11 @@ export default function Landing() {
                   <IconTile icon={<CalendarCheck />} tint="violet" className="h-10 w-10 rounded-xl" />
                   <p className="mt-4 text-[15px] font-semibold text-foreground">{lj.dailyTitle}</p>
                   <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{lj.dailyText}</p>
+                </div>
+                <div className="rounded-2xl border-2 border-[#dbe5ff] bg-white p-6 shadow-xs lg:col-span-2" data-testid="iphone-required">
+                  <IconTile icon={<Smartphone />} tint="cyan" className="h-10 w-10 rounded-xl" />
+                  <p className="mt-4 text-[15px] font-semibold text-foreground"> {lj.iphoneTitle}</p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{lj.iphoneText}</p>
                 </div>
               </div>
               <h3 className="mt-12 text-lg font-semibold text-foreground">{lj.examplesTitle}</h3>

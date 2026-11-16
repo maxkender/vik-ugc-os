@@ -147,6 +147,9 @@ Posters are content creators paid by Vik Studios to film and publish short UGC v
 - Posters film their OWN original, good-quality UGC videos with their phone (face cam, reaction, tutorial, before/after…) to promote a mobile app, and post them on their TikTok and Instagram. No slideshows or reposts.
 - 1 video per day, every day: consistency matters. Every video is checked for quality and regularity, and only validated videos are paid (fixed rate per validated video + views bonus up to the per-video cap).
 
+## Equipment
+- An iPhone is required (filming, editing, the app and its premium access are iPhone only). Ads are shown to iPhone users only.
+
 ## Warm-up (mandatory, before the first brief)
 - After creating the TikTok and Instagram accounts, the poster warms up BOTH accounts for at least 24 hours before posting anything. Purpose: avoid a shadowban; a brand-new account that posts immediately looks like a bot.
 - Checklist on each platform: follow 10–15 accounts in the niche (study, productivity, study apps; a list taken from our library is in the Account tab), scroll and like for about 15 minutes in the niche, complete the profile (photo, name, bio), post nothing.
@@ -157,7 +160,7 @@ Posters are content creators paid by Vik Studios to film and publish short UGC v
 - Every creator gets free premium access to the app (Micabo) through a personal, single-use Apple promo code, assigned automatically after signing (or when the warm-up starts).
 - To activate: open the Account tab (or the brief's "App demo" section) ON THE IPHONE, tap "Activate my access": the App Store opens on the redemption page with the code pre-filled; confirm with the Apple ID, then open the app. Then tap "I've activated it".
 - If the App Store says the code is already used or invalid, or if the card says access is being prepared: escalate (the team can reassign a new code).
-- iPhone only. If the creator uses Android: there is no premium access for Android yet; tell them to contact us (escalate) and that the team will find a solution. Never invent a code and never ask for or repeat a code in the chat.
+- iPhone only: an iPhone is a requirement of the job (stated on the job page, the application form, the onboarding, the guide and the contract). There is no Android alternative. If a creator only has Android, explain politely that the job requires an iPhone, and escalate if they have a question about their contract. Never invent a code and never ask for or repeat a code in the chat.
 
 ## Creator onboarding
 - At first login the poster sees a few welcome screens: who Vik Studios is (a small studio building mobile apps), win-win (only continue if you can be consistent and the rates suit you), warmed-up account first, good videos (edit in CapCut or Edits, good light, speak clearly, recreate the reference video), the rhythm (1 video a day, we provide all assets), the community (Slack), getting paid with Ruul. The last button leads to the warm-up.

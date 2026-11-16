@@ -14,6 +14,8 @@ export interface LandingJob {
   warning: string;
   /** Bouton collant : « {{price}} per video » (ordre des mots propre à chaque langue). */
   pricePerVideo: string;
+  iphoneTitle: string; iphoneText: string; faqIphoneQ: string; faqIphoneA: string;
+  applyIphone: string; yes: string; no: string; iphoneBlocked: string;
 }
 
 export const LANDING_JOB: Record<string, LandingJob> = {
@@ -30,6 +32,14 @@ export const LANDING_JOB: Record<string, LandingJob> = {
     payNote: "Views are counted 7 days after posting. Only validated videos are paid. Weekly payment via Ruul.",
     warning: "PLEASE: IF THE REMUNERATION DOESN'T SUIT YOU, OR THE PROJECT DOESN'T FIT YOU, PLEASE DON'T GO ANY FURTHER.",
     pricePerVideo: "{{price}} per video",
+    iphoneTitle: "iPhone required",
+    iphoneText: "You need an iPhone: you film and edit on it, and the premium access to the app we give you works on iPhone only.",
+    faqIphoneQ: "Do I need an iPhone?",
+    faqIphoneA: "Yes. You film with your iPhone and we give you free premium access to the app, which only works on iPhone. Android phones are not accepted for this job.",
+    applyIphone: "Do you have an iPhone?",
+    yes: "Yes",
+    no: "No",
+    iphoneBlocked: "Thanks for your interest! This job requires an iPhone (the app and the premium access we provide are iPhone only), so we can't accept your application for now.",
   },
   fr: {
     heroTitle: "Job : créateur·rice de contenu UGC pour une app mobile",
@@ -44,6 +54,14 @@ export const LANDING_JOB: Record<string, LandingJob> = {
     payNote: "Les vues sont comptées 7 jours après la publication. Seules les vidéos validées sont payées. Paiement chaque semaine via Ruul.",
     warning: "S'IL TE PLAÎT : SI LA RÉMUNÉRATION NE TE CONVIENT PAS, OU SI LE PROJET NE TE CORRESPOND PAS, NE VA PAS PLUS LOIN.",
     pricePerVideo: "{{price}} par vidéo",
+    iphoneTitle: "iPhone requis",
+    iphoneText: "Il te faut un iPhone : tu tournes et montes dessus, et l'accès premium à l'app qu'on te donne fonctionne uniquement sur iPhone.",
+    faqIphoneQ: "Faut-il un iPhone ?",
+    faqIphoneA: "Oui. Tu filmes avec ton iPhone et on t'offre un accès premium à l'app, qui ne fonctionne que sur iPhone. Les téléphones Android ne sont pas acceptés pour ce job.",
+    applyIphone: "Tu as un iPhone ?",
+    yes: "Oui",
+    no: "Non",
+    iphoneBlocked: "Merci pour ton intérêt ! Ce job demande un iPhone (l'app et l'accès premium qu'on fournit sont uniquement sur iPhone) : on ne peut donc pas accepter ta candidature pour l'instant.",
   },
   es: {
     heroTitle: "Trabajo: creador/a de contenido UGC para una app móvil",
@@ -58,6 +76,14 @@ export const LANDING_JOB: Record<string, LandingJob> = {
     payNote: "Las vistas se cuentan 7 días después de publicar. Solo se pagan los videos validados. Pago semanal a través de Ruul.",
     warning: "POR FAVOR: SI LA REMUNERACIÓN NO TE CONVIENE, O EL PROYECTO NO ES PARA TI, NO SIGAS ADELANTE.",
     pricePerVideo: "{{price}} por video",
+    iphoneTitle: "iPhone obligatorio",
+    iphoneText: "Necesitas un iPhone: grabas y editas con él, y el acceso premium a la app que te damos solo funciona en iPhone.",
+    faqIphoneQ: "¿Necesito un iPhone?",
+    faqIphoneA: "Sí. Grabas con tu iPhone y te damos acceso premium gratis a la app, que solo funciona en iPhone. Los teléfonos Android no se aceptan para este trabajo.",
+    applyIphone: "¿Tienes un iPhone?",
+    yes: "Sí",
+    no: "No",
+    iphoneBlocked: "¡Gracias por tu interés! Este trabajo requiere un iPhone (la app y el acceso premium que damos son solo para iPhone), así que por ahora no podemos aceptar tu postulación.",
   },
   ...LANDING_JOB_GENERATED,
 };

@@ -21,7 +21,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Eksempel: 1 godkendt video med {{views}} visninger = {{base}} + {{bonus}}",
     "payNote": "Visninger bliver talt 7 dage efter opslaget. Kun godkendte videoer bliver betalt. Udbetaling hver uge via Ruul.",
     "warning": "VIL DU VÆRE SÅ SNILD: HVIS BETALINGEN IKKE PASSER TIL DIG, ELLER PROJEKTET IKKE PASSER TIL DIG, SÅ LAD VÆRE MED AT GÅ VIDERE.",
-    "pricePerVideo": "{{price}} pr. video"
+    "pricePerVideo": "{{price}} pr. video",
+    "iphoneTitle": "iPhone påkrævet",
+    "iphoneText": "Du skal have en iPhone: du filmer og redigerer på den, og den premium-adgang til appen, som du får af os, virker kun på iPhone.",
+    "faqIphoneQ": "Skal jeg have en iPhone?",
+    "faqIphoneA": "Ja. Du filmer med din iPhone, og vi giver dig gratis premium-adgang til appen, som kun virker på iPhone. Android-telefoner accepteres ikke til dette job.",
+    "applyIphone": "Har du en iPhone?",
+    "yes": "Ja",
+    "no": "Nej",
+    "iphoneBlocked": "Tak for din interesse! Dette job kræver en iPhone (appen og den premium-adgang, vi stiller til rådighed, virker kun på iPhone), så vi kan desværre ikke acceptere din ansøgning lige nu."
   },
   "ar": {
     "heroTitle": "وظيفة: صانع/ة محتوى UGC لتطبيق جوال",
@@ -42,7 +50,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "مثال: فيديو واحد مقبول بـ {{views}} مشاهدة = {{base}} + {{bonus}}",
     "payNote": "تُحتسب المشاهدات بعد 7 أيام من النشر. لا يُدفع إلا مقابل الفيديوهات المقبولة. الدفع أسبوعيًا عبر Ruul.",
     "warning": "من فضلك: إذا كان الأجر لا يناسبك، أو كان المشروع لا يناسبك، فلا تكمل أكثر من ذلك.",
-    "pricePerVideo": "{{price}} لكل فيديو"
+    "pricePerVideo": "{{price}} لكل فيديو",
+    "iphoneTitle": "مطلوب iPhone",
+    "iphoneText": "تحتاج إلى iPhone: فأنت تصوّر وتمنتج عليه، والوصول المميز (premium) للتطبيق الذي نمنحك إياه يعمل على iPhone فقط.",
+    "faqIphoneQ": "هل أحتاج إلى iPhone؟",
+    "faqIphoneA": "نعم. أنت تصوّر بهاتف iPhone الخاص بك ونمنحك وصولاً مميزاً (premium) مجانياً للتطبيق، وهو يعمل على iPhone فقط. هواتف Android غير مقبولة لهذه الوظيفة.",
+    "applyIphone": "هل لديك iPhone؟",
+    "yes": "نعم",
+    "no": "لا",
+    "iphoneBlocked": "شكراً لاهتمامك! هذه الوظيفة تتطلب iPhone (التطبيق والوصول المميز الذي نوفره يعملان على iPhone فقط)، لذلك لا يمكننا قبول طلبك في الوقت الحالي."
   },
   "bg": {
     "heroTitle": "Работа: UGC създател на съдържание за мобилно приложение",
@@ -63,7 +79,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Пример: 1 одобрено видео с {{views}} гледания = {{base}} + {{bonus}}",
     "payNote": "Гледанията се отчитат 7 дни след публикуването. Плащат се само одобрените видеа. Плащане всяка седмица през Ruul.",
     "warning": "МОЛЯ: АКО ВЪЗНАГРАЖДЕНИЕТО НЕ ТИ ПОДХОЖДА ИЛИ ПРОЕКТЪТ НЕ Е ЗА ТЕБ, МОЛЯ, НЕ ПРОДЪЛЖАВАЙ НАТАТЪК.",
-    "pricePerVideo": "{{price}} за видео"
+    "pricePerVideo": "{{price}} за видео",
+    "iphoneTitle": "Нужен е iPhone",
+    "iphoneText": "Трябва ти iPhone: снимаш и монтираш с него, а премиум достъпът до приложението, който ти даваме, работи само на iPhone.",
+    "faqIphoneQ": "Трябва ли ми iPhone?",
+    "faqIphoneA": "Да. Снимаш с твоя iPhone, а ние ти даваме безплатен премиум достъп до приложението, който работи само на iPhone. Телефони с Android не се приемат за тази работа.",
+    "applyIphone": "Имаш ли iPhone?",
+    "yes": "Да",
+    "no": "Не",
+    "iphoneBlocked": "Благодарим за интереса! Тази работа изисква iPhone (приложението и премиум достъпът, които предоставяме, работят само на iPhone), затова засега не можем да приемем кандидатурата ти."
   },
   "cs": {
     "heroTitle": "Práce: tvůrce/tvůrkyně UGC obsahu pro mobilní aplikaci",
@@ -84,7 +108,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Příklad: 1 schválené video s {{views}} zhlédnutími = {{base}} + {{bonus}}",
     "payNote": "Zhlédnutí se počítají 7 dní po zveřejnění. Platí se jen schválená videa. Platba každý týden přes Ruul.",
     "warning": "PROSÍM: POKUD TI ODMĚNA NEVYHOVUJE, NEBO POKUD PROJEKT NENÍ PRO TEBE, NEPOKRAČUJ DÁL.",
-    "pricePerVideo": "{{price}} za video"
+    "pricePerVideo": "{{price}} za video",
+    "iphoneTitle": "Je potřeba iPhone",
+    "iphoneText": "Potřebuješ iPhone: natáčíš a stříháš na něm a prémiový přístup k aplikaci, který ti dáme, funguje pouze na iPhonu.",
+    "faqIphoneQ": "Potřebuju iPhone?",
+    "faqIphoneA": "Ano. Natáčíš na svůj iPhone a my ti zdarma poskytneme prémiový přístup k aplikaci, která funguje pouze na iPhonu. Telefony s Androidem se pro tuto práci nepřijímají.",
+    "applyIphone": "Máš iPhone?",
+    "yes": "Ano",
+    "no": "Ne",
+    "iphoneBlocked": "Díky za tvůj zájem! Tato práce vyžaduje iPhone (aplikace a prémiový přístup, který poskytujeme, fungují pouze na iPhonu), takže tvou přihlášku zatím bohužel nemůžeme přijmout."
   },
   "el": {
     "heroTitle": "Δουλειά: δημιουργός περιεχομένου UGC για μια εφαρμογή κινητού",
@@ -105,7 +137,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Παράδειγμα: 1 εγκεκριμένο βίντεο με {{views}} προβολές = {{base}} + {{bonus}}",
     "payNote": "Οι προβολές μετριούνται 7 ημέρες μετά τη δημοσίευση. Πληρώνονται μόνο τα εγκεκριμένα βίντεο. Πληρωμή κάθε εβδομάδα μέσω Ruul.",
     "warning": "ΠΑΡΑΚΑΛΩ: ΑΝ Η ΑΜΟΙΒΗ ΔΕΝ ΣΟΥ ΤΑΙΡΙΑΖΕΙ, Ή ΑΝ ΤΟ ΠΡΟΤΖΕΚΤ ΔΕΝ ΣΕ ΕΚΠΡΟΣΩΠΕΙ, ΜΗΝ ΠΡΟΧΩΡΗΣΕΙΣ ΠΑΡΑΠΕΡΑ.",
-    "pricePerVideo": "{{price}} ανά βίντεο"
+    "pricePerVideo": "{{price}} ανά βίντεο",
+    "iphoneTitle": "Απαιτείται iPhone",
+    "iphoneText": "Χρειάζεσαι ένα iPhone: γυρίζεις και κάνεις μοντάζ πάνω του, και η premium πρόσβαση στην εφαρμογή που σου δίνουμε λειτουργεί μόνο σε iPhone.",
+    "faqIphoneQ": "Χρειάζομαι iPhone;",
+    "faqIphoneA": "Ναι. Γυρίζεις τα βίντεο με το iPhone σου και σου δίνουμε δωρεάν premium πρόσβαση στην εφαρμογή, η οποία λειτουργεί μόνο σε iPhone. Τα κινητά Android δεν γίνονται δεκτά για αυτή τη δουλειά.",
+    "applyIphone": "Έχεις iPhone;",
+    "yes": "Ναι",
+    "no": "Όχι",
+    "iphoneBlocked": "Ευχαριστούμε για το ενδιαφέρον σου! Αυτή η δουλειά απαιτεί iPhone (η εφαρμογή και η premium πρόσβαση που παρέχουμε λειτουργούν μόνο σε iPhone), οπότε προς το παρόν δεν μπορούμε να δεχτούμε την αίτησή σου."
   },
   "de": {
     "heroTitle": "Job: UGC Content Creator für eine mobile App",
@@ -126,7 +166,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Beispiel: 1 validiertes Video mit {{views}} Views = {{base}} + {{bonus}}",
     "payNote": "Views werden 7 Tage nach dem Posten gezählt. Nur validierte Videos werden bezahlt. Wöchentliche Zahlung über Ruul.",
     "warning": "BITTE: WENN DIE VERGÜTUNG NICHT ZU DIR PASST ODER DAS PROJEKT NICHT DEINEN VORSTELLUNGEN ENTSPRICHT, GEHE BITTE NICHT WEITER.",
-    "pricePerVideo": "{{price}} pro Video"
+    "pricePerVideo": "{{price}} pro Video",
+    "iphoneTitle": "iPhone erforderlich",
+    "iphoneText": "Du brauchst ein iPhone: Du drehst und schneidest damit, und der Premium-Zugang zur App, den wir dir geben, funktioniert nur auf dem iPhone.",
+    "faqIphoneQ": "Brauche ich ein iPhone?",
+    "faqIphoneA": "Ja. Du filmst mit deinem iPhone und bekommst von uns kostenlosen Premium-Zugang zur App, die nur auf dem iPhone funktioniert. Android-Handys werden für diesen Job nicht akzeptiert.",
+    "applyIphone": "Hast du ein iPhone?",
+    "yes": "Ja",
+    "no": "Nein",
+    "iphoneBlocked": "Danke für dein Interesse! Für diesen Job brauchst du ein iPhone (die App und der Premium-Zugang, den wir zur Verfügung stellen, funktionieren nur auf dem iPhone). Deshalb können wir deine Bewerbung vorerst leider nicht annehmen."
   },
   "it": {
     "heroTitle": "Lavoro: creator di contenuti UGC per un'app mobile",
@@ -147,7 +195,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Esempio: 1 video validato con {{views}} visualizzazioni = {{base}} + {{bonus}}",
     "payNote": "Le visualizzazioni vengono conteggiate 7 giorni dopo la pubblicazione. Vengono pagati solo i video validati. Pagamento settimanale tramite Ruul.",
     "warning": "PER FAVORE: SE IL COMPENSO NON FA PER TE, O SE IL PROGETTO NON FA PER TE, NON ANDARE AVANTI.",
-    "pricePerVideo": "{{price}} per video"
+    "pricePerVideo": "{{price}} per video",
+    "iphoneTitle": "iPhone obbligatorio",
+    "iphoneText": "Ti serve un iPhone: ci giri e monti i video, e l'accesso premium all'app che ti diamo funziona solo su iPhone.",
+    "faqIphoneQ": "Mi serve un iPhone?",
+    "faqIphoneA": "Sì. Giri i video con il tuo iPhone e ti diamo accesso premium gratuito all'app, che funziona solo su iPhone. Gli smartphone Android non sono accettati per questo lavoro.",
+    "applyIphone": "Hai un iPhone?",
+    "yes": "Sì",
+    "no": "No",
+    "iphoneBlocked": "Grazie per il tuo interesse! Questo lavoro richiede un iPhone (l'app e l'accesso premium che forniamo funzionano solo su iPhone), quindi per ora non possiamo accettare la tua candidatura."
   },
   "hr": {
     "heroTitle": "Posao: UGC kreator sadržaja za mobilnu aplikaciju",
@@ -168,7 +224,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Primjer: 1 odobreni video s {{views}} pregleda = {{base}} + {{bonus}}",
     "payNote": "Pregledi se broje 7 dana nakon objave. Plaćaju se samo odobreni videi. Tjedna isplata putem Ruula.",
     "warning": "MOLIMO TE: AKO TI NAKNADA NE ODGOVARA ILI TI PROJEKT NE ODGOVARA, NEMOJ IĆI DALJE.",
-    "pricePerVideo": "{{price}} po videu"
+    "pricePerVideo": "{{price}} po videu",
+    "iphoneTitle": "Potreban je iPhone",
+    "iphoneText": "Trebaš iPhone: na njemu snimaš i montiraš, a premium pristup aplikaciji koji ti dajemo radi samo na iPhoneu.",
+    "faqIphoneQ": "Trebam li iPhone?",
+    "faqIphoneA": "Da. Snimaš svojim iPhoneom, a mi ti dajemo besplatan premium pristup aplikaciji, koja radi samo na iPhoneu. Android telefoni ne prihvaćaju se za ovaj posao.",
+    "applyIphone": "Imaš li iPhone?",
+    "yes": "Da",
+    "no": "Ne",
+    "iphoneBlocked": "Hvala na interesu! Za ovaj je posao potreban iPhone (aplikacija i premium pristup koje osiguravamo rade samo na iPhoneu), pa za sada ne možemo prihvatiti tvoju prijavu."
   },
   "fi": {
     "heroTitle": "Työ: UGC-sisällöntuottaja mobiilisovellukselle",
@@ -189,7 +253,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Esimerkki: 1 hyväksytty video, jolla on {{views}} katselukertaa = {{base}} + {{bonus}}",
     "payNote": "Katselukerrat lasketaan 7 päivää julkaisun jälkeen. Vain hyväksytyistä videoista maksetaan. Maksu viikoittain Ruulin kautta.",
     "warning": "HUOM: JOS PALKKIO EI SOVI SINULLE TAI PROJEKTI EI TUNNU SOPIVALTA, ÄLÄ JATKA PIDEMMÄLLE.",
-    "pricePerVideo": "{{price}} videolta"
+    "pricePerVideo": "{{price}} videolta",
+    "iphoneTitle": "iPhone vaaditaan",
+    "iphoneText": "Tarvitset iPhonen: kuvaat ja editoit sillä, ja appiin antamamme premium-käyttöoikeus toimii vain iPhonella.",
+    "faqIphoneQ": "Tarvitsenko iPhonen?",
+    "faqIphoneA": "Kyllä. Kuvaat iPhonellasi, ja annamme sinulle ilmaisen premium-käyttöoikeuden appiin, joka toimii vain iPhonella. Android-puhelimia ei hyväksytä tähän työhön.",
+    "applyIphone": "Onko sinulla iPhone?",
+    "yes": "Kyllä",
+    "no": "Ei",
+    "iphoneBlocked": "Kiitos kiinnostuksestasi! Tähän työhön tarvitaan iPhone (app ja tarjoamamme premium-käyttöoikeus toimivat vain iPhonella), joten emme valitettavasti voi hyväksyä hakemustasi toistaiseksi."
   },
   "hu": {
     "heroTitle": "Munka: UGC-tartalomgyártó egy mobilappnak",
@@ -210,7 +282,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Példa: 1 jóváhagyott videó {{views}} megtekintéssel = {{base}} + {{bonus}}",
     "payNote": "A megtekintéseket a posztolás után 7 nappal számoljuk. Csak a jóváhagyott videókért fizetünk. Heti kifizetés a Ruulon keresztül.",
     "warning": "KÉRLEK: HA A DÍJAZÁS NEM FELEL MEG NEKED, VAGY A PROJEKT NEM ILLIK HOZZÁD, NE LÉPJ TOVÁBB.",
-    "pricePerVideo": "{{price}} videónként"
+    "pricePerVideo": "{{price}} videónként",
+    "iphoneTitle": "iPhone szükséges",
+    "iphoneText": "Szükséged lesz egy iPhone-ra: azzal forgatsz és vágsz, és az apphoz kapott prémium hozzáférés csak iPhone-on működik.",
+    "faqIphoneQ": "Kell iPhone?",
+    "faqIphoneA": "Igen. iPhone-nal forgatsz, mi pedig ingyenes prémium hozzáférést adunk az apphoz, ami csak iPhone-on működik. Android telefonokat ehhez a munkához nem fogadunk el.",
+    "applyIphone": "Van iPhone-od?",
+    "yes": "Igen",
+    "no": "Nem",
+    "iphoneBlocked": "Köszönjük az érdeklődésedet! Ehhez a munkához iPhone szükséges (az app és az általunk biztosított prémium hozzáférés csak iPhone-on működik), ezért a jelentkezésedet egyelőre nem tudjuk elfogadni."
   },
   "et": {
     "heroTitle": "Töö: UGC-sisuloojaks mobiilirakendusele",
@@ -231,7 +311,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Näide: 1 valideeritud video {{views}} vaatamisega = {{base}} + {{bonus}}",
     "payNote": "Vaatamisi loetakse 7 päeva pärast postitamist. Tasu makstakse ainult valideeritud videote eest. Iganädalane väljamakse Ruuli kaudu.",
     "warning": "PALUN: KUI TASU SULLE EI SOBI VÕI PROJEKT SULLE EI SOBI, PALUN ÄRA LIIGU EDASI.",
-    "pricePerVideo": "{{price}} video kohta"
+    "pricePerVideo": "{{price}} video kohta",
+    "iphoneTitle": "iPhone on vajalik",
+    "iphoneText": "Sul on vaja iPhone'i: sa filmid ja monteerid sellega ning premium-ligipääs rakendusele, mille me sulle anname, töötab ainult iPhone'is.",
+    "faqIphoneQ": "Kas mul on iPhone'i vaja?",
+    "faqIphoneA": "Jah. Sa filmid oma iPhone'iga ja me anname sulle tasuta premium-ligipääsu rakendusele, mis töötab ainult iPhone'is. Android-telefone selle töö jaoks ei aktsepteerita.",
+    "applyIphone": "Kas sul on iPhone?",
+    "yes": "Jah",
+    "no": "Ei",
+    "iphoneBlocked": "Aitäh huvi eest! See töö eeldab iPhone'i (rakendus ja premium-ligipääs, mille me anname, töötavad ainult iPhone'is), seega me ei saa su avaldust praegu vastu võtta."
   },
   "he": {
     "heroTitle": "משרה: יוצר/ת תוכן UGC לאפליקציה סלולרית",
@@ -252,7 +340,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "דוגמה: סרטון מאושר אחד עם {{views}} צפיות = {{base}} + {{bonus}}",
     "payNote": "הצפיות נספרות 7 ימים לאחר הפרסום. רק סרטונים מאושרים מקבלים תשלום. תשלום שבועי דרך Ruul.",
     "warning": "בבקשה: אם התגמול אינו מתאים לכם, או אם הפרויקט אינו מתאים לכם, אנא אל תמשיכו הלאה.",
-    "pricePerVideo": "{{price}} לסרטון"
+    "pricePerVideo": "{{price}} לסרטון",
+    "iphoneTitle": "נדרש iPhone",
+    "iphoneText": "אתם צריכים iPhone: מצלמים ועורכים עליו, והגישה הפרימיום לאפליקציה שאנחנו נותנים לכם עובדת רק באייפון.",
+    "faqIphoneQ": "צריך iPhone?",
+    "faqIphoneA": "כן. מצלמים עם ה-iPhone שלך ואנחנו נותנים לך גישת פרימיום חינמית לאפליקציה, שעובדת רק על iPhone. טלפונים של Android לא מתקבלים לעבודה הזו.",
+    "applyIphone": "יש לך iPhone?",
+    "yes": "כן",
+    "no": "לא",
+    "iphoneBlocked": "תודה על ההתעניינות! העבודה הזו דורשת iPhone (האפליקציה והגישה הפרימיום שאנחנו מספקים עובדות רק על iPhone), ולכן אנחנו לא יכולים לקבל את המועמדות שלך כרגע."
   },
   "nl": {
     "heroTitle": "Job: UGC-contentmaker voor een mobiele app",
@@ -273,7 +369,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Voorbeeld: 1 goedgekeurde video met {{views}} views = {{base}} + {{bonus}}",
     "payNote": "Views worden geteld 7 dagen na het posten. Alleen goedgekeurde video's worden betaald. Wekelijkse betaling via Ruul.",
     "warning": "LET OP: ALS DE VERGOEDING NIET BIJ JE PAST, OF HET PROJECT NIET BIJ JE PAST, GA DAN ALSJEBLIEFT NIET VERDER.",
-    "pricePerVideo": "{{price}} per video"
+    "pricePerVideo": "{{price}} per video",
+    "iphoneTitle": "iPhone vereist",
+    "iphoneText": "Je hebt een iPhone nodig: je filmt en bewerkt daarmee, en de premiumtoegang tot de app die wij je geven werkt alleen op iPhone.",
+    "faqIphoneQ": "Heb ik een iPhone nodig?",
+    "faqIphoneA": "Ja. Je filmt met je iPhone en je krijgt van ons gratis premiumtoegang tot de app, die alleen op iPhone werkt. Android-telefoons worden voor deze job niet geaccepteerd.",
+    "applyIphone": "Heb je een iPhone?",
+    "yes": "Ja",
+    "no": "Nee",
+    "iphoneBlocked": "Bedankt voor je interesse! Voor deze job is een iPhone nodig (de app en de premiumtoegang die we bieden werken alleen op iPhone), dus we kunnen je aanmelding voorlopig niet accepteren."
   },
   "no": {
     "heroTitle": "Jobb: UGC-skaper for en mobilapp",
@@ -294,7 +398,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Eksempel: 1 godkjent video med {{views}} visninger = {{base}} + {{bonus}}",
     "payNote": "Visningene telles 7 dager etter publisering. Bare godkjente videoer blir betalt. Utbetaling hver uke via Ruul.",
     "warning": "VÆR SNILL: HVIS BETALINGEN IKKE PASSER FOR DEG, ELLER PROSJEKTET IKKE PASSER FOR DEG, IKKE GÅ LENGER.",
-    "pricePerVideo": "{{price}} per video"
+    "pricePerVideo": "{{price}} per video",
+    "iphoneTitle": "iPhone er påkrevd",
+    "iphoneText": "Du trenger en iPhone: du filmer og redigerer på den, og premium-tilgangen til appen som du får av oss, fungerer bare på iPhone.",
+    "faqIphoneQ": "Trenger jeg en iPhone?",
+    "faqIphoneA": "Ja. Du filmer med iPhone, og vi gir deg gratis premium-tilgang til appen, som bare fungerer på iPhone. Android-telefoner godtas ikke til denne jobben.",
+    "applyIphone": "Har du en iPhone?",
+    "yes": "Ja",
+    "no": "Nei",
+    "iphoneBlocked": "Takk for interessen din! Denne jobben krever en iPhone (appen og premium-tilgangen vi gir deg fungerer bare på iPhone), så vi kan dessverre ikke ta imot søknaden din for øyeblikket."
   },
   "ja": {
     "heroTitle": "求人:モバイルアプリのUGCコンテンツクリエイター",
@@ -315,7 +427,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "例:承認された動画1本が{{views}}回再生された場合 = {{base}} + {{bonus}}",
     "payNote": "再生数は投稿から7日後にカウントされます。承認された動画のみが報酬の対象です。支払いは毎週、Ruul経由で行われます。",
     "warning": "お願い:報酬が合わない場合や、プロジェクトが自分に合わないと感じた場合は、これ以上進まないでください。",
-    "pricePerVideo": "1本あたり{{price}}"
+    "pricePerVideo": "1本あたり{{price}}",
+    "iphoneTitle": "iPhoneが必要です",
+    "iphoneText": "iPhoneが必要です。撮影も編集もiPhoneでやるし、こちらで提供するアプリのプレミアムアクセスはiPhoneでしか使えません。",
+    "faqIphoneQ": "iPhoneは必要ですか?",
+    "faqIphoneA": "はい。iPhoneで撮影してもらい、アプリのプレミアムアクセスを無料で提供します。ただし、このアプリはiPhoneでしか使えません。この仕事ではAndroidのスマホは対象外です。",
+    "applyIphone": "iPhoneを持っていますか?",
+    "yes": "はい",
+    "no": "いいえ",
+    "iphoneBlocked": "ご興味を持ってくれてありがとう!この仕事にはiPhoneが必要で(アプリとこちらで提供するプレミアムアクセスはiPhone専用です)、残念ながら今回は応募を受け付けることができません。"
   },
   "ko": {
     "heroTitle": "직무: 모바일 앱 UGC 콘텐츠 크리에이터",
@@ -336,7 +456,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "예시: 검수를 통과한 영상 1개의 조회수가 {{views}}회 = {{base}} + {{bonus}}",
     "payNote": "조회수는 게시 7일 후에 집계돼요. 검수를 통과한 영상만 보수가 지급돼요. 보수는 Ruul을 통해 매주 지급돼요.",
     "warning": "부탁드려요: 보수가 맞지 않거나 프로젝트가 나와 맞지 않는다면, 여기서 멈춰 주세요.",
-    "pricePerVideo": "영상당 {{price}}"
+    "pricePerVideo": "영상당 {{price}}",
+    "iphoneTitle": "iPhone 필수",
+    "iphoneText": "iPhone이 꼭 있어야 해요. iPhone으로 촬영하고 편집하는 데다, 저희가 드리는 앱 프리미엄 이용권도 iPhone에서만 쓸 수 있거든요.",
+    "faqIphoneQ": "iPhone이 꼭 필요한가요?",
+    "faqIphoneA": "네. iPhone으로 촬영해야 하고, 저희가 무료로 드리는 앱 프리미엄 이용권도 iPhone에서만 작동해요. 이 일에는 Android 휴대폰은 사용할 수 없어요.",
+    "applyIphone": "iPhone 있어요?",
+    "yes": "네",
+    "no": "아니요",
+    "iphoneBlocked": "관심 가져 주셔서 고마워요! 이 일은 iPhone이 필요해서(앱과 저희가 제공하는 프리미엄 이용권은 iPhone 전용이에요) 아쉽지만 지금은 지원을 받을 수가 없어요."
   },
   "lv": {
     "heroTitle": "Darbs: UGC satura veidotājs/-a mobilajai lietotnei",
@@ -357,7 +485,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Piemērs: 1 apstiprināts video ar {{views}} skatījumiem = {{base}} + {{bonus}}",
     "payNote": "Skatījumus skaita 7 dienas pēc publicēšanas. Tiek apmaksāti tikai apstiprinātie video. Izmaksa katru nedēļu caur Ruul.",
     "warning": "LŪDZU: JA ATALGOJUMS TEVI NEAPMIERINA VAI PROJEKTS TEV NEPIEDER, LŪDZU, NEVIRZIES TĀLĀK.",
-    "pricePerVideo": "{{price}} par video"
+    "pricePerVideo": "{{price}} par video",
+    "iphoneTitle": "Nepieciešams iPhone",
+    "iphoneText": "Tev vajadzīgs iPhone: ar to tu filmē un montē, un premium piekļuve lietotnei, ko mēs tev piešķiram, darbojas tikai iPhone tālrunī.",
+    "faqIphoneQ": "Vai man vajag iPhone?",
+    "faqIphoneA": "Jā. Tu filmē ar savu iPhone, un mēs tev bez maksas piešķiram premium piekļuvi lietotnei, kas darbojas tikai iPhone tālrunī. Android tālruņi šim darbam netiek pieņemti.",
+    "applyIphone": "Vai tev ir iPhone?",
+    "yes": "Jā",
+    "no": "Nē",
+    "iphoneBlocked": "Paldies par interesi! Šim darbam nepieciešams iPhone (lietotne un premium piekļuve, ko mēs nodrošinām, darbojas tikai iPhone tālrunī), tāpēc pašlaik nevaram pieņemt tavu pieteikumu."
   },
   "lt": {
     "heroTitle": "Darbas: UGC turinio kūrėjas (-a) mobiliajai programėlei",
@@ -378,7 +514,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Pavyzdys: 1 patvirtintas vaizdo įrašas su {{views}} peržiūrų = {{base}} + {{bonus}}",
     "payNote": "Peržiūros skaičiuojamos praėjus 7 dienoms po paskelbimo. Mokama tik už patvirtintus vaizdo įrašus. Mokėjimas kiekvieną savaitę per Ruul.",
     "warning": "PRAŠAU: JEI ATLYGIS TAU NETINKA ARBA PROJEKTAS TAVĘS NEDOMINA, TOLIAU NEIK.",
-    "pricePerVideo": "{{price}} už vaizdo įrašą"
+    "pricePerVideo": "{{price}} už vaizdo įrašą",
+    "iphoneTitle": "Reikalingas iPhone",
+    "iphoneText": "Tau reikia iPhone: juo filmuoji ir montuoji, o premium prieiga prie programėlės, kurią tau suteikiame, veikia tik iPhone.",
+    "faqIphoneQ": "Ar man reikia iPhone?",
+    "faqIphoneA": "Taip. Filmuoji savo iPhone, o mes suteikiame tau nemokamą premium prieigą prie programėlės, kuri veikia tik iPhone. Android telefonai šiam darbui netinka.",
+    "applyIphone": "Ar turi iPhone?",
+    "yes": "Taip",
+    "no": "Ne",
+    "iphoneBlocked": "Ačiū už susidomėjimą! Šiam darbui reikalingas iPhone (programėlė ir premium prieiga, kurią suteikiame, veikia tik iPhone), todėl šiuo metu negalime priimti tavo paraiškos."
   },
   "pt": {
     "heroTitle": "Vaga: criador(a) de conteúdo UGC para um app de celular",
@@ -399,7 +543,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Exemplo: 1 vídeo validado com {{views}} visualizações = {{base}} + {{bonus}}",
     "payNote": "As visualizações são contadas 7 dias após a postagem. Só os vídeos validados são pagos. Pagamento semanal via Ruul.",
     "warning": "POR FAVOR: SE A REMUNERAÇÃO NÃO FOR ADEQUADA PARA VOCÊ, OU SE O PROJETO NÃO COMBINAR COM VOCÊ, NÃO PROSSIGA.",
-    "pricePerVideo": "{{price}} por vídeo"
+    "pricePerVideo": "{{price}} por vídeo",
+    "iphoneTitle": "iPhone obrigatório",
+    "iphoneText": "Você precisa de um iPhone: é nele que você grava e edita, e o acesso premium ao app que a gente te dá funciona só no iPhone.",
+    "faqIphoneQ": "Preciso ter um iPhone?",
+    "faqIphoneA": "Sim. Você grava com o seu iPhone e a gente te dá acesso premium gratuito ao app, que só funciona no iPhone. Celulares Android não são aceitos para este trabalho.",
+    "applyIphone": "Você tem um iPhone?",
+    "yes": "Sim",
+    "no": "Não",
+    "iphoneBlocked": "Obrigado pelo seu interesse! Este trabalho exige um iPhone (o app e o acesso premium que oferecemos funcionam só no iPhone), então não podemos aceitar a sua candidatura por enquanto."
   },
   "pl": {
     "heroTitle": "Praca: twórca/twórczyni treści UGC dla aplikacji mobilnej",
@@ -420,7 +572,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Przykład: 1 zatwierdzony film z {{views}} wyświetleniami = {{base}} + {{bonus}}",
     "payNote": "Wyświetlenia liczymy 7 dni po publikacji. Płatne są tylko zatwierdzone filmy. Płatność co tydzień przez Ruul.",
     "warning": "PROSIMY: JEŚLI WYNAGRODZENIE CI NIE ODPOWIADA LUB PROJEKT DO CIEBIE NIE PASUJE, NIE IDŹ DALEJ.",
-    "pricePerVideo": "{{price}} za film"
+    "pricePerVideo": "{{price}} za film",
+    "iphoneTitle": "Wymagany iPhone",
+    "iphoneText": "Potrzebujesz iPhone'a: na nim nagrywasz i montujesz, a dostęp premium do aplikacji, który od nas dostajesz, działa tylko na iPhonie.",
+    "faqIphoneQ": "Czy potrzebuję iPhone'a?",
+    "faqIphoneA": "Tak. Nagrywasz swoim iPhone'em, a my dajemy Ci darmowy dostęp premium do aplikacji, która działa tylko na iPhonie. Telefony z Androidem nie są akceptowane do tej pracy.",
+    "applyIphone": "Masz iPhone'a?",
+    "yes": "Tak",
+    "no": "Nie",
+    "iphoneBlocked": "Dzięki za zainteresowanie! Ta praca wymaga iPhone'a (aplikacja i dostęp premium, które zapewniamy, działają tylko na iPhonie), więc na razie nie możemy przyjąć Twojego zgłoszenia."
   },
   "sk": {
     "heroTitle": "Práca: tvorca/tvorkyňa UGC obsahu pre mobilnú aplikáciu",
@@ -441,7 +601,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Príklad: 1 schválené video s {{views}} zhliadnutiami = {{base}} + {{bonus}}",
     "payNote": "Zhliadnutia sa počítajú 7 dní po zverejnení. Platíme len schválené videá. Platba každý týždeň cez Ruul.",
     "warning": "PROSÍM: AK TI ODMENA NEVYHOVUJE, ALEBO AK PROJEKT NIE JE PRE TEBA, NEPOKRAČUJ ĎALEJ.",
-    "pricePerVideo": "{{price}} za video"
+    "pricePerVideo": "{{price}} za video",
+    "iphoneTitle": "Potrebuješ iPhone",
+    "iphoneText": "Potrebuješ iPhone: natáčaš a strihaš na ňom a prémiový prístup k aplikácii, ktorý ti dáme, funguje iba na iPhone.",
+    "faqIphoneQ": "Potrebujem iPhone?",
+    "faqIphoneA": "Áno. Natáčaš na svoj iPhone a my ti dáme bezplatný prémiový prístup k aplikácii, ktorá funguje iba na iPhone. Telefóny s Androidom na túto prácu neakceptujeme.",
+    "applyIphone": "Máš iPhone?",
+    "yes": "Áno",
+    "no": "Nie",
+    "iphoneBlocked": "Ďakujeme za tvoj záujem! Táto práca vyžaduje iPhone (aplikácia a prémiový prístup, ktorý poskytujeme, fungujú iba na iPhone), a preto zatiaľ nemôžeme prijať tvoju prihlášku."
   },
   "sr": {
     "heroTitle": "Posao: UGC kreator sadržaja za mobilnu aplikaciju",
@@ -462,7 +630,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Primer: 1 odobren video sa {{views}} pregleda = {{base}} + {{bonus}}",
     "payNote": "Pregledi se računaju 7 dana nakon objave. Plaćaju se samo odobreni video-snimci. Isplata svake nedelje preko Ruul-a.",
     "warning": "MOLIMO TE: AKO TE NAKNADA NE ZADOVOLJAVA, ILI TI PROJEKAT NE ODGOVARA, NEMOJ IĆI DALJE.",
-    "pricePerVideo": "{{price}} po videu"
+    "pricePerVideo": "{{price}} po videu",
+    "iphoneTitle": "Potreban je iPhone",
+    "iphoneText": "Potreban ti je iPhone: na njemu snimaš i montiraš, a premium pristup aplikaciji koji ti dajemo radi samo na iPhone-u.",
+    "faqIphoneQ": "Da li mi treba iPhone?",
+    "faqIphoneA": "Da. Snimaš svojim iPhone-om, a mi ti besplatno dajemo premium pristup aplikaciji, koja radi samo na iPhone-u. Android telefoni se za ovaj posao ne prihvataju.",
+    "applyIphone": "Imaš li iPhone?",
+    "yes": "Da",
+    "no": "Ne",
+    "iphoneBlocked": "Hvala ti na interesovanju! Za ovaj posao je potreban iPhone (aplikacija i premium pristup koje obezbeđujemo rade samo na iPhone-u), pa za sada ne možemo da prihvatimo tvoju prijavu."
   },
   "ro": {
     "heroTitle": "Job: creator de conținut UGC pentru o aplicație mobilă",
@@ -483,7 +659,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Exemplu: 1 videoclip validat cu {{views}} vizualizări = {{base}} + {{bonus}}",
     "payNote": "Vizualizările sunt numărate la 7 zile după postare. Doar videoclipurile validate sunt plătite. Plata se face săptămânal prin Ruul.",
     "warning": "TE ROG: DACĂ REMUNERAȚIA NU ÎȚI CONVINE SAU DACĂ PROIECTUL NU ți SE POTRIVEȘTE, NU MERGE MAI DEPARTE.",
-    "pricePerVideo": "{{price}} per videoclip"
+    "pricePerVideo": "{{price}} per videoclip",
+    "iphoneTitle": "Este necesar un iPhone",
+    "iphoneText": "Ai nevoie de un iPhone: filmezi și editezi pe el, iar accesul premium la aplicație pe care ți-l oferim funcționează doar pe iPhone.",
+    "faqIphoneQ": "Am nevoie de un iPhone?",
+    "faqIphoneA": "Da. Filmezi cu iPhone-ul tău, iar noi îți oferim acces premium gratuit la aplicație, care funcționează doar pe iPhone. Telefoanele Android nu sunt acceptate pentru această colaborare.",
+    "applyIphone": "Ai un iPhone?",
+    "yes": "Da",
+    "no": "Nu",
+    "iphoneBlocked": "Mulțumim pentru interes! Această colaborare necesită un iPhone (aplicația și accesul premium pe care le oferim funcționează doar pe iPhone), așa că deocamdată nu putem accepta aplicația ta."
   },
   "sl": {
     "heroTitle": "Delo: ustvarjalec/ustvarjalka UGC vsebin za mobilno aplikacijo",
@@ -504,7 +688,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Primer: 1 potrjen video z {{views}} ogledi = {{base}} + {{bonus}}",
     "payNote": "Ogledi se štejejo 7 dni po objavi. Plačani so samo potrjeni videi. Plačilo vsak teden prek Ruul.",
     "warning": "PROSIMO: ČE TI PLAČILO NE USTREZA ALI ČE PROJEKT NI ZA TEBE, NE hODI NAPREJ.",
-    "pricePerVideo": "{{price}} na video"
+    "pricePerVideo": "{{price}} na video",
+    "iphoneTitle": "Potreben je iPhone",
+    "iphoneText": "Potrebuješ iPhone: nanj snemaš in montiraš, premium dostop do aplikacije, ki ti ga omogočimo, pa deluje samo na iPhonu.",
+    "faqIphoneQ": "Ali potrebujem iPhone?",
+    "faqIphoneA": "Da. Snemaš z iPhonom, mi pa ti brezplačno omogočimo premium dostop do aplikacije, ki deluje samo na iPhonu. Telefoni Android za to delo niso sprejeti.",
+    "applyIphone": "Ali imaš iPhone?",
+    "yes": "Da",
+    "no": "Ne",
+    "iphoneBlocked": "Hvala za tvoje zanimanje! To delo zahteva iPhone (aplikacija in premium dostop, ki ga zagotovimo, delujeta samo na iPhonu), zato tvoje prijave za zdaj žal ne moremo sprejeti."
   },
   "sv": {
     "heroTitle": "Jobb: UGC-skapare för en mobilapp",
@@ -525,7 +717,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Exempel: 1 godkänd video med {{views}} visningar = {{base}} + {{bonus}}",
     "payNote": "Visningarna räknas 7 dagar efter publicering. Bara godkända videor betalas. Utbetalning varje vecka via Ruul.",
     "warning": "SNÄLLA: OM ERSÄTTNINGEN INTE PASSAR DIG, ELLER OM PROJEKTET INTE PASSAR DIG, GÅ INTE LÄNGRE.",
-    "pricePerVideo": "{{price}} per video"
+    "pricePerVideo": "{{price}} per video",
+    "iphoneTitle": "iPhone krävs",
+    "iphoneText": "Du behöver en iPhone: du filmar och redigerar på den, och premiumåtkomsten till appen som du får av oss fungerar bara på iPhone.",
+    "faqIphoneQ": "Behöver jag en iPhone?",
+    "faqIphoneA": "Ja. Du filmar med din iPhone och vi ger dig gratis premiumåtkomst till appen, som bara fungerar på iPhone. Android-telefoner accepteras inte för det här jobbet.",
+    "applyIphone": "Har du en iPhone?",
+    "yes": "Ja",
+    "no": "Nej",
+    "iphoneBlocked": "Tack för ditt intresse! Det här jobbet kräver en iPhone (appen och premiumåtkomsten som vi tillhandahåller fungerar bara på iPhone), så vi kan tyvärr inte ta emot din ansökan just nu."
   },
   "uk": {
     "heroTitle": "Робота: UGC-креатор для мобільного застосунку",
@@ -546,7 +746,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Приклад: 1 затверджене відео з {{views}} переглядами = {{base}} + {{bonus}}",
     "payNote": "Перегляди рахуються через 7 днів після публікації. Оплачуються лише затверджені відео. Щотижнева виплата через Ruul.",
     "warning": "БУДЬ ЛАСКА: ЯКЩО ОПЛАТА ТОБІ НЕ ПІДХОДИТЬ АБО ПРОЄКТ ТОБІ НЕ ПІДХОДИТЬ, НЕ ЙДИ ДАЛІ.",
-    "pricePerVideo": "{{price}} за відео"
+    "pricePerVideo": "{{price}} за відео",
+    "iphoneTitle": "Потрібен iPhone",
+    "iphoneText": "Тобі потрібен iPhone: ти знімаєш і монтуєш на ньому, а преміум-доступ до застосунку, який ми тобі надаємо, працює лише на iPhone.",
+    "faqIphoneQ": "Чи потрібен iPhone?",
+    "faqIphoneA": "Так. Ти знімаєш на свій iPhone, а ми безкоштовно надаємо тобі преміум-доступ до застосунку, який працює лише на iPhone. Телефони на Android для цієї роботи не підходять.",
+    "applyIphone": "У тебе є iPhone?",
+    "yes": "Так",
+    "no": "Ні",
+    "iphoneBlocked": "Дякуємо за інтерес! Для цієї роботи потрібен iPhone (застосунок і преміум-доступ, який ми надаємо, працюють лише на iPhone), тому наразі ми не можемо прийняти твою заявку."
   },
   "is": {
     "heroTitle": "Starf: UGC efnisskapari fyrir snjallforrit",
@@ -567,7 +775,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Dæmi: 1 samþykkt myndband með {{views}} áhorfum = {{base}} + {{bonus}}",
     "payNote": "Áhorf eru talin 7 dögum eftir birtingu. Aðeins samþykkt myndbönd eru greidd. Greitt vikulega í gegnum Ruul.",
     "warning": "ENDILEGA: EF LAUNIN HENTA ÞÉR EKKI, EÐA VERKEFNIÐ HENTAR ÞÉR EKKI, FARÐU ÞÁ EKKI LENGRA.",
-    "pricePerVideo": "{{price}} fyrir hvert myndband"
+    "pricePerVideo": "{{price}} fyrir hvert myndband",
+    "iphoneTitle": "iPhone nauðsynlegur",
+    "iphoneText": "Þú þarft iPhone: þú tekur upp og klippir á hann, og premium-aðgangurinn að appinu sem við gefum þér virkar eingöngu á iPhone.",
+    "faqIphoneQ": "Þarf ég iPhone?",
+    "faqIphoneA": "Já. Þú tekur upp með iPhone og við gefum þér frían premium-aðgang að appinu, sem virkar eingöngu á iPhone. Android-símar eru ekki samþykktir fyrir þetta verkefni.",
+    "applyIphone": "Áttu iPhone?",
+    "yes": "Já",
+    "no": "Nei",
+    "iphoneBlocked": "Takk fyrir áhugann! Þetta starf krefst iPhone (appið og premium-aðgangurinn sem við útvegum virka eingöngu á iPhone), þannig að við getum því miður ekki tekið við umsókninni þinni að svo stöddu."
   },
   "tr": {
     "heroTitle": "İş: Mobil uygulama için UGC içerik üreticisi",
@@ -588,7 +804,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Örnek: {{views}} izlenmeye sahip 1 onaylanmış video = {{base}} + {{bonus}}",
     "payNote": "İzlenmeler paylaşımdan 7 gün sonra sayılır. Yalnızca onaylanan videolar için ödeme yapılır. Ödeme her hafta Ruul üzerinden yapılır.",
     "warning": "LÜTFEN: ÜCRET SANA UYMUYORSA YA DA PROJE SANA UYGUN DEĞİLSE, LÜTFEN DAHA FAZLA İLERLEME.",
-    "pricePerVideo": "Video başına {{price}}"
+    "pricePerVideo": "Video başına {{price}}",
+    "iphoneTitle": "iPhone gerekli",
+    "iphoneText": "Bir iPhone'a ihtiyacın var: çekimleri ve kurguyu onunla yapıyorsun, ayrıca sana verdiğimiz uygulamanın premium erişimi sadece iPhone'da çalışıyor.",
+    "faqIphoneQ": "iPhone'um olması gerekiyor mu?",
+    "faqIphoneA": "Evet. iPhone'unla çekim yapıyorsun ve sana uygulamaya ücretsiz premium erişim veriyoruz, bu erişim sadece iPhone'da çalışıyor. Bu iş için Android telefonlar kabul edilmiyor.",
+    "applyIphone": "iPhone'un var mı?",
+    "yes": "Evet",
+    "no": "Hayır",
+    "iphoneBlocked": "İlgin için teşekkürler! Bu iş için iPhone gerekiyor (uygulama ve sağladığımız premium erişim sadece iPhone'da çalışıyor), bu yüzden başvurunu şimdilik kabul edemiyoruz."
   },
   "hy": {
     "heroTitle": "Աշխատանք՝ UGC կոնտենտ ստեղծող բջջային հավելվածի համար",
@@ -609,7 +833,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Օրինակ՝ 1 հաստատված տեսանյութ {{views}} դիտումով = {{base}} + {{bonus}}",
     "payNote": "Դիտումները հաշվվում են հրապարակումից 7 օր հետո։ Վճարվում են միայն հաստատված տեսանյութերը։ Վճարումը՝ շաբաթական, Ruul-ի միջոցով։",
     "warning": "ԽՆԴՐՈՒՄ ԵՆՔ՝ ԵԹԵ ՎԱՐՁԱՏՐՈՒԹՅՈՒՆԸ ՔԵԶ ՉԻ ՀԱՄԱՊԱՏԱՍԽԱՆՈՒՄ, ԿԱՄ ՆԱԽԱԳԻԾԸ ՔԵԶ ՉԻ ՀԱՄԱՊԱՏԱՍԽԱՆՈՒՄ, ԽՆԴՐՈՒՄ ԵՆՔ ԱՎԵԼԻ ՇԱՏ ՉԳԱԼ։",
-    "pricePerVideo": "{{price}} մեկ տեսանյութի համար"
+    "pricePerVideo": "{{price}} մեկ տեսանյութի համար",
+    "iphoneTitle": "Պետք է iPhone",
+    "iphoneText": "Քեզ պետք է iPhone․ դու նկարահանում և մոնտաժում ես հենց դրանով, իսկ հավելվածի պրեմիում հասանելիությունը, որ մենք քեզ տալիս ենք, աշխատում է միայն iPhone-ով։",
+    "faqIphoneQ": "Պե՞տք է iPhone ունենալ։",
+    "faqIphoneA": "Այո։ Դու նկարահանում ես քո iPhone-ով, իսկ մենք քեզ անվճար պրեմիում հասանելիություն ենք տալիս հավելվածին, որն աշխատում է միայն iPhone-ով։ Android հեռախոսներն այս աշխատանքի համար չեն ընդունվում։",
+    "applyIphone": "iPhone ունե՞ս։",
+    "yes": "Այո",
+    "no": "Ոչ",
+    "iphoneBlocked": "Շնորհակալություն հետաքրքրության համար։ Այս աշխատանքի համար անհրաժեշտ է iPhone (հավելվածը և մեր տրամադրած պրեմիում հասանելիությունը աշխատում են միայն iPhone-ով), ուստի առայժմ չենք կարող ընդունել քո հայտը։"
   },
   "ka": {
     "heroTitle": "ვაკანსია: UGC კონტენტის შემქმნელი მობილური აპისთვის",
@@ -630,7 +862,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "მაგალითი: 1 ვალიდირებული ვიდეო {{views}} ნახვით = {{base}} + {{bonus}}",
     "payNote": "ნახვები ითვლება გამოქვეყნებიდან 7 დღის შემდეგ. მხოლოდ ვალიდირებული ვიდეოები ანაზღაურდება. ყოველკვირეული გადახდა Ruul-ის მეშვეობით.",
     "warning": "გთხოვთ: თუ ანაზღაურება არ გიწყობთ ხელს, ან პროექტი არ გესადაგებათ, გთხოვთ, ნუ გააგრძელებთ.",
-    "pricePerVideo": "{{price}} თითო ვიდეოზე"
+    "pricePerVideo": "{{price}} თითო ვიდეოზე",
+    "iphoneTitle": "საჭიროა iPhone",
+    "iphoneText": "შენ გჭირდება iPhone: მასზე იღებ და ამონტაჟებ, ხოლო აპლიკაციაზე პრემიუმ წვდომა, რომელსაც ჩვენ გაძლევთ, მხოლოდ iPhone-ზე მუშაობს.",
+    "faqIphoneQ": "მჭირდება თუ არა iPhone?",
+    "faqIphoneA": "დიახ. იღებ შენი iPhone-ით, ჩვენ კი აპლიკაციაზე უფასო პრემიუმ წვდომას გაძლევთ, რომელიც მხოლოდ iPhone-ზე მუშაობს. Android ტელეფონები ამ სამუშაოსთვის არ მიიღება.",
+    "applyIphone": "გაქვს iPhone?",
+    "yes": "კი",
+    "no": "არა",
+    "iphoneBlocked": "გმადლობთ დაინტერესებისთვის! ამ სამუშაოსთვის საჭიროა iPhone (აპლიკაცია და პრემიუმ წვდომა, რომელსაც ჩვენ გთავაზობთ, მხოლოდ iPhone-ზე მუშაობს), ამიტომ ამ ეტაპზე შენს განაცხადს ვერ მივიღებთ."
   },
   "ms": {
     "heroTitle": "Kerja: Pencipta kandungan UGC untuk aplikasi mudah alih",
@@ -651,7 +891,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Contoh: 1 video yang disahkan dengan {{views}} tontonan = {{base}} + {{bonus}}",
     "payNote": "Tontonan dikira 7 hari selepas disiarkan. Hanya video yang disahkan akan dibayar. Pembayaran setiap minggu melalui Ruul.",
     "warning": "HARAP MAKLUM: JIKA BAYARAN TIDAK SESUAI DENGAN ANDA, ATAU PROJEK INI TIDAK SESUAI DENGAN ANDA, SILA JANGAN TERUSKAN.",
-    "pricePerVideo": "{{price}} setiap video"
+    "pricePerVideo": "{{price}} setiap video",
+    "iphoneTitle": "iPhone diperlukan",
+    "iphoneText": "Kamu perlukan iPhone: kamu merakam dan mengedit video menggunakannya, dan akses premium ke app yang kami berikan hanya berfungsi pada iPhone.",
+    "faqIphoneQ": "Adakah saya perlukan iPhone?",
+    "faqIphoneA": "Ya. Kamu merakam video dengan iPhone dan kami beri kamu akses premium percuma ke app tersebut, yang hanya berfungsi pada iPhone. Telefon Android tidak diterima untuk kerja ini.",
+    "applyIphone": "Adakah kamu ada iPhone?",
+    "yes": "Ya",
+    "no": "Tidak",
+    "iphoneBlocked": "Terima kasih atas minat kamu! Kerja ini memerlukan iPhone (app dan akses premium yang kami sediakan hanya untuk iPhone), jadi buat masa ini kami tidak dapat menerima permohonan kamu."
   },
   "id": {
     "heroTitle": "Lowongan: kreator konten UGC untuk aplikasi mobile",
@@ -672,7 +920,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Contoh: 1 video yang divalidasi dengan {{views}} views = {{base}} + {{bonus}}",
     "payNote": "Views dihitung 7 hari setelah posting. Hanya video yang divalidasi yang dibayar. Pembayaran mingguan lewat Ruul.",
     "warning": "TOLONG: JIKA BAYARANNYA TIDAK COCOK UNTUKMU, ATAU PROYEKNYA TIDAK SESUAI DENGANMU, JANGAN LANJUT LEBIH JAUH.",
-    "pricePerVideo": "{{price}} per video"
+    "pricePerVideo": "{{price}} per video",
+    "iphoneTitle": "Wajib punya iPhone",
+    "iphoneText": "Kamu butuh iPhone: kamu merekam dan mengedit di iPhone, dan akses premium ke aplikasi yang kami berikan hanya bisa dipakai di iPhone.",
+    "faqIphoneQ": "Apakah aku harus punya iPhone?",
+    "faqIphoneA": "Ya. Kamu merekam pakai iPhone, dan kami memberimu akses premium gratis ke aplikasi yang hanya bisa dipakai di iPhone. Ponsel Android tidak diterima untuk pekerjaan ini.",
+    "applyIphone": "Apakah kamu punya iPhone?",
+    "yes": "Ya",
+    "no": "Tidak",
+    "iphoneBlocked": "Terima kasih atas minatmu! Pekerjaan ini membutuhkan iPhone (aplikasi dan akses premium yang kami berikan hanya tersedia di iPhone), jadi untuk saat ini kami belum bisa menerima lamaranmu."
   },
   "vi": {
     "heroTitle": "Việc làm: Nhà sáng tạo nội dung UGC cho một ứng dụng di động",
@@ -693,7 +949,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Ví dụ: 1 video được duyệt với {{views}} lượt xem = {{base}} + {{bonus}}",
     "payNote": "Lượt xem được tính sau khi đăng 7 ngày. Chỉ những video được duyệt mới được trả tiền. Thanh toán hằng tuần qua Ruul.",
     "warning": "XIN HÃY LƯU Ý: NẾU MỨC THÙ LAO KHÔNG PHÙ HỢP VỚI BẠN, HOẶC DỰ ÁN KHÔNG PHÙ HỢP VỚI BẠN, XIN ĐỪNG TIẾP TỤC.",
-    "pricePerVideo": "{{price}} mỗi video"
+    "pricePerVideo": "{{price}} mỗi video",
+    "iphoneTitle": "Cần có iPhone",
+    "iphoneText": "Bạn cần có iPhone: bạn quay và dựng video ngay trên đó, và quyền truy cập premium vào ứng dụng mà tụi mình tặng bạn chỉ dùng được trên iPhone.",
+    "faqIphoneQ": "Mình có cần iPhone không?",
+    "faqIphoneA": "Có nhé. Bạn quay video bằng iPhone và tụi mình tặng bạn quyền truy cập premium miễn phí vào ứng dụng, mà ứng dụng này chỉ chạy trên iPhone. Điện thoại Android không được chấp nhận cho công việc này.",
+    "applyIphone": "Bạn có iPhone không?",
+    "yes": "Có",
+    "no": "Không",
+    "iphoneBlocked": "Cảm ơn bạn đã quan tâm! Công việc này yêu cầu có iPhone (ứng dụng và quyền truy cập premium mà tụi mình cung cấp chỉ dùng được trên iPhone), nên hiện tại tụi mình chưa thể nhận đơn ứng tuyển của bạn."
   },
   "th": {
     "heroTitle": "งาน: ครีเอเตอร์คอนเทนต์ UGC สำหรับแอปมือถือ",
@@ -714,7 +978,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "ตัวอย่าง: 1 วิดีโอที่ผ่านการตรวจสอบ ยอดวิว {{views}} = {{base}} + {{bonus}}",
     "payNote": "ยอดวิวจะนับหลังโพสต์ 7 วัน จ่ายเฉพาะวิดีโอที่ผ่านการตรวจสอบเท่านั้น จ่ายเงินทุกสัปดาห์ผ่าน Ruul",
     "warning": "ขอร้องนะ: ถ้าค่าตอบแทนไม่เหมาะกับคุณ หรือโปรเจกต์นี้ไม่ใช่แนวของคุณ กรุณาอย่าไปต่อ",
-    "pricePerVideo": "{{price}} ต่อวิดีโอ"
+    "pricePerVideo": "{{price}} ต่อวิดีโอ",
+    "iphoneTitle": "ต้องมี iPhone",
+    "iphoneText": "คุณต้องมี iPhone เพราะคุณจะถ่ายและตัดต่อบนเครื่องนี้ และสิทธิ์พรีเมียมของแอปที่เรามอบให้ใช้ได้เฉพาะบน iPhone เท่านั้น",
+    "faqIphoneQ": "ต้องมี iPhone ไหม",
+    "faqIphoneA": "ต้องมีนะ คุณจะถ่ายวิดีโอด้วย iPhone และเรามอบสิทธิ์พรีเมียมของแอปให้ใช้ฟรี ซึ่งใช้ได้เฉพาะบน iPhone เท่านั้น งานนี้ไม่รับโทรศัพท์ Android",
+    "applyIphone": "คุณมี iPhone ไหม",
+    "yes": "มี",
+    "no": "ไม่มี",
+    "iphoneBlocked": "ขอบคุณที่สนใจนะ! งานนี้ต้องใช้ iPhone (แอปและสิทธิ์พรีเมียมที่เราให้ใช้ได้เฉพาะบน iPhone เท่านั้น) เราจึงยังไม่สามารถรับใบสมัครของคุณได้ในตอนนี้"
   },
   "kk": {
     "heroTitle": "Жұмыс: мобильді қосымшаға арналған UGC контент жасаушы",
@@ -735,7 +1007,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "Мысал: {{views}} қаралымы бар 1 расталған бейне = {{base}} + {{bonus}}",
     "payNote": "Қаралымдар жарияланғаннан кейін 7 күннен соң есептеледі. Тек расталған бейнелерге ақы төленеді. Төлем апта сайын Ruul арқылы жүреді.",
     "warning": "ӨТІНЕМІН: ЕГЕР ТӨЛЕМ САҒАН СЫЙМАСА НЕМЕСЕ ЖОБА САҒАН ЛАЙЫҚ БОЛМАСА, ОДАН ӘРІ ЖАЛҒАСТЫРМА.",
-    "pricePerVideo": "Бір бейне үшін {{price}}"
+    "pricePerVideo": "Бір бейне үшін {{price}}",
+    "iphoneTitle": "iPhone қажет",
+    "iphoneText": "Саған iPhone керек: сен соның көмегімен түсіріп, монтаж жасайсың, ал біз беретін қолданбаға премиум қолжетімділік тек iPhone-да жұмыс істейді.",
+    "faqIphoneQ": "iPhone керек пе?",
+    "faqIphoneA": "Иә. Сен iPhone-мен түсіресің, ал біз саған қолданбаға тегін премиум қолжетімділік береміз, ол тек iPhone-да жұмыс істейді. Бұл жұмыс үшін Android телефондары қабылданбайды.",
+    "applyIphone": "Сенде iPhone бар ма?",
+    "yes": "Иә",
+    "no": "Жоқ",
+    "iphoneBlocked": "Қызығушылық танытқаның үшін рахмет! Бұл жұмысқа iPhone қажет (қолданба мен біз беретін премиум қолжетімділік тек iPhone-да жұмыс істейді), сондықтан қазір сенің өтінімеңді қабылдай алмаймыз."
   },
   "hi": {
     "heroTitle": "नौकरी: मोबाइल ऐप के लिए UGC कंटेंट क्रिएटर",
@@ -756,6 +1036,14 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "payExample": "उदाहरण: {{views}} व्यूज़ के साथ 1 मान्य वीडियो = {{base}} + {{bonus}}",
     "payNote": "व्यूज़ पोस्ट करने के 7 दिन बाद गिने जाते हैं। केवल मान्य वीडियो का ही भुगतान किया जाता है। Ruul के माध्यम से साप्ताहिक भुगतान।",
     "warning": "कृपया: यदि पारिश्रमिक आपको सूट नहीं करता है, या परियोजना आपको फिट नहीं बैठती है, तो कृपया आगे न बढ़ें।",
-    "pricePerVideo": "प्रति वीडियो {{price}}"
+    "pricePerVideo": "प्रति वीडियो {{price}}",
+    "iphoneTitle": "iPhone ज़रूरी है",
+    "iphoneText": "तुम्हारे पास iPhone होना चाहिए: तुम उसी पर शूट और एडिट करते हो, और ऐप का जो प्रीमियम एक्सेस हम तुम्हें देते हैं, वह सिर्फ़ iPhone पर ही चलता है।",
+    "faqIphoneQ": "क्या मेरे पास iPhone होना ज़रूरी है?",
+    "faqIphoneA": "हाँ। तुम अपने iPhone से वीडियो शूट करते हो और हम तुम्हें ऐप का मुफ़्त प्रीमियम एक्सेस देते हैं, जो सिर्फ़ iPhone पर चलता है। इस जॉब के लिए Android फ़ोन स्वीकार नहीं किए जाते।",
+    "applyIphone": "क्या तुम्हारे पास iPhone है?",
+    "yes": "हाँ",
+    "no": "नहीं",
+    "iphoneBlocked": "तुमने रुचि दिखाई, इसके लिए धन्यवाद! इस जॉब के लिए iPhone चाहिए (ऐप और हमारी तरफ़ से मिलने वाला प्रीमियम एक्सेस सिर्फ़ iPhone पर ही काम करते हैं), इसलिए हम अभी तुम्हारा आवेदन स्वीकार नहीं कर सकते।"
   }
 };

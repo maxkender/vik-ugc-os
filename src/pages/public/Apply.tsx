@@ -10,6 +10,8 @@ import { ConsentBanner } from "@/components/public/ConsentBanner";
 import { Button, Field, IconTile, Input, Select, Spinner, Textarea, type Tint } from "@/components/ui";
 import { uiLangForCountry } from "@/i18n";
 import { JobWarning } from "@/components/public/JobWarning";
+import { landingJob } from "@/i18n/landingJob";
+import { cn } from "@/lib/utils";
 import { ageOn } from "@shared/zones.ts";
 import { flag } from "@/lib/utils";
 import { LangSwitcher, keptParams, useOpenCountries } from "./Landing";
@@ -21,7 +23,7 @@ const BRAND = "Vik Studios";
 type Form = {
   first_name: string; last_name: string; birthdate: string; email: string; phone: string; country: string; languages: string;
   ugc_experience: string; tiktok_url: string; tiktok_followers: string; instagram_url: string; instagram_followers: string;
-  equipment: string; availability: string; motivation: string; website: string; adult: boolean; consent: boolean;
+  equipment: string; availability: string; motivation: string; website: string; adult: boolean; consent: boolean; has_iphone: "" | "yes" | "no";
 };
 
 export default function Apply() {
@@ -29,12 +31,13 @@ export default function Apply() {
   const [params] = useSearchParams();
   const pixel = usePixel(params, "apply");
   const { t, i18n } = useTranslation();
+  const lj = landingJob(i18n.resolvedLanguage);
   const { data: countries, isLoading } = useOpenCountries();
   const open = useMemo(() => (countries ?? []).filter((c) => c.open && c.zone_code), [countries]);
   const [f, setF] = useState<Form>({
     first_name: "", last_name: "", birthdate: "", email: "", phone: "", country: (param ?? "").toUpperCase(), languages: "",
     ugc_experience: "", tiktok_url: "", tiktok_followers: "", instagram_url: "", instagram_followers: "",
-    equipment: "", availability: "", motivation: "", website: "", adult: false, consent: false,
+    equipment: "", availability: "", motivation: "", website: "", adult: false, consent: false, has_iphone: "",
   });
   const set = <K extends keyof Form>(k: K, v: Form[K]) => setF((x) => ({ ...x, [k]: v }));
   const [yapPath, setYapPath] = useState<string | null>(null);
@@ -84,6 +87,7 @@ export default function Apply() {
     const errs: string[] = [];
     if (f.birthdate && ageOn(f.birthdate) < 18) errs.push("underage");
     if (!yapPath) errs.push("yap_video");
+    if (f.has_iphone !== "yes") return; // iPhone requis (16/11) : bloqué en amont
     if (errs.length) return setErrors(errs);
     setBusy(true);
     setErrors([]);
@@ -93,7 +97,7 @@ export default function Apply() {
     const eventId = newEventId();
     try {
       await callFn("apply", {
-        action: "submit", ...f,
+        action: "submit", ...f, has_iphone: f.has_iphone === "yes",
         tiktok_followers: f.tiktok_followers ? Number(f.tiktok_followers) : null,
         instagram_followers: f.instagram_followers ? Number(f.instagram_followers) : null,
         languages: f.languages.split(",").map((s) => s.trim()).filter(Boolean),
@@ -140,6 +144,20 @@ export default function Apply() {
               <h1 className="text-[28px] font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">{t("apply.title")}</h1>
               <p className="mt-2 text-[15px] text-muted-foreground">{t("apply.subtitle")}</p>
             </div>
+            {/* iPhone requis (16/11, Max) : question obligatoire, « non » bloque la candidature. */}
+            <div className="rounded-2xl border bg-white p-5 shadow-xs sm:p-6" data-testid="iphone-question">
+              <p className="text-[15px] font-semibold text-foreground">{lj.applyIphone} <span className="text-danger">*</span></p>
+              <p className="mt-1 text-[13px] text-muted-foreground">{lj.iphoneText}</p>
+              <div className="mt-3 flex gap-2">
+                {(["yes", "no"] as const).map((v) => (
+                  <label key={v} className={cn("flex h-11 flex-1 cursor-pointer items-center justify-center rounded-lg border text-sm font-medium", f.has_iphone === v ? "border-accent bg-accent-soft text-accent" : "border-border-strong bg-white text-foreground")}>
+                    <input type="radio" name="has_iphone" required className="sr-only" checked={f.has_iphone === v} onChange={() => set("has_iphone", v)} />{v === "yes" ? lj.yes : lj.no}
+                  </label>
+                ))}
+              </div>
+              {f.has_iphone === "no" && <p className="mt-3 rounded-xl bg-tint-yellow px-4 py-3 text-sm text-[#8a5a00]" role="alert">{lj.iphoneBlocked}</p>}
+            </div>
+            {f.has_iphone === "no" ? null : <>
             <FormSection n={1} icon={<User />} tint="blue" title={t("apply.identity")}>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label={t("apply.firstName")}><Input required maxLength={80} value={f.first_name} onChange={(e) => set("first_name", e.target.value)} autoComplete="given-name" /></Field>
@@ -193,7 +211,8 @@ export default function Apply() {
             </div>
             {messages.length > 0 && <div className="rounded-xl bg-tint-red px-4 py-3 text-sm text-[#a52326]">{messages.map((m) => <p key={m}>{m}</p>)}</div>}
             <JobWarning lang={i18n.resolvedLanguage ?? "en"} />
-            <Button type="submit" size="lg" className="h-12 w-full text-[15px]" loading={busy} disabled={underage || (progress !== null && !yapPath)}>{t("apply.submit")}</Button>
+            <Button type="submit" size="lg" className="h-12 w-full text-[15px]" loading={busy} disabled={underage || f.has_iphone !== "yes" || (progress !== null && !yapPath)}>{t("apply.submit")}</Button>
+            </>}
           </form>
         )}
         <p className="mt-10 text-center text-xs text-subtle-foreground"><Link to="/privacy" className="hover:underline">Privacy</Link> · <Link to="/terms" className="hover:underline">Terms</Link></p>

@@ -15,7 +15,7 @@
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { audit, caller, getSetting, HttpError, requireAdmin, serve, userId } from "../_shared/http.ts";
 import { type TranslationReview, activationAllowed, adPayload, adsetPayload, blockingItems, campaignPayload, landingUrl, launchChecklist, toMinor, type MetaObjective } from "../_shared/logic/meta.ts";
-import { employmentViolations } from "../_shared/logic/pixel.ts";
+import { employmentTargeting, employmentViolations } from "../_shared/logic/pixel.ts";
 import { capiHealthCheck, sendLead } from "../_shared/capi.ts";
 
 interface MetaCfg {
@@ -383,6 +383,26 @@ serve(async (req, body, db) => {
     }
     case "sync_insights":
       return await syncInsights(db, cfg);
+    case "retarget_ios": {
+      // iPhone uniquement (16/11) : applique le ciblage par défaut (iOS + mobile) aux ad sets existants, PAUSED par défaut.
+      const statuses: string[] = body.include_active ? ["PAUSED", "ACTIVE"] : ["PAUSED"];
+      const { data: sets } = await db.from("meta_adsets").select("id, meta_id, country, targeting, status").in("status", statuses).not("country", "is", null);
+      const { data: ctry } = await db.from("countries").select("code, language");
+      const langOf = new Map((ctry ?? []).map((r) => [r.code, String(r.language ?? "en")]));
+      const out: any[] = [];
+      for (const a of sets ?? []) {
+        const t = employmentTargeting([a.country], [langOf.get(a.country) ?? "en"]);
+        const v = employmentViolations(t as any);
+        if (v.length) { out.push({ country: a.country, error: v.join(", ") }); continue; }
+        try {
+          await graph(cfg, a.meta_id, { method: "POST", params: { targeting: t } });
+          await db.from("meta_adsets").update({ targeting: { ...(a.targeting ?? {}), sent: t } }).eq("id", a.id);
+          out.push({ country: a.country, ok: true });
+        } catch (e) { out.push({ country: a.country, error: e instanceof Error ? e.message : String(e) }); }
+      }
+      await audit(db, userId(c), "meta.retarget_ios", "meta_adsets", null, { results: out });
+      return { ok: true, results: out };
+    }
     case "zone_structure":
       return await zoneStructure(db, cfg, company, body, c);
     case "create_pending_ads":

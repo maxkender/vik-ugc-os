@@ -66,3 +66,16 @@ describe("checklist de lancement", () => {
     expect(blockingItems(launchChecklist({ ...base, pixelLastFired: "2026-11-01T00:00:00Z" })).map((x) => x.key)).toEqual(["pixel"]);
   });
 });
+
+describe("ciblage iPhone uniquement (16/11)", () => {
+  it("tout nouvel ad set cible iOS + mobile, sans violer EMPLOYMENT", async () => {
+    const { employmentTargeting, employmentViolations } = await import("./pixel.ts");
+    const { adsetPayload } = await import("./meta.ts");
+    const t = employmentTargeting(["FR"], ["fr"]);
+    expect(t.user_os).toEqual(["iOS"]);
+    expect(t.device_platforms).toEqual(["mobile"]);
+    expect(employmentViolations(t)).toEqual([]);
+    const p = adsetPayload({ name: "x", campaignId: "1", country: "DE", countries: ["DE"], langs: ["de"], dailyBudget: 5, employment: true, beneficiary: "Vik Studios", objective: "leads", pixelId: "2" } as any);
+    expect((p.targeting as any).user_os).toEqual(["iOS"]);
+  });
+});

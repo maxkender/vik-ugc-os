@@ -78,6 +78,7 @@ export const GUIDE: Record<string, GuideText> = {
       intro: "Everything you need to make a video we can validate: format, content, app demo, publishing and validation. Read it once, then use your daily brief.",
       formatTitle: "1. Format",
       format: [
+        "iPhone required: you film and edit on your iPhone (the app's premium access is iPhone only).",
         "Vertical 9:16, 15–30 seconds.",
         "The hook is in the first 2 seconds (on screen and/or spoken).",
         "On-screen text is readable and stays in the safe zones: not in the top 15% or the bottom 25% of the screen (TikTok and Instagram buttons cover them).",
@@ -174,6 +175,7 @@ export const GUIDE: Record<string, GuideText> = {
       intro: "Tout ce qu'il faut pour une vidéo qu'on peut valider : format, contenu, démo de l'app, publication et validation. Lis-le une fois, puis sers-toi de ton brief du jour.",
       formatTitle: "1. Format",
       format: [
+        "iPhone obligatoire : tu filmes et montes sur ton iPhone (l'accès premium à l'app est uniquement sur iPhone).",
         "Vertical 9:16, 15 à 30 secondes.",
         "L'accroche est dans les 2 premières secondes (à l'écran et/ou à l'oral).",
         "Le texte à l'écran est lisible et reste dans les safe zones : ni dans les 15 % du haut, ni dans les 25 % du bas (les boutons TikTok et Instagram les cachent).",
@@ -270,6 +272,7 @@ export const GUIDE: Record<string, GuideText> = {
       intro: "Todo lo que necesitas para un video que podamos validar: formato, contenido, demo de la app, publicación y validación. Léela una vez y luego usa tu brief del día.",
       formatTitle: "1. Formato",
       format: [
+        "iPhone obligatorio: grabas y editas en tu iPhone (el acceso premium a la app es solo para iPhone).",
         "Vertical 9:16, de 15 a 30 segundos.",
         "El hook va en los 2 primeros segundos (en pantalla y/o hablado).",
         "El texto en pantalla se lee bien y queda en las safe zones: ni en el 15 % de arriba ni en el 25 % de abajo (los botones de TikTok e Instagram los tapan).",

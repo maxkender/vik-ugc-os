@@ -34,4 +34,7 @@ describe("résumé du contrat", () => {
   it("précise la responsabilité Ruul dans toutes les langues du résumé", () => {
     for (const l of ["en", "fr", "es", "de", "it", "pt"]) expect(contractSummary(l, i)).toMatch(/Ruul.*(responsab|responsib|Verantwortung)/s);
   });
+  it("exige un iPhone dans toutes les langues du résumé", () => {
+    for (const l of ["en", "fr", "es", "de", "it", "pt"]) expect(contractSummary(l, i)).toContain("iPhone");
+  });
 });

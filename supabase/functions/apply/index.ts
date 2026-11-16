@@ -38,6 +38,7 @@ serve(async (req, body, db) => {
   else if (ageOn(birthdate) < 18) errors.push("underage");
   if (body.adult !== true) errors.push("adult");
   if (body.consent !== true) errors.push("consent");
+  if (body.has_iphone !== true) errors.push("iphone_required"); // iPhone requis (16/11)
   const yap = s(body.yap_video_path, 300);
   if (!/^pending\/[0-9a-f-]{36}\.(mp4|mov|webm|m4v)$/i.test(yap)) errors.push("yap_video");
   const { data: c } = await db.from("countries").select("code, open, language").eq("code", country).maybeSingle();
@@ -51,7 +52,7 @@ serve(async (req, body, db) => {
   if (!listed?.length) throw new HttpError(422, "yap_video_missing");
 
   const row = {
-    first_name, last_name, email, birthdate, country,
+    first_name, last_name, email, birthdate, country, has_iphone: true,
     phone: s(body.phone, 40) || null,
     languages: Array.isArray(body.languages) ? body.languages.map((l: unknown) => s(l, 10)).filter(Boolean).slice(0, 10) : [],
     ugc_experience: s(body.ugc_experience, 2000) || null,

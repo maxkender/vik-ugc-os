@@ -50,6 +50,7 @@ export const GUIDE_GENERATED: Record<string, GuideText> = {
       "intro": "Alles, was du brauchst, um ein Video zu machen, das wir bestätigen können: Format, Inhalt, App-Demo, Veröffentlichung und Validierung. Lies ihn einmal durch und nutze dann dein tägliches Briefing.",
       "formatTitle": "1. Format",
       "format": [
+        "iPhone erforderlich: Du filmst und schneidest auf deinem iPhone (der Premium-Zugang zur App gilt nur für iPhone).",
         "Hochkant 9:16, 15–30 Sekunden.",
         "Der Hook kommt in den ersten 2 Sekunden (im Bild und/oder gesprochen).",
         "Der Text im Bild ist gut lesbar und bleibt in den Safe Zones: nicht in den oberen 15 % und nicht in den unteren 25 % des Bildschirms (die Buttons von TikTok und Instagram verdecken sie).",
@@ -211,6 +212,7 @@ export const GUIDE_GENERATED: Record<string, GuideText> = {
       "intro": "Tutto quello che ti serve per fare un video che possiamo validare: formato, contenuto, demo dell'app, pubblicazione e validazione. Leggila una volta, poi usa il tuo brief giornaliero.",
       "formatTitle": "1. Formato",
       "format": [
+        "iPhone obbligatorio: filmi e monti con il tuo iPhone (l'accesso premium all'app è solo per iPhone).",
         "Verticale 9:16, 15–30 secondi.",
         "L'hook è nei primi 2 secondi (a schermo e/o parlato).",
         "Il testo a schermo è leggibile e resta nelle zone sicure: non nel 15% superiore né nel 25% inferiore dello schermo (i pulsanti di TikTok e Instagram le coprono).",

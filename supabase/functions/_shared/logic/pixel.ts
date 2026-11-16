@@ -113,6 +113,9 @@ export function employmentTargeting(countries: string[], langs: string[]) {
     age_min: 18,
     age_max: 65,
     ...(locales.length ? { locales } : {}),
+    // iPhone uniquement (16/11, Max) : l'accès premium (codes promo Apple) et les créateurs sont iOS. Compatible EMPLOYMENT.
+    user_os: ["iOS"],
+    device_platforms: ["mobile"],
     targeting_automation: { advantage_audience: 1 },
   };
 }
