@@ -171,16 +171,16 @@ export const NOTES_COPY_GENERATED: Record<string, NotesPack> = {
     "cta": "linkten başvur ↓"
   },
   "sr": {
-    "app": "Белешке",
-    "title": "студентски посао доступан баш сада:",
-    "subtitle": "UGC креатор садржаја за мобилну апликацију",
+    "app": "Beleške",
+    "title": "studentski posao dostupan baš sada:",
+    "subtitle": "UGC kreator sadržaja za mobilnu aplikaciju",
     "lines": [
-      "1 видео дневно са твојим телефоном",
-      "шаљемо ти бриф + пример видео",
-      "не требају ти пратиоци",
-      "плаћање сваке недеље"
+      "1 video dnevno sa tvojim telefonom",
+      "šaljemo ti brif + primer video",
+      "ne trebaju ti pratioci",
+      "plaćanje svake nedelje"
     ],
-    "cta": "пријави се преко линка ↓"
+    "cta": "prijavi se preko linka ↓"
   },
   "he": {
     "app": "הערות",

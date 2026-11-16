@@ -19,7 +19,7 @@ function ugcPrompt(countryName: string, hook: string | null, format: string) {
     : hook === "nofollow"
       ? "holding a smartphone at arm's length to record a selfie video, casual and confident, at home on a sofa"
       : "studying at a desk with notebooks, highlighters and a laptop, holding a smartphone to film a short study video";
-  return `Candid ${format === "9:16" ? "vertical" : "square"} smartphone photo, authentic UGC social-media look: a friendly Latin American university student (around 20, fictional person) in ${countryName}, ${scene}. Warm natural light, realistic skin texture, slightly imperfect framing, shallow depth of field. ${format === "9:16" ? "Subject in the middle third of the frame." : "Subject on the right half of the frame."} No text, no letters, no watermark, no brand logos, no famous people.`;
+  return `Candid ${format === "9:16" ? "vertical" : "square"} smartphone photo, authentic UGC social-media look: a friendly university student (around 20, fictional person) who lives in ${countryName}, with a look typical of the local population, in an everyday setting typical of ${countryName}, ${scene}. Warm natural light, realistic skin texture, slightly imperfect framing, shallow depth of field. ${format === "9:16" ? "Subject in the middle third of the frame." : "Subject on the right half of the frame."} No text, no letters, no watermark, no brand logos, no famous people.`;
 }
 const FAL_SIZE: Record<string, { width: number; height: number }> = { "1:1": { width: 1088, height: 1088 }, "4:5": { width: 1088, height: 1360 }, "9:16": { width: 1080, height: 1920 } };
 

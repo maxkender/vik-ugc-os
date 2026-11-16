@@ -54,7 +54,7 @@ export function flagEmoji(code: string): string {
 }
 
 export function countryName(code: string, lang: string): string {
-  try { return new Intl.DisplayNames([lang], { type: "region" }).of(code.toUpperCase()) ?? code; } catch { return code; }
+  try { return new Intl.DisplayNames([lang === "sr" ? "sr-Latn" : lang], { type: "region" }).of(code.toUpperCase()) ?? code; } catch { return code; }
 }
 
 /** Textes de la carte pour une langue, une accroche et un pays. */

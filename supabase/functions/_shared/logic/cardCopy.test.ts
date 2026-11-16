@@ -15,7 +15,7 @@ describe("carte offre d'emploi", () => {
     expect(cardCopy("fr", "student", "MX").title).toContain("au Mexique");
     expect(cardCopy("fr", "student", "US").title).toContain("aux États-Unis");
     expect(cardCopy("pt", "student", "BR").title).toContain("no Brasil");
-    expect(cardCopy("sr", "student", "RS").title).toContain("у Србији");
+    expect(cardCopy("sr", "student", "RS").title).toContain("u Srbiji");
     expect(flagEmoji("rs")).toBe("🇷🇸");
   });
   it("toutes les langues : textes conformes (pas de revenus, montants, questions)", () => {

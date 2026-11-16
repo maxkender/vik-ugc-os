@@ -222,7 +222,7 @@ export const IN_COUNTRY: Record<string, Record<string, string>> = {
     "HU": "Magyarországon"
   },
   "sr": {
-    "RS": "у Србији"
+    "RS": "u Srbiji"
   },
   "el": {
     "GR": "στην Ελλάδα"
@@ -319,7 +319,7 @@ export const CARD_TITLES: Record<string, string> = {
   "bg": "търсим хора, които да публикуват в TikTok {{in_country}}",
   "hr": "tražimo ljude koji će objavljivati na TikToku {{in_country}}",
   "hu": "embereket keresünk TikTok-posztolásra – {{in_country}}",
-  "sr": "тражимо људе за објављивање на TikTok-у {{in_country}}",
+  "sr": "tražimo ljude za objavljivanje na TikTok-u {{in_country}}",
   "el": "ψάχνουμε άτομα να ανεβάζουν βίντεο στο TikTok {{in_country}}",
   "ar": "نبحث عن أشخاص للنشر على TikTok {{in_country}}",
   "sk": "hľadáme ľudí na pridávanie videí na TikTok {{in_country}}",
@@ -361,7 +361,7 @@ export const CARD_PRIMARY_FIRST: Record<string, string> = {
   "bg": "Търсим създатели на съдържание {{in_country}} 📱",
   "hr": "Tražimo kreatore sadržaja {{in_country}} 📱",
   "el": "Ψάχνουμε δημιουργούς περιεχομένου {{in_country}} 📱",
-  "sr": "Тражимо креаторе садржаја {{in_country}} 📱",
+  "sr": "Tražimo kreatore sadržaja {{in_country}} 📱",
   "ar": "نبحث عن صنّاع محتوى {{in_country}} 📱",
   "sl": "Iščemo ustvarjalce in ustvarjalke vsebin {{in_country}} 📱",
   "he": "מגייסים יוצרי/ות תוכן {{in_country}} 📱",

@@ -89,7 +89,7 @@ async function renderCard(cr: any): Promise<Blob> {
   // 9:16 : le titre reste au moins aussi grand qu'en 1:1 ; on réduit d'abord les lignes, puis le titre.
   let titleS = Math.round(W * (tall ? 0.085 : 0.062));
   let M = measure(titleS);
-  const minLine = Math.round(W * (tall ? 0.038 : 0.026)), minTitle = Math.round(W * (tall ? 0.066 : 0.03));
+  const minLine = Math.round(W * (tall ? 0.038 : 0.032)), minTitle = Math.round(W * (tall ? 0.066 : 0.03));
   while (M.h > maxCardH && lineS > minLine) { lineS -= 1; M = measure(titleS); }
   while (M.h > maxCardH && titleS > minTitle) { titleS -= 2; M = measure(titleS); }
   while (M.h > maxCardH && titleS > 30) { titleS -= 2; lineS = Math.max(20, lineS - 1); M = measure(titleS); }
@@ -193,10 +193,10 @@ async function renderNotes(cr: any): Promise<Blob> {
   const inner = W - 2 * padX;
   const top = tall ? H * 0.14 : H * 0.05;
   const bottom = tall ? H * 0.8 : H * 0.96;
-  const headS = Math.round(W * 0.05);
-  const dateS = Math.round(W * 0.03);
+  const headS = Math.round(W * (tall ? 0.056 : 0.05));
+  const dateS = Math.round(W * (tall ? 0.034 : 0.03));
   const fit = (titleS: number) => {
-    const subS = Math.round(titleS * 0.62), lineS = Math.round(titleS * 0.6), ctaS = Math.round(titleS * 0.62);
+    const subS = Math.round(titleS * 0.66), lineS = Math.round(titleS * 0.66), ctaS = Math.round(titleS * 0.68);
     ctx.font = `700 ${titleS}px Inter`;
     const tl = wrapAny(ctx, n.title ?? "", inner);
     ctx.font = `500 ${subS}px Inter`;
@@ -210,9 +210,10 @@ async function renderNotes(cr: any): Promise<Blob> {
       + ll.reduce((a: number, x: string[]) => a + x.length * lineS * 1.3 + lineS * 0.55, 0) + ctaS * 0.6 + cl.length * ctaS * 1.3;
     return { subS, lineS, ctaS, arrowW, tl, sl, ll, cl, h };
   };
-  let titleS = Math.round(W * (tall ? 0.092 : 0.075));
+  // On part grand et on réduit jusqu'à remplir la zone utile : grandes polices, peu de vide.
+  let titleS = Math.round(W * (tall ? 0.15 : 0.1));
   let F = fit(titleS);
-  while (F.h > bottom - top && titleS > 30) { titleS -= 2; F = fit(titleS); }
+  while (F.h > (bottom - top) * 0.97 && titleS > 30) { titleS -= 2; F = fit(titleS); }
   // Centre verticalement le bloc dans la zone utile (peu de vide au-dessus et en dessous).
   let y = top + Math.max(0, (bottom - top - F.h) / 2) * (tall ? 1 : 0.5);
   const xL = rtl ? W - padX : padX;
@@ -364,7 +365,9 @@ export async function renderCreative(cr: any): Promise<Blob> {
   };
   let size = Math.round(W * (tall ? 0.1 : 0.085));
   let L = lay(size);
-  while (size > 40 && L.h > bottomLimit - topLimit) { size -= 4; L = lay(size); }
+  // Réduit aussi quand une ligne déborde (mot long : « UGC-Content-Creator:in »).
+  const overflow = (sz: number, lines: string[]) => { ctx.font = `700 ${sz}px Inter`; return lines.some((l) => ctx.measureText(l).width > maxW); };
+  while (size > 40 && (L.h > bottomLimit - topLimit || overflow(size, L.hl))) { size -= 4; L = lay(size); }
   let y = bottomLimit - L.h;
   if (tag) {
     ctx.font = `700 ${tagS}px Inter`;

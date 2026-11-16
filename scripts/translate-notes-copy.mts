@@ -5,7 +5,7 @@ import { NOTES_COPY } from "../supabase/functions/_shared/logic/notesCopy.ts";
 import { copyViolations } from "../supabase/functions/_shared/logic/jobCopy.ts";
 const NAMES: Record<string, string> = {
   de: "German", it: "Italian", pt: "Brazilian Portuguese", nl: "Dutch", pl: "Polish", ro: "Romanian", cs: "Czech", sk: "Slovak",
-  hu: "Hungarian", el: "Greek", bg: "Bulgarian", hr: "Croatian", sl: "Slovenian", sr: "Serbian (Cyrillic)", uk: "Ukrainian", tr: "Turkish",
+  hu: "Hungarian", el: "Greek", bg: "Bulgarian", hr: "Croatian", sl: "Slovenian", sr: "Serbian (Latin script)", uk: "Ukrainian", tr: "Turkish",
   ar: "Arabic", he: "Hebrew", ja: "Japanese", ko: "Korean", sv: "Swedish", no: "Norwegian Bokmål", da: "Danish", fi: "Finnish",
   et: "Estonian", lv: "Latvian", lt: "Lithuanian", is: "Icelandic", hy: "Armenian", ka: "Georgian", kk: "Kazakh", hi: "Hindi",
   id: "Indonesian", ms: "Malay", th: "Thai", vi: "Vietnamese",

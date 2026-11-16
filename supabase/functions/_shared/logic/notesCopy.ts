@@ -30,7 +30,7 @@ export function notesCopy(lang: string | null | undefined, now = new Date()) {
   const known = NOTES_COPY[l] ? l : "en";
   let date = "";
   try {
-    date = new Intl.DateTimeFormat(lang ?? known, { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(now);
+    date = new Intl.DateTimeFormat(known === "sr" ? "sr-Latn" : (lang ?? known), { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(now);
   } catch { date = now.toISOString().slice(0, 10); }
   return { lang: known, ...NOTES_COPY[known], date };
 }
