@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { AtSign, BarChart3, CalendarCheck, LogOut, MessageSquare, Wallet } from "lucide-react";
+import { AtSign, BarChart3, BookOpen, CalendarCheck, LogOut, MessageSquare, Wallet } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
@@ -9,12 +9,25 @@ import { cn } from "@/lib/utils";
 import { LANGS, uiLangForCountry } from "@/i18n";
 import { Logo } from "@/components/brand/Logo";
 import { AssistantBubble } from "@/components/assistant/AssistantBubble";
+import { guideText } from "@/i18n/guide";
+import { CreatorOnboarding } from "@/components/creator/CreatorOnboarding";
 
 /** Espace créateur : pensé pour le téléphone (barre d'onglets en bas), onglets en haut sur grand écran. */
 export default function CreatorLayout() {
   const { t, i18n } = useTranslation();
   const { profile } = useAuth();
   const nav = useNavigate();
+  const loc = useLocation();
+  // Ancres (#warmup, #ruul) : on attend que la page ait chargé ses données, puis on y fait défiler.
+  useEffect(() => {
+    if (!loc.hash) return;
+    let n = 0;
+    const t = setInterval(() => {
+      const el = document.getElementById(loc.hash.slice(1));
+      if (el || ++n > 20) { clearInterval(t); el?.scrollIntoView({ behavior: "smooth", block: "start" }); }
+    }, 150);
+    return () => clearInterval(t);
+  }, [loc.pathname, loc.hash]);
 
   useEffect(() => {
     let stored: string | null = null;
@@ -32,9 +45,22 @@ export default function CreatorLayout() {
     refetchInterval: 60_000,
   });
   const unread = unreadQ.data ?? 0;
+  // Onboarding à la 1re connexion du posteur (écrans swipables), puis direction le warm-up.
+  const onbQ = useQuery({
+    queryKey: ["onboarding-seen", profile?.id],
+    enabled: !!profile?.id && profile?.role === "poster",
+    queryFn: async () => (await supabase.from("posters").select("onboarding_seen_at").eq("id", profile!.id).maybeSingle()).data,
+  });
+  const showOnboarding = profile?.role === "poster" && !!onbQ.data && !onbQ.data.onboarding_seen_at;
+  const finishOnboarding = async (to: string) => {
+    await supabase.rpc("poster_onboarding_done");
+    await onbQ.refetch();
+    nav(to);
+  };
   const tabs: { to: string; end?: boolean; label: string; icon: any; badge?: number }[] = [
     { to: "/creator", end: true, label: t("creator.nav.today"), icon: CalendarCheck },
     { to: "/creator/account", label: t("account.nav"), icon: AtSign },
+    { to: "/creator/guide", label: guideText(i18n.resolvedLanguage).guide.nav, icon: BookOpen },
     { to: "/creator/stats", label: t("creator.nav.stats"), icon: BarChart3 },
     { to: "/creator/feedback", label: t("creator.nav.feedback"), icon: MessageSquare, badge: unread },
     { to: "/creator/payments", label: t("creator.nav.payments"), icon: Wallet },
@@ -70,6 +96,7 @@ export default function CreatorLayout() {
       </header>
 
       <main className="mx-auto max-w-2xl px-4 pb-28 pt-6 sm:pb-16 sm:pt-8"><Outlet /></main>
+      {showOnboarding && <CreatorOnboarding lang={i18n.resolvedLanguage ?? "en"} onDone={() => finishOnboarding("/creator/account#warmup")} onRuul={() => finishOnboarding("/creator/payments#ruul")} />}
 
       {/* Assistant posteurs : bulle flottante au-dessus de la barre d'onglets mobile */}
       <AssistantBubble />

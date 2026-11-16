@@ -74,7 +74,7 @@ async function loadContext(db: SupabaseClient, posterId: string) {
   const today = new Date().toISOString().slice(0, 10);
   const [{ data: profile }, { data: poster }, { data: assignments }, { data: todays }, { data: payouts }, { data: onboarding }] = await Promise.all([
     db.from("profiles").select("id, full_name, locale").eq("id", posterId).maybeSingle(),
-    db.from("posters").select("id, display_name, country, language, zone_code, status, handles_status, ruul_status, daily_quota, tiktok_handle, instagram_handle").eq("id", posterId).maybeSingle(),
+    db.from("posters").select("id, display_name, country, language, zone_code, status, handles_status, ruul_status, daily_quota, warmup_status, warmup_started_at, tiktok_handle, instagram_handle").eq("id", posterId).maybeSingle(),
     db.from("brief_assignments").select("id, poster_id, due_date, status, posted_at, validated_at, views_d2, views_d7, rejection_reason, briefs(title, hook, instructions)")
       .eq("poster_id", posterId).order("due_date", { ascending: false }).limit(30),
     db.from("brief_assignments").select("id, poster_id, due_date, status, posted_at, validated_at, views_d2, views_d7, rejection_reason, briefs(title, hook, instructions)")

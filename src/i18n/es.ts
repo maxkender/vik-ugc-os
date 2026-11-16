@@ -83,7 +83,7 @@ const es: Dict = {
     paymentsTitle: "Pagos", ruulTitle: "Cobra con Ruul",
     ruulSteps: [
       "Escribe el email que quieres usar en Ruul y guárdalo.",
-      "Te añadimos en Ruul: recibirás un email de invitación de Ruul.",
+      "Te agregamos en Ruul y te escribimos: acepta la invitación en tu cuenta de Ruul.",
       "Crea tu cuenta de Ruul, verifica tu identidad y añade tu método de cobro.",
       "Vuelve aquí y haz clic en «It's done».",
     ],

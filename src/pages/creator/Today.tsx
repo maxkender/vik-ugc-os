@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { WarmupLock } from "./Warmup";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -9,13 +10,16 @@ import { formatMoney } from "@shared/zones.ts";
 import { cn } from "@/lib/utils";
 import { playSources } from "@shared/playback.ts";
 import { VideoSurface } from "@/components/video/VideoSurface";
+import { guideText } from "@/i18n/guide";
 import { READ_ONLY_HINT, todayIso, useCreatorIdentity, useMyPoster } from "./shared";
 
 interface RefVideo { id: string; url: string | null; thumbnail_path: string | null; thumbnail_src: string | null; video_path: string | null; video_src?: string | null; external_id?: string | null; caption: string | null; platform: string }
 interface BriefFile { id: string; name: string; kind: string; path: string; mime: string | null; size_bytes: number | null }
 interface Assignment {
-  id: string; due_date: string; status: "todo" | "posted" | "validated" | "rejected" | "changes_requested"; posted_url: string | null; rejection_reason: string | null;
-  briefs: { title: string; hook: string | null; instructions: string | null; reference_video_id: string | null; videos: RefVideo | null; brief_assets?: { assets: BriefFile | null }[] } | null;
+  id: string; due_date: string; status: "todo" | "posted" | "validated" | "rejected" | "changes_requested"; posted_url: string | null; posted_url_instagram?: string | null; rejection_reason: string | null;
+  briefs: { title: string; hook: string | null; instructions: string | null; reference_video_id: string | null;
+    angle?: string | null; hook_variants?: string[] | null; caption?: string | null; hashtags?: string | null; post_time?: string | null; demo_notes?: string | null; app_access?: string | null;
+    apps?: { name: string; pitch: Record<string, string> | null; ios_url: string | null; android_url: string | null } | null; videos: RefVideo | null; brief_assets?: { assets: BriefFile | null }[] } | null;
 }
 
 const STATUS = {
@@ -92,13 +96,16 @@ function BriefCard({ a, index }: { a: Assignment; index: number }) {
   const qc = useQueryClient();
   const toast = useToast();
   const [url, setUrl] = useState(a.posted_url ?? "");
+  const [ig, setIg] = useState(a.posted_url_instagram ?? "");
+  const G = guideText(i18n.resolvedLanguage);
+  const lang2 = (i18n.resolvedLanguage ?? "en").split("-")[0];
   const [busy, setBusy] = useState(false);
   const { readOnly } = useCreatorIdentity();
   const b = a.briefs;
   const submit = async () => {
     if (readOnly) return;
     setBusy(true);
-    const { error } = await supabase.rpc("submit_post", { p_assignment: a.id, p_url: url.trim() });
+    const { error } = await supabase.rpc("submit_post_links", { p_assignment: a.id, p_tiktok: url.trim(), p_instagram: ig.trim() });
     setBusy(false);
     if (error) toast(error.message, "danger");
     else {
@@ -106,7 +113,7 @@ function BriefCard({ a, index }: { a: Assignment; index: number }) {
       qc.invalidateQueries({ queryKey: ["my-assignments"] });
     }
   };
-  const valid = /^https?:\/\//i.test(url.trim());
+  const valid = /^https?:\/\/([a-z0-9-]+\.)*tiktok\.com\//i.test(url.trim()) && /^https?:\/\/([a-z0-9-]+\.)*instagram\.com\//i.test(ig.trim());
   return (
     <article className="overflow-hidden rounded-2xl border bg-white shadow-xs">
       <div className="flex items-start justify-between gap-3 border-b border-separator px-5 py-4">
@@ -127,6 +134,21 @@ function BriefCard({ a, index }: { a: Assignment; index: number }) {
             <p className="text-[17px] font-semibold leading-snug text-[#0b1530]">{b.hook}</p>
           </div>
         )}
+        {(b?.hook_variants ?? []).length > 0 && (
+          <div>
+            <p className="mb-1.5 text-xs font-medium text-subtle-foreground">{G.brief.hookVariants}</p>
+            <ul className="space-y-1">{b!.hook_variants!.map((h) => <li key={h} className="text-[14px] font-medium text-foreground">« {h} »</li>)}</ul>
+          </div>
+        )}
+        <BriefSection title={G.brief.content}>
+          {b?.apps?.pitch && <p className="text-[14px] leading-relaxed text-foreground"><b>{G.brief.app} · {b.apps.name}</b> : {b.apps.pitch[lang2] ?? b.apps.pitch.en}</p>}
+          {b?.angle && <p className="mt-2 text-[14px] text-foreground"><b>{G.brief.angle}</b> : {b.angle}</p>}
+          <p className="mt-3 text-xs font-medium text-subtle-foreground">{G.brief.structure}</p>
+          <ol className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[13px] font-medium text-foreground">
+            {G.brief.structureSteps.map((x, n) => <li key={x} className="flex items-center gap-1.5"><span className="rounded-full bg-accent-soft px-2.5 py-1 text-accent">{n + 1}. {x}</span>{n < 2 && <span className="text-subtle-foreground">→</span>}</li>)}
+          </ol>
+          {b?.videos && <p className="mt-3 rounded-lg bg-tint-yellow px-3 py-2 text-[13px] font-medium text-[#8a5a00]">♻️ {G.brief.recreate}</p>}
+        </BriefSection>
         <div className="grid gap-5 sm:grid-cols-[1fr_auto] sm:items-start">
           {b?.instructions && (
             <div className="order-2 sm:order-1">
@@ -136,7 +158,29 @@ function BriefCard({ a, index }: { a: Assignment; index: number }) {
           )}
           {b?.videos && <div className="order-1 sm:order-2 sm:w-[200px]"><Reference v={b.videos} /></div>}
         </div>
-        <BriefFiles files={(b?.brief_assets ?? []).map((x) => x.assets).filter((x): x is BriefFile => !!x)} />
+        <BriefSection title={G.brief.demo}>
+          {(b?.apps?.ios_url || b?.apps?.android_url) && (
+            <p className="flex flex-wrap items-center gap-2 text-[13px]"><span className="font-medium text-subtle-foreground">{G.brief.install} :</span>
+              {b?.apps?.ios_url && <a className="rounded-full border px-2.5 py-1 font-medium text-foreground hover:bg-muted" href={b.apps.ios_url} target="_blank" rel="noopener noreferrer">App Store ↗</a>}
+              {b?.apps?.android_url && <a className="rounded-full border px-2.5 py-1 font-medium text-foreground hover:bg-muted" href={b.apps.android_url} target="_blank" rel="noopener noreferrer">Google Play ↗</a>}
+            </p>
+          )}
+          {b?.demo_notes && <p className="mt-2 text-[14px] text-foreground"><b>{G.brief.whatToFilm}</b> : {b.demo_notes}</p>}
+          {b?.app_access && <p className="mt-2 text-[14px] text-foreground"><b>{G.brief.access}</b> : {b.app_access}</p>}
+          <div className="mt-3"><BriefFiles files={(b?.brief_assets ?? []).map((x) => x.assets).filter((x): x is BriefFile => !!x)} /></div>
+        </BriefSection>
+        <BriefSection title={G.brief.publish}>
+          <p className="text-[14px] font-medium text-foreground">{G.brief.publishBoth}</p>
+          {b?.caption && <CopyLine label={G.brief.caption} text={b.caption} copy={G.brief.copy} copied={G.brief.copied} />}
+          {b?.hashtags && <CopyLine label={G.brief.hashtags} text={b.hashtags} copy={G.brief.copy} copied={G.brief.copied} />}
+          <p className="mt-2 text-[13px] text-muted-foreground">{b?.post_time && <>{G.brief.time} : <b className="text-foreground">{b.post_time}</b> · </>}{G.brief.deadline.replace("{{date}}", new Date(`${a.due_date}T12:00:00Z`).toLocaleDateString(i18n.resolvedLanguage, { weekday: "long", day: "numeric", month: "long" }))}</p>
+        </BriefSection>
+        <details className="rounded-xl border border-border-strong px-4 py-3">
+          <summary className="cursor-pointer text-[13px] font-semibold text-foreground">{G.brief.format} · {G.brief.validation}</summary>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-[13px] text-foreground">{G.brief.formatShort.map((x) => <li key={x}>{x}</li>)}</ul>
+          <ol className="mt-3 list-decimal space-y-1 pl-5 text-[13px] text-foreground">{G.guide.checks.map((x) => <li key={x}>{x}</li>)}</ol>
+          <Link to="/creator/guide" className="mt-3 inline-block text-[13px] font-medium text-accent hover:underline">{G.brief.openGuide} →</Link>
+        </details>
 
         {a.status === "rejected" && a.rejection_reason && (
           <div className="flex gap-2.5 rounded-xl bg-tint-red px-4 py-3 text-sm text-[#a52326]">
@@ -159,14 +203,15 @@ function BriefCard({ a, index }: { a: Assignment; index: number }) {
           )
         ) : (
           <div className="rounded-xl border border-border-strong bg-muted p-3">
-            <label className="mb-2 flex items-center gap-1.5 px-1 text-xs font-medium text-muted-foreground"><Link2 className="h-3.5 w-3.5" /> {t("creator.postedLink")}</label>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <input type="url" inputMode="url" placeholder="https://www.tiktok.com/@you/video/…" value={url} onChange={(e) => setUrl(e.target.value)} aria-label={t("creator.postedLink")}
-                className="h-12 w-full rounded-lg border border-border-strong bg-white px-3.5 text-[15px] placeholder:text-subtle-foreground focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/10" />
-              <Button size="lg" className="h-12 shrink-0 sm:px-6" onClick={submit} loading={busy} disabled={readOnly || !valid || url.trim() === (a.posted_url ?? "")} title={readOnly ? READ_ONLY_HINT : undefined}>
-                <Send className="h-4 w-4" /> {t("creator.submit")}
-              </Button>
-            </div>
+            <label className="mb-1.5 flex items-center gap-1.5 px-1 text-xs font-medium text-muted-foreground"><Link2 className="h-3.5 w-3.5" /> {G.brief.tiktokLink}</label>
+            <input type="url" inputMode="url" placeholder="https://www.tiktok.com/@you/video/…" value={url} onChange={(e) => setUrl(e.target.value)} aria-label={G.brief.tiktokLink}
+              className="h-12 w-full rounded-lg border border-border-strong bg-white px-3.5 text-[15px] placeholder:text-subtle-foreground focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/10" />
+            <label className="mb-1.5 mt-3 flex items-center gap-1.5 px-1 text-xs font-medium text-muted-foreground"><Link2 className="h-3.5 w-3.5" /> {G.brief.instagramLink}</label>
+            <input type="url" inputMode="url" placeholder="https://www.instagram.com/reel/…" value={ig} onChange={(e) => setIg(e.target.value)} aria-label={G.brief.instagramLink}
+              className="h-12 w-full rounded-lg border border-border-strong bg-white px-3.5 text-[15px] placeholder:text-subtle-foreground focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/10" />
+            <Button size="lg" className="mt-3 h-12 w-full" onClick={submit} loading={busy} disabled={readOnly || !valid || (url.trim() === (a.posted_url ?? "") && ig.trim() === (a.posted_url_instagram ?? ""))} title={readOnly ? READ_ONLY_HINT : undefined}>
+              <Send className="h-4 w-4" /> {G.brief.submit}
+            </Button>
           </div>
         )}
       </div>
@@ -210,7 +255,7 @@ export default function Today() {
     enabled: !!me.id,
     queryFn: async () => {
       const { data, error } = await supabase.from("brief_assignments")
-        .select("id, due_date, status, posted_url, rejection_reason, briefs(title, hook, instructions, reference_video_id, videos(id, url, external_id, thumbnail_path, thumbnail_src, video_path, video_src, caption, platform), brief_assets(assets(id, name, kind, path, mime, size_bytes)))")
+        .select("id, due_date, status, posted_url, posted_url_instagram, rejection_reason, briefs(title, hook, instructions, reference_video_id, angle, hook_variants, caption, hashtags, post_time, demo_notes, app_access, apps(name, pitch, ios_url, android_url), videos(id, url, external_id, thumbnail_path, thumbnail_src, video_path, video_src, caption, platform), brief_assets(assets(id, name, kind, path, mime, size_bytes)))")
         .eq("poster_id", me.id!).order("due_date", { ascending: false }).limit(60);
       if (error) throw error;
       return (data ?? []) as unknown as Assignment[];
@@ -246,6 +291,7 @@ export default function Today() {
       </section>
 
       <section className="space-y-4">
+        <WarmupLock />
         <h2 className="text-[13px] font-semibold text-muted-foreground">{t("creator.todayTitle")}</h2>
         {q.isLoading ? <div className="flex justify-center py-10"><Spinner /></div>
           : current.length === 0 ? (
@@ -270,4 +316,26 @@ export default function Today() {
 
 function CalendarIcon() {
   return <Clock className="h-6 w-6" />;
+}
+
+function BriefSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-xl border border-border-strong px-4 py-3.5">
+      <p className="mb-2 text-[13px] font-semibold text-foreground">{title}</p>
+      {children}
+    </div>
+  );
+}
+
+function CopyLine({ label, text, copy, copied }: { label: string; text: string; copy: string; copied: string }) {
+  const [done, setDone] = useState(false);
+  return (
+    <div className="mt-2">
+      <p className="mb-1 text-xs font-medium text-subtle-foreground">{label}</p>
+      <div className="flex items-start gap-2 rounded-lg bg-muted px-3 py-2">
+        <p className="min-w-0 flex-1 whitespace-pre-wrap break-words text-[13px] text-foreground">{text}</p>
+        <button className="shrink-0 text-xs font-medium text-accent" onClick={async () => { try { await navigator.clipboard.writeText(text); } catch { /* ignore */ } setDone(true); setTimeout(() => setDone(false), 1500); }}>{done ? copied : copy}</button>
+      </div>
+    </div>
+  );
 }

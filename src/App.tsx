@@ -22,6 +22,7 @@ const CreatorPreview = lazy(() => import("./pages/admin/CreatorPreview"));
 const Competitors = lazy(() => import("./pages/admin/Competitors"));
 const Onboarding = lazy(() => import("./pages/admin/Onboarding"));
 const CreatorAccount = lazy(() => import("./pages/creator/Account"));
+const CreatorGuide = lazy(() => import("./pages/creator/Guide"));
 const WinningAds = lazy(() => import("./pages/admin/WinningAds"));
 const Agents = lazy(() => import("./pages/admin/Agents"));
 const Legal = lazy(() => import("./pages/public/Legal"));
@@ -74,6 +75,7 @@ export function App() {
           <Route path="payments" element={<CreatorPayments />} />
           <Route path="feedback" element={<CreatorFeedback />} />
           <Route path="account" element={<CreatorAccount />} />
+          <Route path="guide" element={<CreatorGuide />} />
         </Route>
 
         <Route path="/admin" element={<RequireRole roles={[...staff]}><AdminLayout /></RequireRole>}>

@@ -83,7 +83,7 @@ const fr: Dict = {
     paymentsTitle: "Paiements", ruulTitle: "Être payé·e avec Ruul",
     ruulSteps: [
       "Saisis l'email que tu veux utiliser sur Ruul et enregistre.",
-      "On t'ajoute sur Ruul : tu reçois un email d'invitation de Ruul.",
+      "On t'ajoute sur Ruul et on t'écrit : accepte l'invitation dans ton compte Ruul.",
       "Crée ton compte Ruul, vérifie ton identité et ajoute ton moyen de paiement.",
       "Reviens ici et clique sur « It's done ».",
     ],

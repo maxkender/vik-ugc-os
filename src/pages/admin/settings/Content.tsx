@@ -6,12 +6,14 @@ import { EmailsTab } from "./content/EmailsTab";
 import { ContractTab } from "./content/ContractTab";
 import { LandingTab } from "./content/LandingTab";
 import { BiosTab } from "./content/BiosTab";
+import { OnboardingTab } from "./content/OnboardingTab";
 
-type Tab = "emails" | "contract" | "landing" | "creator" | "bios";
+type Tab = "emails" | "contract" | "landing" | "onboarding" | "creator" | "bios";
 const TABS: { value: Tab; label: string }[] = [
   { value: "emails", label: "Emails" },
   { value: "contract", label: "Contrat" },
   { value: "landing", label: "Page job" },
+  { value: "onboarding", label: "Onboarding créateur" },
   { value: "creator", label: "Espace posteur" },
   { value: "bios", label: "Bios & pseudos" },
 ];
@@ -28,6 +30,7 @@ export default function Content() {
       {tab === "contract" && <ContractTab />}
       {tab === "landing" && <LandingTab />}
       {tab === "bios" && <BiosTab />}
+      {tab === "onboarding" && <OnboardingTab />}
       {tab === "creator" && (
         <Card className="flex flex-wrap items-center justify-between gap-4">
           <div>

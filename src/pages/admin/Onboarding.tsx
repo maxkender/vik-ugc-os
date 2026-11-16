@@ -19,6 +19,8 @@ const STEPS = [
   { key: "first_login", label: "1re connexion" },
   { key: "handles_submitted", label: "Handles soumis" },
   { key: "handles_ok", label: "Handles OK" },
+  { key: "warmup_started", label: "Warm-up commencé" },
+  { key: "warmup_done", label: "Warm-up validé (24 h)" },
   { key: "ruul_connected", label: "Ruul connecté" },
   { key: "first_post", label: "1er post" },
 ] as const;
@@ -29,7 +31,7 @@ const REMIND: Record<StepKey, "contract" | "access" | "handles" | "ruul" | "firs
   applied: null, accepted: null,
   contract_email_sent: "contract", email_opened: "contract", link_clicked: "contract", signed: "contract",
   access_sent: "access", first_login: "access",
-  handles_submitted: "handles", handles_ok: "handles",
+  handles_submitted: "handles", handles_ok: "handles", warmup_started: "handles", warmup_done: "handles",
   ruul_connected: "ruul", first_post: "first_post",
 };
 const REMIND_LABEL: Record<string, string> = { contract: "contrat", access: "accès", handles: "comptes", ruul: "Ruul", first_post: "1er post" };
@@ -62,6 +64,8 @@ function computeRow(app: any, events: any[], lastSignIn: string | null): Row {
   done.first_login = lastSignIn ?? undefined;
   done.handles_submitted = first("handles_submitted") ?? (p && ["submitted", "verified"].includes(p.handles_status) ? p.handles_checked_at ?? undefined : undefined);
   done.handles_ok = first("handles_ok") ?? (p?.handles_status === "verified" ? p.handles_checked_at ?? undefined : undefined);
+  done.warmup_started = first("warmup_started") ?? p?.warmup_started_at ?? undefined;
+  done.warmup_done = first("warmup_done") ?? (p?.warmup_status === "validated" ? p.warmup_validated_at ?? undefined : undefined);
   done.ruul_connected = first("ruul_connected") ?? (p?.ruul_status === "done" ? p.ruul_done_at ?? undefined : undefined);
   done.first_post = first("first_post") ?? (app.status === "active" ? app.updated_at : undefined);
   const current = STEPS.find((s) => !done[s.key])?.key ?? null;
@@ -124,7 +128,7 @@ export default function Onboarding() {
     queryKey: ["onboarding"],
     queryFn: async () => {
       const [apps, events, signIns, tests] = await Promise.all([
-        supabase.from("applications").select("id, first_name, last_name, email, country, status, created_at, updated_at, decided_at, poster_id, posters(handles_status, handles_checked_at, ruul_status, ruul_done_at, tiktok_handle, instagram_handle), contracts(sent_at, signed_at, status)")
+        supabase.from("applications").select("id, first_name, last_name, email, country, status, created_at, updated_at, decided_at, poster_id, posters(handles_status, handles_checked_at, ruul_status, ruul_done_at, tiktok_handle, instagram_handle, warmup_status, warmup_started_at, warmup_validated_at), contracts(sent_at, signed_at, status)")
           .neq("status", "rejected").order("created_at", { ascending: false }).limit(1000),
         supabase.from("onboarding_events").select("application_id, poster_id, step, at, meta").order("at").limit(20000),
         supabase.rpc("posters_last_sign_in"),

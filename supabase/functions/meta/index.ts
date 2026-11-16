@@ -179,7 +179,7 @@ async function createPendingAds(db: SupabaseClient, cfg: MetaCfg) {
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         // App Meta encore en mode développement : on s'arrête, on réessaiera à la prochaine heure.
-        if (/development mode|mode de développement|app.*not.*live|is in development/i.test(msg)) {
+        if (/development mode|mode de développement|en cours de développement|doit être publique|app.*not.*live|is in development|must be public/i.test(msg)) {
           await db.from("settings").upsert({ key: "meta_ads_pending", value: { blocked: "app_dev_mode", at: new Date().toISOString(), message: msg.slice(0, 300) } });
           return { ok: false, blocked: "app_dev_mode", created: results.filter((r) => !r.error).length, message: msg };
         }
@@ -187,7 +187,9 @@ async function createPendingAds(db: SupabaseClient, cfg: MetaCfg) {
       }
     }
   }
-  await db.from("settings").upsert({ key: "meta_ads_pending", value: { blocked: null, at: new Date().toISOString(), created: results.filter((r) => !r.error).length } });
+  const errors = results.filter((r) => r.error);
+  await db.from("settings").upsert({ key: "meta_ads_pending", value: { blocked: null, at: new Date().toISOString(), created: results.filter((r) => !r.error).length,
+    failed: errors.length, errors: errors.slice(0, 5).map((r) => `${r.adset}: ${String(r.error).slice(0, 300)}`), sets: (sets ?? []).length, approved: (crs ?? []).length } });
   return { ok: true, created: results.filter((r) => !r.error).length, results };
 }
 

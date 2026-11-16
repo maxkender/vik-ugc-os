@@ -88,7 +88,7 @@ const en = {
     paymentsTitle: "Payments", ruulTitle: "Get paid with Ruul",
     ruulSteps: [
       "Enter the email you want to use on Ruul and save.",
-      "We add you on Ruul: you receive an invitation email from Ruul.",
+      "We add you on Ruul and email you: accept the invitation in your Ruul account.",
       "Create your Ruul account, verify your ID and add your payout method.",
       "Come back here and click \"It's done\".",
     ],

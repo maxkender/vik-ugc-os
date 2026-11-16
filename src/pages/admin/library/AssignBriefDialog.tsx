@@ -18,6 +18,14 @@ export function AssignBriefDialog({ video, open, onClose, origin = "library" }: 
   const [title, setTitle] = useState("");
   const [hook, setHook] = useState("");
   const [instructions, setInstructions] = useState("");
+  // Brief complet (16/11) : angle, variantes de hook, démo, publication.
+  const [angle, setAngle] = useState("");
+  const [variants, setVariants] = useState("");
+  const [caption, setCaption] = useState("");
+  const [hashtags, setHashtags] = useState("#studytok #studytips #micabo");
+  const [postTime, setPostTime] = useState("18:00–21:00");
+  const [demo, setDemo] = useState("Enregistrement d'écran : importer un cours (photo ou PDF) → les flashcards apparaissent. 5–8 secondes.");
+  const [access, setAccess] = useState("");
   const [appId, setAppId] = useState("");
   const [language, setLanguage] = useState("");
   const [targets, setTargets] = useState<string[]>([]);
@@ -50,12 +58,13 @@ export function AssignBriefDialog({ video, open, onClose, origin = "library" }: 
     setBusy(true);
     try {
       const res = await callFn("briefs", {
-        action: "create", title, hook, instructions, app_id: appId || null, video_id: video?.id ?? null, language: language || null,
+        action: "create", title, hook, instructions, angle, hook_variants: variants.split("\n").map((x) => x.trim()).filter(Boolean).slice(0, 3),
+        caption, hashtags, demo_notes: demo, app_access: access, post_time: postTime, app_id: appId || null, video_id: video?.id ?? null, language: language || null,
         target_countries: targets, origin, due_date: due,
         ...(mode === "posters" ? { poster_ids: selected, quantity: selected.length } : { pool_id: poolId, quantity }),
       });
       if (video && !video.video_path) callFn("collect", { action: "store_video", video_id: video.id }).catch(() => {});
-      toast(`Brief créé · ${res.assigned + (res.dispatched?.assigned ?? 0)} assignation(s)`, "success");
+      toast(`Brief créé · ${res.assigned + (res.dispatched?.assigned ?? 0)} assignation(s)${res.skipped_warmup ? ` · ${res.skipped_warmup} posteur(s) ignoré(s) : warm-up pas encore validé` : ""}`, res.skipped_warmup ? "danger" : "success");
       qc.invalidateQueries({ queryKey: ["briefs"] });
       onClose();
     } catch (e) {
@@ -73,6 +82,15 @@ export function AssignBriefDialog({ video, open, onClose, origin = "library" }: 
           <Field label="Titre"><Input value={title} onChange={(e) => setTitle(e.target.value)} /></Field>
           <Field label="Hook (première phrase)"><Input value={hook} onChange={(e) => setHook(e.target.value)} /></Field>
           <Field label="Consignes"><Textarea rows={5} value={instructions} onChange={(e) => setInstructions(e.target.value)} /></Field>
+          <Field label="Angle du jour"><Input value={angle} onChange={(e) => setAngle(e.target.value)} placeholder="ex. réviser en 20 min au lieu de 2 h" /></Field>
+          <Field label="Variantes du hook (une par ligne, 3 max)"><Textarea rows={3} value={variants} onChange={(e) => setVariants(e.target.value)} /></Field>
+          <Field label="Démo de l'app : quoi filmer"><Textarea rows={2} value={demo} onChange={(e) => setDemo(e.target.value)} /></Field>
+          <Field label="Accès / compte de test (si besoin)"><Input value={access} onChange={(e) => setAccess(e.target.value)} /></Field>
+          <Field label="Légende proposée"><Textarea rows={2} value={caption} onChange={(e) => setCaption(e.target.value)} /></Field>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field label="Hashtags"><Input value={hashtags} onChange={(e) => setHashtags(e.target.value)} /></Field>
+            <Field label="Heure conseillée"><Input value={postTime} onChange={(e) => setPostTime(e.target.value)} /></Field>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <Field label="App"><Select value={appId} onChange={(e) => setAppId(e.target.value)}>{(apps ?? []).map((a: any) => <option key={a.id} value={a.id}>{a.name}</option>)}</Select></Field>
             <Field label="Langue"><Input placeholder="ex. fr, es (vide = toutes)" value={language} onChange={(e) => setLanguage(e.target.value)} /></Field>

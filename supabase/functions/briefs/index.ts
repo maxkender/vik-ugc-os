@@ -14,7 +14,8 @@ import { feedbackEmailVars, parseTimestamp, REVIEW_CHECKS, type Verdict } from "
 
 async function dispatch(db: SupabaseClient, day: string) {
   const cfg = await getSetting(db, "briefs");
-  const { data: posters } = await db.from("posters").select("id, country, language, daily_quota").eq("status", "active");
+  // Warm-up de 24 h obligatoire avant le 1er brief (16/11) : seuls les posteurs au warm-up validé reçoivent des briefs.
+  const { data: posters } = await db.from("posters").select("id, country, language, daily_quota").eq("status", "active").eq("warmup_status", "validated");
   const { data: today } = await db.from("brief_assignments").select("poster_id").eq("due_date", day);
   const { data: totals } = await db.from("brief_assignments").select("poster_id").gte("due_date", isoDay(new Date(Date.now() - 30 * 86_400_000)));
   const count = (rows: any[] | null, id: string) => (rows ?? []).filter((r) => r.poster_id === id).length;
@@ -49,13 +50,20 @@ serve(async (req, body, db) => {
       requireStaff(c);
       const title = String(body.title ?? "").trim();
       if (!title) throw new HttpError(400, "title");
-      const posterIds: string[] = Array.isArray(body.poster_ids) ? body.poster_ids : [];
+      const asked: string[] = Array.isArray(body.poster_ids) ? body.poster_ids : [];
+      // Assignation directe : uniquement aux posteurs dont le warm-up est validé (les autres sont signalés).
+      const { data: ready } = asked.length ? await db.from("posters").select("id").in("id", asked).eq("warmup_status", "validated") : { data: [] as any[] };
+      const posterIds: string[] = (ready ?? []).map((r: any) => r.id);
+      const skippedWarmup = asked.filter((id) => !posterIds.includes(id));
       const { data: b, error } = await db.from("briefs").insert({
         title, instructions: body.instructions ?? null, hook: body.hook ?? null, app_id: body.app_id ?? null,
         reference_video_id: body.video_id ?? null, language: body.language || null,
         target_countries: Array.isArray(body.target_countries) ? body.target_countries : [],
         pool_id: body.pool_id ?? null, quantity: Math.max(1, Number(body.quantity ?? posterIds.length ?? 1)),
         origin: ["library", "ad", "manual"].includes(body.origin) ? body.origin : "library", created_by: userId(c),
+        angle: body.angle || null, hook_variants: Array.isArray(body.hook_variants) ? body.hook_variants.filter(Boolean).slice(0, 3) : [],
+        caption: body.caption || null, hashtags: body.hashtags || null, post_time: body.post_time || null,
+        demo_notes: body.demo_notes || null, app_access: body.app_access || null,
       }).select("id").single();
       if (error) throw error;
       const due = body.due_date ?? isoDay(new Date());
@@ -66,7 +74,7 @@ serve(async (req, body, db) => {
       let dispatched = null;
       if (body.pool_id && body.dispatch_now !== false) dispatched = await dispatch(db, due);
       await audit(db, userId(c), "brief.create", "brief", b.id, { posters: posterIds.length, pool: body.pool_id ?? null });
-      return { ok: true, brief_id: b.id, assigned: posterIds.length, dispatched };
+      return { ok: true, brief_id: b.id, assigned: posterIds.length, skipped_warmup: skippedWarmup.length, dispatched };
     }
     case "dispatch": {
       requireAdmin(c);

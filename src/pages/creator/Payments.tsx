@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { Button, IconTile, Spinner, useToast } from "@/components/ui";
 import { formatMoney } from "@shared/zones.ts";
 import { shortWeekLabel } from "@shared/dates.ts";
+import { guideText } from "@/i18n/guide";
 import { cn } from "@/lib/utils";
 import { READ_ONLY_HINT, useCreatorIdentity, useMyPoster } from "./shared";
 
@@ -17,7 +18,7 @@ const RUUL_CLS = {
   done: "bg-tint-green text-[#0b7a3c]", stopped: "bg-tint-red text-[#c42a2d]",
 } as const;
 /** Étape Ruul déjà franchie (0 à 4). */
-const RUUL_PROGRESS = { none: 0, email_given: 1, added: 2, done: 4, stopped: 0 } as const;
+const RUUL_PROGRESS = { none: 0, email_given: 3, added: 3, done: 5, stopped: 0 } as const;
 
 export default function Payments() {
   const { t, i18n } = useTranslation();
@@ -44,13 +45,15 @@ export default function Payments() {
     const { error } = await supabase.rpc("poster_update_self", kind === "save" ? { p_ruul_email: email.trim() } : { p_ruul_done: true });
     setBusy(null);
     if (error) return toast(error.message, "danger");
-    toast(kind === "save" ? t("common.save") + " ✓" : t("creator.ruulStatus.done"), "success");
+    toast(kind === "save" ? R.saved : R.status.done, "success");
     qc.invalidateQueries({ queryKey: ["my-poster"] });
   };
 
   if (poster.isLoading) return <div className="flex justify-center py-16"><Spinner /></div>;
   const status = poster.data?.ruul_status ?? "none";
-  const steps = t("creator.ruulSteps", { returnObjects: true }) as unknown as string[];
+  // Flux Ruul (16/11) : le créateur crée son compte, nous donne l'email ; on l'ajoute et on lui écrit à chaque étape.
+  const R = guideText(i18n.resolvedLanguage).ruul;
+  const steps = R.steps;
   const progress = RUUL_PROGRESS[status];
   const list = payouts.data ?? [];
   const paidTotal = list.filter((p) => p.status === "paid").reduce((s, p) => s + Number(p.total), 0);
@@ -60,14 +63,16 @@ export default function Payments() {
     <div className="space-y-6">
       <h1 className="text-xl font-semibold tracking-[-0.01em] text-foreground">{t("creator.paymentsTitle")}</h1>
 
-      <section className="rounded-2xl border bg-white p-5 shadow-xs sm:p-6">
-        <div className="mb-5 flex items-start justify-between gap-3">
+      <section id="ruul" className="scroll-mt-20 rounded-2xl border bg-white p-5 shadow-xs sm:p-6">
+        <div className="mb-3 flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             <IconTile icon={<Wallet />} tint="violet" className="h-10 w-10 rounded-xl" />
-            <h2 className="text-[15px] font-semibold text-foreground">{t("creator.ruulTitle")}</h2>
+            <h2 className="text-[15px] font-semibold text-foreground">{R.title}</h2>
           </div>
-          <span className={cn("shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold", RUUL_CLS[status])}>{t(`creator.ruulStatus.${status}`)}</span>
+          <span className={cn("shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold", RUUL_CLS[status])}>{R.status[status as keyof typeof R.status]}</span>
         </div>
+        <p className="mb-4 text-sm leading-relaxed text-muted-foreground">{R.intro}</p>
+        <a href="https://ruul.io" target="_blank" rel="noopener noreferrer" className="mb-4 inline-flex text-sm font-medium text-accent hover:underline">{R.openRuul} ↗</a>
         <ol className="space-y-3">
           {steps.map((s, i) => {
             const done = i < progress;
@@ -83,7 +88,8 @@ export default function Payments() {
           })}
         </ol>
         <div className="mt-5 rounded-xl border border-border-strong bg-muted p-3">
-          <label className="mb-2 block px-1 text-xs font-medium text-muted-foreground">{t("creator.ruulEmail")}</label>
+          <label className="mb-1 block px-1 text-xs font-medium text-muted-foreground">{R.emailLabel}</label>
+          <p className="mb-2 px-1 text-[11px] text-subtle-foreground">{R.emailHint}</p>
           <div className="flex flex-col gap-2 sm:flex-row">
             <input type="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={status === "done"}
               className="h-12 w-full rounded-lg border border-border-strong bg-white px-3.5 text-[15px] focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/10 disabled:opacity-60" />
@@ -92,6 +98,7 @@ export default function Payments() {
               disabled={me.readOnly || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) || email.trim() === poster.data?.ruul_email || status === "done"}>{t("creator.ruulSave")}</Button>
           </div>
         </div>
+        <p className="mt-3 text-xs text-subtle-foreground">{R.noRuulEmails}</p>
         {status !== "done" && (
           <Button size="lg" className="mt-3 h-12 w-full" onClick={() => update("done")} loading={busy === "done"} disabled={me.readOnly || !(status === "added" || status === "email_given")} title={me.readOnly ? READ_ONLY_HINT : undefined}>
             <Check className="h-4 w-4" /> {t("creator.ruulDone")}

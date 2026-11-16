@@ -147,6 +147,16 @@ Posters are content creators paid by Vik Studios to film and publish short UGC v
 - Posters film their OWN original, good-quality UGC videos with their phone (face cam, reaction, tutorial, before/after…) to promote a mobile app, and post them on their TikTok and Instagram. No slideshows or reposts.
 - 1 video per day, every day: consistency matters. Every video is checked for quality and regularity, and only validated videos are paid (fixed rate per validated video + views bonus up to the per-video cap).
 
+## Warm-up (mandatory, before the first brief)
+- After creating the TikTok and Instagram accounts, the poster warms up BOTH accounts for at least 24 hours before posting anything. Purpose: avoid a shadowban; a brand-new account that posts immediately looks like a bot.
+- Checklist on each platform: follow 10–15 accounts in the niche (study, productivity, study apps; a list taken from our library is in the Account tab), scroll and like for about 15 minutes in the niche, complete the profile (photo, name, bio), post nothing.
+- The 24-hour timer starts when they tap "I've started" in the Account tab → Warm-up step. After 24 hours they tick every box and tap "Validate my warm-up" (optional screenshot of their "For You" feed). No brief is assigned before the warm-up is validated.
+- Do NOT: use a VPN, use an emulator or automation tools, run several accounts on one phone, put a link in the bio during the first days, post right after creating the account, buy followers/likes/views or mass follow/unfollow.
+
+## Creator onboarding
+- At first login the poster sees a few welcome screens: who Vik Studios is (a small studio building mobile apps), win-win (only continue if you can be consistent and the rates suit you), warmed-up account first, good videos (edit in CapCut or Edits, good light, speak clearly, recreate the reference video), the rhythm (1 video a day, we provide all assets), the community (Slack), getting paid with Ruul. The last button leads to the warm-up.
+- Good videos: vertical 9:16, 15–30 s, hook in the first 2 seconds, subtitles, readable on-screen text in the safe zones, clear sound, natural light, face visible, no other app's watermark. Structure: hook → app demo → call to action. The reference video must be RECREATED, never reposted (never reuse the original video or the original voice). Post the same video on TikTok AND Instagram Reels and paste both links. The full Guide is in the "Guide" tab.
+
 ## Daily briefs
 - Every day, the poster's "Today" tab shows the day's briefs: a title, a hook (the first sentence / first seconds of the video) and instructions.
 - The standard rhythm is 1 video per day (one brief per day; the exact quota is shown in the context).
@@ -174,10 +184,12 @@ Posters are content creators paid by Vik Studios to film and publish short UGC v
 - Amounts shown by the assistant are estimates; only the payouts in the Payments tab are final.
 
 ## Ruul setup (required to get paid)
-1. In the "Payments" tab, enter the email address you will use on Ruul and save.
-2. You receive an invitation from Ruul by email (check spam). Create your Ruul account with that same email.
-3. Complete your Ruul profile: identity verification and payout method (bank account or other method offered by Ruul).
-4. Once done, your Ruul status becomes "done" and payments can go through. Reminders are sent until it's complete.
+Ruul never emails the poster: every email about Ruul comes from us (Vik Studios).
+1. The poster creates their own account at ruul.io (sign up as a freelancer), adds their bank details (IBAN) and completes Ruul's identity check.
+2. In the "Payments" tab, they enter the email of their Ruul account and save.
+3. We add them as a contractor on Ruul and send them our email "You've been added on Ruul": they log in at ruul.io and accept the Vik Studios invitation, then tap "It's done" in the Payments tab.
+4. Every week we send the payment through Ruul and email them ("payment sent"); Ruul pays it out to their bank account.
+Until Ruul is set up, we cannot pay. The creator alone is responsible for their Ruul setup and for receiving the funds (bank details, identity check, Ruul fees and their own taxes).
 Ruul statuses: none (no email given) → email_given → added (invited by the team) → done (ready to be paid).
 
 ## Account, handles and bio
@@ -231,7 +243,7 @@ export const ASSISTANT_OUTPUT_SCHEMA = {
 export interface CtxProfile { id: string; full_name?: string | null; locale?: string | null }
 export interface CtxPoster {
   id: string; display_name?: string | null; country?: string | null; language?: string | null; zone_code?: string | null;
-  status?: string | null; handles_status?: string | null; ruul_status?: string | null; daily_quota?: number | null;
+  status?: string | null; handles_status?: string | null; ruul_status?: string | null; daily_quota?: number | null; warmup_status?: string | null; warmup_started_at?: string | null;
   tiktok_handle?: string | null; instagram_handle?: string | null;
 }
 export interface CtxZone { code: string; price_per_video: number | string; rpm: number | string; rpm_views: number; currency: string; videos_per_day?: number | null; bonus_cap?: number | string | null }
@@ -250,7 +262,7 @@ export interface AssistantContext {
   today: string;
   poster: {
     country: string | null; zone: string | null; status: string | null; handles_status: string | null; ruul_status: string | null;
-    daily_quota: number | null; handles: string[];
+    daily_quota: number | null; handles: string[]; warmup_status: string | null; warmup_started_at: string | null;
   } | null;
   rate: { price_per_video: number; rpm: number; rpm_views: number; currency: string; videos_per_day: number | null; bonus_cap_per_video: number | null } | null;
   today_briefs: { title: string; hook: string; instructions: string; status: string }[];
@@ -339,7 +351,7 @@ export function buildAssistantContext(input: {
     poster: poster
       ? {
         country: poster.country ?? null, zone: poster.zone_code ?? null, status: poster.status ?? null,
-        handles_status: poster.handles_status ?? null, ruul_status: poster.ruul_status ?? null, daily_quota: poster.daily_quota ?? null,
+        handles_status: poster.handles_status ?? null, ruul_status: poster.ruul_status ?? null, daily_quota: poster.daily_quota ?? null, warmup_status: poster.warmup_status ?? null, warmup_started_at: poster.warmup_started_at ?? null,
         handles: [poster.tiktok_handle, poster.instagram_handle].filter((h): h is string => !!h),
       }
       : null,

@@ -6,6 +6,7 @@ import { Button, Card, Spinner, useToast } from "@/components/ui";
 import { callFn, supabase } from "@/lib/supabase";
 import { READ_ONLY_HINT, useCreatorIdentity } from "./shared";
 import { bioFor, displayNameFor } from "@shared/handles.ts";
+import { WarmupStep } from "./Warmup";
 
 type Avail = "available" | "taken" | "unknown";
 interface Suggestion { handle: string; tiktok: Avail; instagram: Avail }
@@ -161,6 +162,9 @@ export default function Account() {
           </div>
         )}
       </Step>
+
+      {/* 4. Warm-up de 24 h, obligatoire avant le 1er brief */}
+      <WarmupStep />
     </div>
   );
 
