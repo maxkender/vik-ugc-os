@@ -9,6 +9,8 @@
 //   zone_structure { countries[], daily_budget? }   admin / cron : 1 campagne PAUSED par zone (A/B/C) + 1 ad set PAUSED par pays (5 €/j par défaut)
 //   create_pending_ads                               admin / cron (horaire) : crée les pubs (PAUSED) des créas validées sans pub ;
 //                                                    s'arrête proprement tant que l'app Meta est en mode développement
+//   activate_batch { countries[], force? }           admin (clic uniquement, jamais cron) : active les ad sets de ces pays,
+//                                                    leurs pubs et leurs campagnes ; les autres ad sets restent PAUSED
 //   archive { level, id }                            admin (clic) : ARCHIVED côté Meta (irréversible)
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { audit, caller, getSetting, HttpError, requireAdmin, serve, userId } from "../_shared/http.ts";
@@ -374,6 +376,43 @@ serve(async (req, body, db) => {
       return await zoneStructure(db, cfg, company, body, c);
     case "create_pending_ads":
       return await createPendingAds(db, cfg);
+    case "activate_batch": {
+      // Lot de lancement (16/11 : FR, DE, IT, GB, ES). Clic admin uniquement ; mêmes garde-fous que « activate ».
+      if (c.kind !== "user" || c.role !== "admin") throw new HttpError(403, "activation manuelle uniquement (admin)");
+      const countries: string[] = (body.countries ?? []).map((x: string) => String(x).toUpperCase());
+      if (!countries.length) throw new HttpError(400, "countries");
+      const { data: sets } = await db.from("meta_adsets").select("*, meta_campaigns(id, meta_id, status), meta_ads(id, meta_id, status)")
+        .in("country", countries).not("status", "in", "(ARCHIVED,DELETED)");
+      const missing = countries.filter((x) => !(sets ?? []).some((a: any) => a.country === x));
+      if (missing.length) throw new HttpError(409, `Pas d'ad set pour : ${missing.join(", ")}`);
+      const noAds = (sets ?? []).filter((a: any) => !(a.meta_ads ?? []).length).map((a: any) => a.country);
+      if (noAds.length) throw new HttpError(409, `Aucune pub encore créée pour : ${noAds.join(", ")} (valide les créas, puis « Créer les pubs » ; l'app Meta doit être en Live)`);
+      for (const a of sets ?? []) if (Number(a.daily_budget) > cfg.max_daily_budget) throw new HttpError(400, `Budget ${a.country} au-dessus du plafond par ad set`);
+      const active = (await db.from("meta_adsets").select("daily_budget").eq("status", "ACTIVE")).data ?? [];
+      const total = active.reduce((x, r) => x + Number(r.daily_budget), 0) + (sets ?? []).filter((a: any) => a.status !== "ACTIVE").reduce((x: number, a: any) => x + Number(a.daily_budget), 0);
+      if (total > cfg.global_daily_cap) throw new HttpError(400, `Plafond global : ${total} > ${cfg.global_daily_cap} €/jour`);
+      const blocking = blockingItems(await checklist(db, cfg));
+      if (blocking.length && body.force !== true) throw new HttpError(409, `Checklist de lancement incomplète : ${blocking.map((b) => b.label).join(", ")}`);
+      if (blocking.length) await audit(db, userId(c), "meta.activate_batch.forced", "meta_adsets", null, { blocking: blocking.map((b) => b.key), countries });
+      const done: string[] = [];
+      for (const a of sets ?? []) {
+        for (const ad of a.meta_ads ?? []) if (ad.status !== "ACTIVE") {
+          await graph(cfg, ad.meta_id, { method: "POST", params: { status: "ACTIVE" } });
+          await db.from("meta_ads").update({ status: "ACTIVE" }).eq("id", ad.id);
+        }
+        await graph(cfg, a.meta_id, { method: "POST", params: { status: "ACTIVE" } });
+        await db.from("meta_adsets").update({ status: "ACTIVE" }).eq("id", a.id);
+        done.push(a.country);
+      }
+      for (const camp of new Map((sets ?? []).map((a: any) => [a.meta_campaigns.id, a.meta_campaigns])).values()) {
+        if (camp.status !== "ACTIVE") {
+          await graph(cfg, camp.meta_id, { method: "POST", params: { status: "ACTIVE" } });
+          await db.from("meta_campaigns").update({ status: "ACTIVE" }).eq("id", camp.id);
+        }
+      }
+      await audit(db, userId(c), "meta.activate_batch", "meta_adsets", null, { countries: done, daily_total: total });
+      return { ok: true, activated: done, daily_total: total };
+    }
     case "archive": {
       if (c.kind !== "user") throw new HttpError(403, "archivage manuel uniquement");
       const level = String(body.level);

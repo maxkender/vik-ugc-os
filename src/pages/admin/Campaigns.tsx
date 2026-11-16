@@ -100,6 +100,25 @@ export default function Campaigns() {
     if (!window.confirm(`Archiver « ${row.name} » sur Meta ? C'est irréversible (l'objet ne pourra plus être réactivé).`)) return;
     act(`arch-${row.id}`, () => callFn("meta", { action: "archive", level, id: row.id }), "Archivé");
   };
+  // Lot de lancement (réglage meta.launch_batch) : un clic de Max active ces ad sets, leurs pubs et leurs campagnes.
+  const metaSetting = useQuery({ queryKey: ["meta-setting"], queryFn: async () => (await supabase.from("settings").select("value").eq("key", "meta").single()).data?.value as any });
+  const batch: string[] = metaSetting.data?.launch_batch ?? [];
+  const batchSets = (camps.data ?? []).flatMap((c: any) => c.meta_adsets ?? []).filter((a: any) => batch.includes(a.country) && a.status !== "ARCHIVED");
+  const batchBudget = batchSets.reduce((x: number, a: any) => x + Number(a.daily_budget), 0);
+  const activateBatch = () => {
+    if (!window.confirm(`Activer le lot ${batch.join(", ")} ?\n${batchSets.length} ad sets · ${batchBudget} €/jour au total. Les autres pays restent en pause.`)) return;
+    act("batch", async () => {
+      try {
+        return await callFn("meta", { action: "activate_batch", countries: batch });
+      } catch (e) {
+        const msg = (e as Error).message;
+        if (/Checklist de lancement incomplète/.test(msg) && window.confirm(`${msg}\n\nForcer l'activation du lot malgré tout ? (action journalisée)`)) {
+          return await callFn("meta", { action: "activate_batch", countries: batch, force: true });
+        }
+        throw e;
+      }
+    }, "Lot activé");
+  };
   const pendingState = useQuery({ queryKey: ["meta-ads-pending"], queryFn: async () => (await supabase.from("settings").select("value").eq("key", "meta_ads_pending").maybeSingle()).data?.value as any });
   const adsetLabel = (a: any) => a.country ?? `Zone ${a.zone_code ?? "?"}`;
   const adsetCountries = (a: any): string[] => (a.country ? [a.country] : a.targeting?.countries ?? []);
@@ -168,7 +187,14 @@ export default function Campaigns() {
             <div className="h-full rounded-full" style={{ width: `${Math.max(2, Math.min(100, (committed / Math.max(globalCap, 1)) * 100))}%`, background: committed > globalCap * 0.9 ? "#fe504f" : "#004dff" }} />
           </div>
           <p className="mt-2 text-xs text-subtle-foreground">Actifs + en pause · dont actifs : {activeBudget} €</p>
-          <Button size="sm" className="mt-3 w-full" loading={busy === "pending"} onClick={createPending}><Upload className="h-3.5 w-3.5" /> Créer les pubs</Button>
+          {batch.length > 0 && (
+            <div className="mt-3 rounded-xl border border-[#dbe5ff] bg-[#f6f9ff] p-3" data-testid="launch-batch">
+              <p className="text-[13px] font-semibold text-foreground">Lot de lancement : {batch.map((x) => `${flag(x)} ${x}`).join("  ")}</p>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">{batchSets.length} ad sets · {batchBudget} €/jour · {batchSets.filter((a: any) => a.status === "ACTIVE").length} actif(s). Les autres pays restent en pause.</p>
+              <Button size="sm" className="mt-2 w-full" loading={busy === "batch"} onClick={activateBatch}><Play className="h-3.5 w-3.5" /> Activer ce lot</Button>
+            </div>
+          )}
+          <Button size="sm" variant="secondary" className="mt-3 w-full" loading={busy === "pending"} onClick={createPending}><Upload className="h-3.5 w-3.5" /> Créer les pubs</Button>
           <p className="mt-1.5 text-[11px] leading-snug text-subtle-foreground">
             {pendingState.data?.blocked === "app_dev_mode" ? "En attente : app Meta en mode développement (réessai automatique chaque heure)." : "Créas validées → pubs PAUSED, aussi automatiquement chaque heure."}
           </p>

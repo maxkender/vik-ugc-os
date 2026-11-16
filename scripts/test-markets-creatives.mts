@@ -11,7 +11,7 @@ import { formatMoney } from "../supabase/functions/_shared/logic/zones.ts";
 
 const REF = "lnytuhsgzkqrkehemasu";
 const MGMT = { authorization: `Bearer sbp_${"0".repeat(40)}`, "content-type": "application/json" };
-export const TEST_MARKETS: Record<string, string> = { FR: "fr", DE: "de", BE: "fr", ES: "es", IT: "it", PL: "pl", RS: "sr", RO: "ro", BG: "bg", MX: "es" };
+export const TEST_MARKETS: Record<string, string> = { FR: "fr", DE: "de", BE: "fr", ES: "es", IT: "it", PL: "pl", RS: "sr", RO: "ro", BG: "bg", MX: "es", GB: "en" };
 const out = process.argv[2];
 const only = (process.argv[3] ?? "").split(",").filter(Boolean);
 const markets = Object.entries(TEST_MARKETS).filter(([c]) => !only.length || only.includes(c));
@@ -37,8 +37,9 @@ for (const [code, lang] of markets) {
   const z = zoneOf.get(code);
   if (!z) throw new Error(`zone ${code}`);
   const card = cardCopy(lang, "student", code);
-  const notes = notesCopy(lang);
-  const job = jobCopy(lang, "student", formatMoney(Number(z.price_per_video), z.currency, lang), code);
+  const locale = code === "GB" ? "en-GB" : lang; // « US$10 », dates britanniques
+  const notes = notesCopy(locale);
+  const job = jobCopy(lang, "student", formatMoney(Number(z.price_per_video), z.currency, locale), code);
   for (const format of ["1:1", "9:16"]) {
     rows.push({ country: code, language: card.lang, format, style: "card", hook: "student", headline: job.headline, subline: null, cta: job.cta, bonus_line: null,
       card: { label: card.label, title: card.title, lines: card.lines, cta: card.cta, footer: card.footer }, ad_text: card.primary });
