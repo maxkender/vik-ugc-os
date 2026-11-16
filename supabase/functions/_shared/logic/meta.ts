@@ -4,6 +4,7 @@
  * L'activation passe par `activationAllowed` (admin + budget sous le plafond).
  */
 export type MetaStatus = "PAUSED" | "ACTIVE";
+import { employmentTargeting } from "./pixel.ts";
 
 export function assertPaused(payload: Record<string, unknown>): void {
   const s = payload.status ?? payload.effective_status;
@@ -25,10 +26,13 @@ export function landingUrl(base: string, p: { country: string; lang: string; cam
 /** Budget Meta en centimes (devise du compte). */
 export const toMinor = (amount: number) => Math.round(amount * 100);
 
-export function campaignPayload(name: string, countries: string[] = []) {
+export type MetaObjective = "leads" | "traffic";
+
+/** Objectif : OUTCOME_LEADS (événement « Lead » du pixel, sur le site) par défaut ; OUTCOME_TRAFFIC en option. */
+export function campaignPayload(name: string, countries: string[] = [], objective: MetaObjective = "leads") {
   const p = {
     name,
-    objective: "OUTCOME_TRAFFIC",
+    objective: objective === "traffic" ? "OUTCOME_TRAFFIC" : "OUTCOME_LEADS",
     status: "PAUSED" as MetaStatus,
     special_ad_categories: ["EMPLOYMENT"],     // offres d'emploi : catégorie spéciale obligatoire
     special_ad_category_country: countries.map((c) => c.toUpperCase()),
@@ -40,34 +44,34 @@ export function campaignPayload(name: string, countries: string[] = []) {
 }
 
 /**
- * Ad set par pays. Catégorie spéciale EMPLOYMENT : Meta interdit le ciblage
- * par âge fin, genre et intérêts détaillés — on stocke 18–25 / étudiants comme
- * intention (targeting_intent) et on n'envoie que pays + âge 18–65 si la
- * catégorie est active. Voir DECISIONS.md.
+ * Ad set (un pays ou une zone). Catégorie spéciale EMPLOYMENT : ciblage conforme uniquement
+ * (pays + langue + Advantage+ audience, 18–65, ni genre, ni intérêts, ni code postal) — voir employmentViolations.
+ * Objectif « leads » : optimisation sur la conversion Lead du pixel (site web) ; « traffic » : vues de landing.
  */
-export function adsetPayload(p: { name: string; campaignId: string; country: string; dailyBudget: number; employment: boolean; ageMin?: number; ageMax?: number; beneficiary?: string }) {
-  const targeting: Record<string, unknown> = {
-    geo_locations: { countries: [p.country.toUpperCase()] },
-    age_min: p.employment ? 18 : Math.max(18, p.ageMin ?? 18),
-    age_max: p.employment ? 65 : Math.min(65, p.ageMax ?? 25),
-    targeting_automation: { advantage_audience: 0 },
-  };
-  const payload = {
+export function adsetPayload(p: {
+  name: string; campaignId: string; country: string; countries?: string[]; langs?: string[]; dailyBudget: number; employment: boolean;
+  beneficiary?: string; objective?: MetaObjective; pixelId?: string | null;
+}) {
+  // Sans pixel, impossible d'optimiser sur le Lead : repli sur le trafic.
+  const objective: MetaObjective = p.objective === "traffic" || !p.pixelId ? "traffic" : "leads";
+  const targeting = employmentTargeting(p.countries?.length ? p.countries : [p.country], p.langs ?? []);
+  const payload: Record<string, unknown> = {
     name: p.name,
     campaign_id: p.campaignId,
     status: "PAUSED" as MetaStatus,
     daily_budget: toMinor(p.dailyBudget),
     billing_event: "IMPRESSIONS",
-    optimization_goal: "LANDING_PAGE_VIEWS",
+    optimization_goal: objective === "leads" ? "OFFSITE_CONVERSIONS" : "LANDING_PAGE_VIEWS",
     bid_strategy: "LOWEST_COST_WITHOUT_CAP",
     destination_type: "WEBSITE",
+    ...(objective === "leads" ? { promoted_object: { pixel_id: p.pixelId, custom_event_type: "LEAD" } } : {}),
     // DSA (UE) : annonceur et payeur obligatoires sur chaque ad set (vérifié le 14/11).
     dsa_beneficiary: p.beneficiary ?? "Vik Studios",
     dsa_payor: p.beneficiary ?? "Vik Studios",
     targeting,
   };
   assertPaused(payload);
-  return payload;
+  return payload as typeof payload & { targeting: ReturnType<typeof employmentTargeting>; optimization_goal: string };
 }
 
 export function adPayload(p: { name: string; adsetId: string; creativeId: string }) {
@@ -87,3 +91,47 @@ export function activationAllowed(p: { isAdmin: boolean; dailyBudget: number; ca
 export function costPer(spend: number, count: number): number | null {
   return count > 0 ? Math.round((spend / count) * 100) / 100 : null;
 }
+
+// ---------------------------------------------------------------------------
+// Checklist de lancement (Campagnes Meta) : « Activer » bloqué tant qu'un prérequis critique est ❌.
+// ---------------------------------------------------------------------------
+export interface ChecklistInput {
+  accountStatus: number | null;          // 1 = actif
+  hasFunding: boolean;
+  pageOk: boolean;
+  pixelId: string | null;
+  pixelLastFired: string | null;          // ISO
+  pixelShared: boolean;                   // pixel aussi utilisé par un autre site
+  capiTestedAt: string | null;            // dernier envoi OK avec test_event_code
+  landingOk: boolean;                     // landing https joignable
+  domainVerified: boolean;                // case manuelle (Business Manager → Domaines)
+  emailsSent: number;                     // emails réellement délivrés par Brevo
+  translationsReviewed: boolean;          // case manuelle
+  approvedCreatives: number;
+  creativesValidated: boolean;            // case manuelle
+  globalCap: number;
+  committedBudget: number;
+  now?: Date;
+}
+export interface ChecklistItem { key: string; label: string; ok: boolean; critical: boolean; detail: string; manual?: boolean }
+
+const DAY = 86_400_000;
+export function launchChecklist(i: ChecklistInput): ChecklistItem[] {
+  const now = (i.now ?? new Date()).getTime();
+  const fresh = (iso: string | null, days: number) => !!iso && now - Date.parse(iso) < days * DAY;
+  return [
+    { key: "account", label: "Compte publicitaire actif", ok: i.accountStatus === 1, critical: true, detail: i.accountStatus === 1 ? "account_status = 1" : `account_status = ${i.accountStatus ?? "?"}` },
+    { key: "payment", label: "Moyen de paiement", ok: i.hasFunding, critical: true, detail: i.hasFunding ? "moyen de paiement enregistré" : "aucun moyen de paiement" },
+    { key: "page", label: "Page Facebook publiée", ok: i.pageOk, critical: true, detail: i.pageOk ? "page publiée" : "page absente ou non publiée" },
+    { key: "pixel", label: "Pixel qui reçoit des événements", ok: !!i.pixelId && fresh(i.pixelLastFired, 7), critical: true,
+      detail: !i.pixelId ? "aucun pixel réglé" : i.pixelLastFired ? `dernier événement ${i.pixelLastFired.slice(0, 16).replace("T", " ")}${i.pixelShared ? " (pixel partagé : pas forcément notre site)" : ""}` : "aucun événement reçu" },
+    { key: "capi", label: "Conversions API testée (test_event_code)", ok: fresh(i.capiTestedAt, 30), critical: true, detail: i.capiTestedAt ? `test OK le ${i.capiTestedAt.slice(0, 10)}` : "pas encore testée : code de test à saisir dans Réglages → Intégrations" },
+    { key: "landing", label: "Landing en ligne (https)", ok: i.landingOk, critical: true, detail: i.landingOk ? "répond 200" : "injoignable ou non https" },
+    { key: "domain", label: "Domaine vérifié dans le Business Manager", ok: i.domainVerified, critical: false, manual: true, detail: "case à cocher après vérification" },
+    { key: "emails", label: "Emails Brevo testés", ok: i.emailsSent > 0, critical: true, detail: i.emailsSent > 0 ? `${i.emailsSent} email(s) délivré(s)` : "aucun email réellement délivré" },
+    { key: "translations", label: "Traductions relues", ok: i.translationsReviewed, critical: false, manual: true, detail: "case à cocher après relecture native" },
+    { key: "creatives", label: "Créas validées", ok: i.approvedCreatives > 0 && i.creativesValidated, critical: true, manual: true, detail: `${i.approvedCreatives} créa(s) approuvée(s)${i.creativesValidated ? "" : " · validation finale à cocher"}` },
+    { key: "budget", label: "Budget global plafonné", ok: i.globalCap > 0 && i.committedBudget <= i.globalCap, critical: true, detail: `${i.committedBudget} € engagés / plafond ${i.globalCap} €/jour` },
+  ];
+}
+export const blockingItems = (items: ChecklistItem[]) => items.filter((x) => x.critical && !x.ok);

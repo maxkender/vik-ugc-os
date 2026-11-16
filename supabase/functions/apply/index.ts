@@ -5,6 +5,9 @@
 import { HttpError, serve } from "../_shared/http.ts";
 import { queueEmail } from "../_shared/outbox.ts";
 import { ageOn } from "../_shared/logic/zones.ts";
+import { getSetting } from "../_shared/http.ts";
+import { sendLead } from "../_shared/capi.ts";
+import { fbcFromFbclid, validEventId, validFbc, validFbp } from "../_shared/logic/pixel.ts";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const s = (v: unknown, max = 500) => (typeof v === "string" ? v.trim().slice(0, max) : "");
@@ -17,7 +20,9 @@ serve(async (req, body, db) => {
   if (req.method === "GET" || body.action === "pricing") {
     const country = s(body.country, 2).toUpperCase();
     const { data: c } = await db.from("countries").select("code, name, language, open, zone_code, zones(price_per_video, rpm, rpm_views, currency, videos_per_day)").eq("code", country).maybeSingle();
-    return { ok: true, country: c ?? null };
+    // Pixel Meta (public) : la landing et le formulaire le chargent seulement après consentement.
+    const meta = await getSetting<{ pixel_id?: string; tracking_enabled?: boolean }>(db, "meta");
+    return { ok: true, country: c ?? null, tracking: meta.tracking_enabled !== false && meta.pixel_id ? { pixel_id: meta.pixel_id } : null };
   }
   if (body.action !== "submit") throw new HttpError(400, "unknown action");
 
@@ -60,6 +65,7 @@ serve(async (req, body, db) => {
     yap_video_path: yap,
     locale: s(body.locale, 10) || c!.language || "en",
     utm: typeof body.utm === "object" && body.utm ? Object.fromEntries(Object.entries(body.utm).slice(0, 10).map(([k, v]) => [s(k, 40), s(v, 200)])) : {},
+    attribution: attributionOf(body.tracking),
   };
   const { data, error } = await db.from("applications").insert(row).select("id").single();
   if (error) {
@@ -67,5 +73,30 @@ serve(async (req, body, db) => {
     throw error;
   }
   await queueEmail(db, { template: "application_received", to: email, language: row.locale, vars: { first_name }, relatedType: "application", relatedId: data.id });
+  // Conversions API : Lead côté serveur, dédupliqué avec le pixel par event_id. Seulement avec le consentement publicitaire.
+  const a = row.attribution as Record<string, any>;
+  // Jamais pour un compte de test (@vik-qa.test) : ce serait une fausse conversion sur le pixel.
+  if (a.consent === true && a.event_id && !email.endsWith("@vik-qa.test")) {
+    await sendLead(db, {
+      applicationId: data.id, eventId: a.event_id, email, phone: row.phone, country,
+      fbc: a.fbc ?? null, fbp: a.fbp ?? null,
+      ip: (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || null,
+      userAgent: s(req.headers.get("user-agent"), 400) || null, sourceUrl: a.source_url ?? null,
+    }).catch((e) => console.error("capi", e instanceof Error ? e.message : String(e)));
+  }
   return { ok: true, id: data.id };
 });
+
+/** Attribution envoyée par le navigateur (consentement, fbclid, _fbc, _fbp, event_id), validée. */
+function attributionOf(t: any): Record<string, unknown> {
+  if (!t || typeof t !== "object") return {};
+  const fbclid = s(t.fbclid, 500) || null;
+  const fbc = validFbc(t.fbc) ?? (fbclid ? fbcFromFbclid(fbclid) : null);
+  const url = s(t.source_url, 500);
+  return {
+    consent: t.consent === true,
+    event_id: validEventId(t.event_id),
+    fbclid, fbc, fbp: validFbp(t.fbp),
+    source_url: /^https:\/\//.test(url) ? url : null,
+  };
+}

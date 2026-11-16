@@ -4,6 +4,7 @@ import { BarChart3, Megaphone, Pause, Play, Plus, RefreshCw, ShieldCheck, Upload
 import { supabase, callFn } from "@/lib/supabase";
 import { useCountries, useSetting } from "@/lib/hooks";
 import { costPer } from "@shared/meta.ts";
+import { LaunchChecklist } from "./campaigns/LaunchChecklist";
 import { Badge, Button, Card, CardTitle, Dialog, Empty, Field, IconTile, Input, PageHeader, Spinner, Table, Td, Th, useToast } from "@/components/ui";
 import { dateFr, flag } from "@/lib/utils";
 
@@ -54,7 +55,18 @@ export default function Campaigns() {
 
   const activate = (level: string, row: any, budget: number) => {
     if (!window.confirm(`Activer ce ${level} ?\nBudget journalier : ${budget} €\nPlafond : ${cap} €\nLa diffusion (et la dépense) démarre immédiatement.`)) return;
-    act(`act-${row.id}`, () => callFn("meta", { action: "activate", level, id: row.id }), "Activé");
+    act(`act-${row.id}`, async () => {
+      try {
+        return await callFn("meta", { action: "activate", level, id: row.id });
+      } catch (e) {
+        const msg = (e as Error).message;
+        // Checklist incomplète : forçage admin explicite seulement (journalisé côté serveur).
+        if (/Checklist de lancement incomplète/.test(msg) && window.confirm(`${msg}\n\nForcer l'activation malgré tout ? (action journalisée)`)) {
+          return await callFn("meta", { action: "activate", level, id: row.id, force: true });
+        }
+        throw e;
+      }
+    }, "Activé");
   };
   const pause = (level: string, row: any) => act(`pause-${row.id}`, () => callFn("meta", { action: "pause", level, id: row.id }), "Mis en pause");
 
@@ -120,6 +132,7 @@ export default function Campaigns() {
           <Button onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> Nouvelle campagne</Button>
         </>}
       />
+      <LaunchChecklist />
       <div className="mb-8 grid gap-4 lg:grid-cols-3">
         <div className="flex items-start gap-4 rounded-xl border border-[#ffe3b0] bg-tint-yellow p-5 lg:col-span-2">
           <IconTile icon={<ShieldCheck />} tint="yellow" className="bg-white" />
@@ -253,6 +266,7 @@ function NewCampaignDialog({ open, onClose, cap, countries, defaultLanding, onCr
   const [budgets, setBudgets] = useState<Record<string, number>>({});
   const [landing, setLanding] = useState("");
   const [busy, setBusy] = useState(false);
+  const [objective, setObjective] = useState<"leads" | "traffic">("leads");
   const [q, setQ] = useState("");
   const zoneOf = (code: string) => countries.find((c) => c.code === code)?.zone_code ?? "?";
   const groups = mode === "zone" ? [...new Set(sel.map(zoneOf))].sort() : sel;
@@ -266,7 +280,7 @@ function NewCampaignDialog({ open, onClose, cap, countries, defaultLanding, onCr
     try {
       await callFn("meta", {
         action: "create_campaign", name, countries: sel, daily_budget: budget, by_zone: mode === "zone",
-        budgets: Object.fromEntries(groups.map((k) => [k, budgetOf(k)])), landing_base_url: landing || defaultLanding,
+        budgets: Object.fromEntries(groups.map((k) => [k, budgetOf(k)])), landing_base_url: landing || defaultLanding, objective,
       });
       toast("Campagne créée en PAUSED", "success");
       setSel([]);
@@ -284,13 +298,19 @@ function NewCampaignDialog({ open, onClose, cap, countries, defaultLanding, onCr
       <div className="grid gap-5 md:grid-cols-2">
         <div className="space-y-4">
           <Field label="Nom"><Input value={name} onChange={(e) => setName(e.target.value)} /></Field>
+          <Field label="Objectif" hint="Prospects : Meta optimise sur les candidatures (événement Lead du pixel). Trafic : sur les vues de la landing.">
+            <div className="flex gap-4 text-sm">
+              <label className="flex items-center gap-2"><input type="radio" checked={objective === "leads"} onChange={() => setObjective("leads")} /> Prospects (Lead)</label>
+              <label className="flex items-center gap-2"><input type="radio" checked={objective === "traffic"} onChange={() => setObjective("traffic")} /> Trafic</label>
+            </div>
+          </Field>
           <Field label="Découpage">
             <div className="flex gap-4 text-sm">
               <label className="flex items-center gap-2"><input type="radio" checked={mode === "country"} onChange={() => setMode("country")} /> Un ad set par pays</label>
               <label className="flex items-center gap-2"><input type="radio" checked={mode === "zone"} onChange={() => setMode("zone")} /> Un ad set par zone (A/B/C)</label>
             </div>
           </Field>
-          <Field label={`Pays (${sel.length})`} hint="Ciblage 18–65 (catégorie Emploi : âge fin et intérêts interdits par Meta).">
+          <Field label={`Pays (${sel.length})`} hint="Catégorie Emploi : pays + langue du pays + Advantage+ audience, 18–65. Ni genre, ni intérêts, ni code postal.">
             <div className="mb-2 flex flex-wrap gap-1.5">
               {["A", "B", "C"].map((z) => <Button key={z} size="sm" variant="outline" onClick={() => setSel([...new Set([...sel, ...countries.filter((c) => c.zone_code === z).map((c) => c.code)])])}>+ Zone {z}</Button>)}
               <Button size="sm" variant="ghost" onClick={() => setSel([])}>Aucun</Button>

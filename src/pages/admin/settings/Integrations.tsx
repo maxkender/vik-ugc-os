@@ -94,6 +94,21 @@ export default function Integrations() {
             <Field label="Nom de la page"><Input value={d.page_name ?? ""} onChange={(e) => set("page_name", e.target.value)} /></Field>
             <Field label="Plafond budget journalier (devise du compte)"><Input type="number" value={d.max_daily_budget} onChange={(e) => set("max_daily_budget", num(e.target.value))} /></Field>
             <Field label="Bénéficiaire / payeur (DSA)"><Input value={d.beneficiary ?? ""} onChange={(e) => set("beneficiary", e.target.value)} /></Field>
+            <Field label="ID du pixel Meta" hint="Chargé sur /join et /apply après consentement ; Lead envoyé aussi par la Conversions API (dédupliqué). Recommandé : un pixel dédié à Vik UGC OS.">
+              <Input value={d.pixel_id ?? ""} onChange={(e) => set("pixel_id", e.target.value.replace(/\D/g, ""))} placeholder="ex. 1755822698850602" />
+            </Field>
+            <Field label="Code de test Conversions API" hint="Events Manager → Tester les événements. Avec un code, les événements serveur vont dans l'outil de test (pas comptés). Vide en production.">
+              <Input value={d.capi_test_code ?? ""} onChange={(e) => set("capi_test_code", e.target.value.trim())} placeholder="TEST12345" />
+            </Field>
+            <Field label="Objectif des nouvelles campagnes">
+              <select className="h-10 w-full rounded-xl border border-border-strong bg-white px-3 text-sm" value={d.objective ?? "leads"} onChange={(e) => set("objective", e.target.value)}>
+                <option value="leads">Prospects (OUTCOME_LEADS) : optimisé sur la candidature (Lead du pixel)</option>
+                <option value="traffic">Trafic (OUTCOME_TRAFFIC) : vues de la landing</option>
+              </select>
+            </Field>
+            <Field label="Suivi Meta (pixel + CAPI)">
+              <label className="flex h-10 items-center gap-2 text-sm"><input type="checkbox" checked={d.tracking_enabled !== false} onChange={(e) => set({ tracking_enabled: e.target.checked, capi_enabled: e.target.checked })} /> Activé (après consentement du visiteur)</label>
+            </Field>
             <div className="sm:col-span-2 space-y-2">
               <Button size="sm" variant="outline" loading={testing} onClick={testMeta}>Tester la connexion</Button>
               {meta && <div className="rounded-md bg-muted p-3 text-sm">

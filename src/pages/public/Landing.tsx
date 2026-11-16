@@ -1,6 +1,8 @@
 import { useEffect, useMemo } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { usePixel } from "@/lib/usePixel";
+import { ConsentBanner } from "@/components/public/ConsentBanner";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, Check, ClipboardList, Globe2, Heart, MessageCircle, PenLine, Plus, Share2, TrendingUp, Video, Wallet } from "lucide-react";
 import { supabase } from "@/lib/supabase";
@@ -33,7 +35,7 @@ export function useOpenCountries() {
 export function keptParams(params: URLSearchParams): string {
   const out = new URLSearchParams();
   params.forEach((v, k) => {
-    if (k === "lang" || k.startsWith("utm_")) out.set(k, v);
+    if (k === "lang" || k === "fbclid" || k.startsWith("utm_")) out.set(k, v);
   });
   const s = out.toString();
   return s ? `?${s}` : "";
@@ -54,6 +56,7 @@ const BRAND = "Vik Studios";
 export default function Landing() {
   const { country: param } = useParams();
   const [params] = useSearchParams();
+  const pixel = usePixel(params, "landing");
   const nav = useNavigate();
   const { t, i18n } = useTranslation();
   const { data: countries, isLoading } = useOpenCountries();
@@ -102,6 +105,7 @@ export default function Landing() {
 
   return (
     <div className="min-h-full bg-white">
+      <ConsentBanner enabled={pixel.enabled} />
       <header className="sticky top-0 z-30 border-b border-transparent bg-white/85 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
           <Logo className="h-[22px] sm:h-6" />

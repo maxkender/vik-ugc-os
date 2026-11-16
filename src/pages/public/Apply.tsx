@@ -4,6 +4,9 @@ import { useTranslation } from "react-i18next";
 import * as tus from "tus-js-client";
 import { CheckCircle2, Sparkles, Upload, User, Video } from "lucide-react";
 import { ANON_KEY, SUPABASE_URL, callFn } from "@/lib/supabase";
+import { usePixel } from "@/lib/usePixel";
+import { attribution, newEventId, track } from "@/lib/pixel";
+import { ConsentBanner } from "@/components/public/ConsentBanner";
 import { Button, Field, IconTile, Input, Select, Spinner, Textarea, type Tint } from "@/components/ui";
 import { uiLangForCountry } from "@/i18n";
 import { ageOn } from "@shared/zones.ts";
@@ -23,6 +26,7 @@ type Form = {
 export default function Apply() {
   const { country: param } = useParams();
   const [params] = useSearchParams();
+  const pixel = usePixel(params, "apply");
   const { t, i18n } = useTranslation();
   const { data: countries, isLoading } = useOpenCountries();
   const open = useMemo(() => (countries ?? []).filter((c) => c.open && c.zone_code), [countries]);
@@ -84,6 +88,8 @@ export default function Apply() {
     setErrors([]);
     const utm: Record<string, string> = {};
     params.forEach((v, k) => { if (k.startsWith("utm_")) utm[k] = v; });
+    // Même event_id pour le pixel (navigateur) et la Conversions API (serveur) : Meta déduplique.
+    const eventId = newEventId();
     try {
       await callFn("apply", {
         action: "submit", ...f,
@@ -91,7 +97,9 @@ export default function Apply() {
         instagram_followers: f.instagram_followers ? Number(f.instagram_followers) : null,
         languages: f.languages.split(",").map((s) => s.trim()).filter(Boolean),
         yap_video_path: yapPath, locale: i18n.resolvedLanguage ?? "en", utm,
+        tracking: attribution(eventId),
       });
+      track("Lead", { content_name: "ugc_creator_application", country: f.country }, eventId);
       setDone(true);
       window.scrollTo(0, 0);
     } catch (err) {
@@ -110,6 +118,7 @@ export default function Apply() {
 
   return (
     <div className="min-h-full bg-white">
+      <ConsentBanner enabled={pixel.enabled} />
       <header className="sticky top-0 z-30 border-b border-separator bg-white/90 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-2xl items-center justify-between px-5">
         <Link to={`/join/${f.country.toLowerCase()}${keptParams(params)}`} className="inline-flex"><Logo className="h-[22px]" /></Link>
