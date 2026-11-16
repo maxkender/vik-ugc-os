@@ -30,4 +30,11 @@ describe("textes des créas", () => {
     expect(creativeCopy("es", "student", "3 €", { country: "ES" }).headline).toContain("vídeo");
     expect(creativeCopy("fr", "earn", "5 $").bonus).toBeNull();
   });
+  it("estimation mensuelle : « hasta » + note « no garantizados », jamais une promesse", () => {
+    const c = creativeCopy("es", "nofollow", "2,50 US$", { monthly: "150 US$", perDay: 2, country: "CO" });
+    expect(c.monthly).toBe("Hasta ~150 US$/mes* + bono según tus vistas");
+    expect(c.disclaimer).toBe("*Estimación con 2 videos al día durante 30 días. Ingresos no garantizados.");
+    expect(c.headline).toBe("Sin necesidad de seguidores. 2,50 US$ por video.");
+    expect(creativeCopy("ja", "earn", "2 $", { monthly: "120 $" }).monthly).toBeNull();
+  });
 });

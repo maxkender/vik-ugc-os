@@ -224,7 +224,7 @@ export default function Landing() {
           </section>
         </>
       )}
-      <footer className="border-t border-separator py-8 text-center text-xs text-subtle-foreground">© {new Date().getFullYear()} {BRAND}</footer>
+      <footer className="border-t border-separator py-8 pb-28 text-center text-xs text-subtle-foreground sm:pb-8">© {new Date().getFullYear()} {BRAND} · <Link to="/privacy" className="hover:underline">Privacy</Link> · <Link to="/terms" className="hover:underline">Terms</Link></footer>
 
       {/* CTA collant mobile */}
       {open && (

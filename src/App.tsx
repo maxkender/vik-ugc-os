@@ -23,6 +23,7 @@ const Onboarding = lazy(() => import("./pages/admin/Onboarding"));
 const CreatorAccount = lazy(() => import("./pages/creator/Account"));
 const WinningAds = lazy(() => import("./pages/admin/WinningAds"));
 const Agents = lazy(() => import("./pages/admin/Agents"));
+const Legal = lazy(() => import("./pages/public/Legal"));
 const Briefs = lazy(() => import("./pages/admin/Briefs"));
 const Assets = lazy(() => import("./pages/admin/Assets"));
 const Candidates = lazy(() => import("./pages/admin/Candidates"));
@@ -63,6 +64,8 @@ export function App() {
         <Route path="/apply" element={<Apply />} />
         <Route path="/apply/:country" element={<Apply />} />
         <Route path="/sign/:token" element={<Sign />} />
+        <Route path="/privacy" element={<Legal />} />
+        <Route path="/terms" element={<Legal />} />
 
         <Route path="/creator" element={<RequireRole roles={["poster", "admin"]}><CreatorLayout /></RequireRole>}>
           <Route index element={<CreatorToday />} />

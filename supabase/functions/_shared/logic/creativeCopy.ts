@@ -170,16 +170,33 @@ function localize(text: string, lang: string, country?: string | null): string {
   return text.replace(/vídeo/g, "video").replace(/Vídeo/g, "Video").replace(/móvil/g, "celular");
 }
 
+/**
+ * Estimation mensuelle (jamais une promesse : « hasta », « estimación », « no garantizados » ; Meta refuse les revenus garantis).
+ * {{monthly}} = tarif × vidéos/jour × 30. La note de bas de créa explique le calcul.
+ */
+export const MONTHLY_COPY: Record<string, { line: string; note: string }> = {
+  es: { line: "Hasta ~{{monthly}}/mes* + bono según tus vistas", note: "*Estimación con {{perDay}} videos al día durante 30 días. Ingresos no garantizados." },
+  en: { line: "Up to ~{{monthly}}/month* + bonus based on your views", note: "*Estimate with {{perDay}} videos a day for 30 days. Earnings not guaranteed." },
+  fr: { line: "Jusqu'à ~{{monthly}}/mois* + bonus selon tes vues", note: "*Estimation avec {{perDay}} vidéos par jour pendant 30 jours. Revenus non garantis." },
+  pt: { line: "Até ~{{monthly}}/mês* + bónus conforme as tuas visualizações", note: "*Estimativa com {{perDay}} vídeos por dia durante 30 dias. Ganhos não garantidos." },
+  de: { line: "Bis zu ~{{monthly}}/Monat* + Bonus je nach Aufrufen", note: "*Schätzung bei {{perDay}} Videos pro Tag über 30 Tage. Keine garantierten Einnahmen." },
+  it: { line: "Fino a ~{{monthly}}/mese* + bonus in base alle visualizzazioni", note: "*Stima con {{perDay}} video al giorno per 30 giorni. Guadagni non garantiti." },
+};
+
 export function creativeCopy(
-  lang: string | null | undefined, hook: Hook, price: string, opts: { bonus?: string | null; country?: string | null } = {},
-): CreativeCopy & { lang: string; bonus: string | null } {
+  lang: string | null | undefined, hook: Hook, price: string,
+  opts: { bonus?: string | null; country?: string | null; monthly?: string | null; perDay?: number } = {},
+): CreativeCopy & { lang: string; bonus: string | null; monthly: string | null; disclaimer: string | null } {
   const l = (lang ?? "en").split("-")[0];
   const known = CREATIVE_COPY[l] ? l : "en";
   const pack = CREATIVE_COPY[known];
   const c = pack[hook] ?? pack.student;
   const fill = (s: string) => localize(s.replace(/\{\{price\}\}/g, price), known, opts.country);
   const bonus = opts.bonus ? (BONUS_COPY[known] ?? BONUS_COPY.en).replace(/\{\{bonus\}\}/g, opts.bonus) : null;
-  return { headline: fill(c.headline), subline: fill(c.subline), cta: fill(c.cta), lang: known, bonus };
+  const m = opts.monthly ? MONTHLY_COPY[known] : null;
+  const monthly = m ? localize(m.line.replace(/\{\{monthly\}\}/g, opts.monthly!), known, opts.country) : null;
+  const disclaimer = m ? localize(m.note.replace(/\{\{perDay\}\}/g, String(opts.perDay ?? 2)), known, opts.country) : null;
+  return { headline: fill(c.headline), subline: fill(c.subline), cta: fill(c.cta), lang: known, bonus, monthly, disclaimer };
 }
 
 /** Langues écrites de droite à gauche (alignement du texte sur le canvas). */

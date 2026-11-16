@@ -194,6 +194,7 @@ export default function Apply() {
             <Button type="submit" size="lg" className="h-12 w-full text-[15px]" loading={busy} disabled={underage || (progress !== null && !yapPath)}>{t("apply.submit")}</Button>
           </form>
         )}
+        <p className="mt-10 text-center text-xs text-subtle-foreground"><Link to="/privacy" className="hover:underline">Privacy</Link> · <Link to="/terms" className="hover:underline">Terms</Link></p>
       </main>
     </div>
   );

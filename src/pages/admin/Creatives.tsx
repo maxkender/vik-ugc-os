@@ -40,8 +40,14 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, maxW: number): string
 }
 
 /** Rendu du template : fond (image IA ou dégradé), titre auto-ajusté, sous-titre, bouton CTA, signature. */
+/**
+ * Rendu d'une créa (canvas, dans le navigateur). Avec photo : visuel UGC plein cadre + dégradés de lisibilité,
+ * logo Vik Studios, bloc texte ancré en bas. En 9:16, tout le texte reste dans les safe zones des stories / reels
+ * (rien dans les 14 % du haut ni les 20 % du bas). Sans photo : fond dégradé de marque.
+ */
 export async function renderCreative(cr: any): Promise<Blob> {
   const [W, H] = FORMATS[cr.format] ?? [1080, 1080];
+  const tall = H / W > 1.5;
   const canvas = document.createElement("canvas");
   canvas.width = W;
   canvas.height = H;
@@ -49,22 +55,29 @@ export async function renderCreative(cr: any): Promise<Blob> {
   await document.fonts.ready;
   await Promise.all(["700 80px Inter", "500 40px Inter", "600 40px Inter"].map((f) => document.fonts.load(f).catch(() => null)));
   const accent = cssVar("--accent", "#5b4ce0");
-  let drewBg = false;
+  let photo = false;
   if (cr.background_path) {
     try {
       const img = await loadImage(publicUrl("creatives", cr.background_path)!);
-      const s = Math.max(W / img.width, H / img.height);
-      ctx.drawImage(img, (W - img.width * s) / 2, (H - img.height * s) / 2, img.width * s, img.height * s);
-      const g = ctx.createLinearGradient(0, 0, 0, H);
-      g.addColorStop(0, "rgba(0,0,0,0.55)");
-      g.addColorStop(0.45, "rgba(0,0,0,0.1)");
-      g.addColorStop(1, "rgba(0,0,0,0.6)");
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, W, H);
-      drewBg = true;
-    } catch { /* fallback dégradé */ }
+      const sc = Math.max(W / img.width, H / img.height);
+      ctx.drawImage(img, (W - img.width * sc) / 2, (H - img.height * sc) / 2, img.width * sc, img.height * sc);
+      photo = true;
+    } catch { /* repli dégradé */ }
   }
-  if (!drewBg) {
+  if (photo) {
+    // Lisibilité : bandeau sombre en haut (logo) et dégradé fort sous le texte.
+    const top = ctx.createLinearGradient(0, 0, 0, H * 0.3);
+    top.addColorStop(0, "rgba(0,10,40,0.55)");
+    top.addColorStop(1, "rgba(0,10,40,0)");
+    ctx.fillStyle = top;
+    ctx.fillRect(0, 0, W, H * 0.3);
+    const bottom = ctx.createLinearGradient(0, H * (tall ? 0.38 : 0.3), 0, H);
+    bottom.addColorStop(0, "rgba(0,10,40,0)");
+    bottom.addColorStop(0.35, "rgba(0,10,40,0.62)");
+    bottom.addColorStop(1, "rgba(0,10,40,0.9)");
+    ctx.fillStyle = bottom;
+    ctx.fillRect(0, H * (tall ? 0.38 : 0.3), W, H);
+  } else {
     const g = ctx.createLinearGradient(0, 0, W, H);
     g.addColorStop(0, accent);
     g.addColorStop(1, "#00113E");
@@ -79,95 +92,97 @@ export async function renderCreative(cr: any): Promise<Blob> {
     }
     ctx.globalAlpha = 1;
   }
-  const pad = W * 0.08, maxW = W - 2 * pad;
+  const pad = W * 0.07, maxW = W - 2 * pad;
   const rtl = RTL_LANGS.has(String(cr.language ?? "").split("-")[0]);
-  ctx.direction = rtl ? "rtl" : "ltr";
-  ctx.textAlign = rtl ? "right" : "left";
-  const tx = rtl ? W - pad : pad;
-  ctx.fillStyle = "#ffffff";
-  ctx.shadowColor = "rgba(0,0,0,0.45)";
-  ctx.shadowBlur = 18;
-  // titre : taille auto pour tenir dans 40 % de la hauteur (plus grand en 9:16 : lisible en story)
-  const tall = H / W > 1.5;
-  let size = Math.round(W * (tall ? 0.12 : 0.105));
-  let lines: string[] = [];
-  // Hauteur disponible : du haut du texte jusqu'au-dessus du bouton CTA (titre + bonus + sous-titre doivent tenir).
-  const ctaS = Math.round(W * (tall ? 0.055 : 0.045));
-  const space = (H - pad - ctaS * 2.1 - ctaS * 1.5 - ctaS) - H * (tall ? 0.2 : 0.12);
-  const blockHeight = (sz: number) => {
-    ctx.font = `700 ${sz}px Inter`;
-    const hl = wrap(ctx, cr.headline, maxW).length * sz * 1.12;
-    let bonus = 0;
-    if (cr.bonus_line) {
-      const bs = Math.round(W * (tall ? 0.05 : 0.043));
-      ctx.font = `700 ${bs}px Inter`;
-      bonus = wrap(ctx, cr.bonus_line, maxW - bs * 1.2).length * bs * 1.25 + bs * 0.7 + sz * 0.15;
-    }
-    let sub = 0;
-    if (cr.subline) {
-      const ss = Math.round(sz * (tall ? 0.4 : 0.42));
-      ctx.font = `500 ${ss}px Inter`;
-      sub = wrap(ctx, cr.subline, maxW).length * ss * 1.3 + ss * 0.4;
-    }
-    return hl + bonus + sub;
-  };
-  for (; size > 36; size -= 4) {
-    if (blockHeight(size) <= space) break;
+  // Logo (blanc) en haut à gauche, dans la safe zone.
+  const logoY = tall ? H * 0.145 : pad * 0.9;
+  try {
+    const logo = await loadImage("/brand/vik-studios-logo-white.svg");
+    const lw = W * (tall ? 0.34 : 0.3), lh = (logo.height / logo.width) * lw;
+    ctx.drawImage(logo, rtl ? W - pad - lw : pad, logoY, lw, lh);
+  } catch {
+    ctx.fillStyle = "#ffffff";
+    ctx.font = `700 ${Math.round(W * 0.04)}px Inter`;
+    ctx.fillText("Vik Studios", pad, logoY + W * 0.04);
   }
+
+  // Bloc texte ancré en bas : titre, bonus, estimation mensuelle (ou sous-titre), CTA, mention.
+  const bottomLimit = tall ? H * 0.8 : H - pad * 0.7;
+  const topLimit = tall ? H * 0.4 : H * 0.3;
+  const ctaS = Math.round(W * (tall ? 0.05 : 0.042));
+  const noteS = Math.round(W * (tall ? 0.024 : 0.022));
+  const bonusS = Math.round(W * (tall ? 0.046 : 0.04));
+  const monthS = Math.round(W * (tall ? 0.04 : 0.035));
+  const second = cr.monthly_line ?? (photo ? null : cr.subline);
+  ctx.textAlign = rtl ? "right" : "left";
+  ctx.direction = rtl ? "rtl" : "ltr";
+  const tx = rtl ? W - pad : pad;
+  const lay = (size: number) => {
+    ctx.font = `700 ${size}px Inter`;
+    const hl = wrap(ctx, cr.headline, maxW);
+    ctx.font = `700 ${bonusS}px Inter`;
+    const bl = cr.bonus_line ? wrap(ctx, cr.bonus_line, maxW - bonusS * 1.2) : [];
+    ctx.font = `600 ${monthS}px Inter`;
+    const ml = second ? wrap(ctx, second, maxW) : [];
+    ctx.font = `500 ${noteS}px Inter`;
+    const nl = cr.disclaimer ? wrap(ctx, cr.disclaimer, maxW) : [];
+    const h = hl.length * size * 1.1 + (bl.length ? bl.length * bonusS * 1.25 + bonusS * 0.7 + size * 0.35 : 0)
+      + (ml.length ? ml.length * monthS * 1.3 + monthS * 0.5 : 0) + ctaS * 2.1 + ctaS * 0.9 + (nl.length ? nl.length * noteS * 1.35 + noteS * 0.6 : 0);
+    return { hl, bl, ml, nl, h };
+  };
+  let size = Math.round(W * (tall ? 0.1 : 0.085));
+  let L = lay(size);
+  while (size > 40 && L.h > bottomLimit - topLimit) { size -= 4; L = lay(size); }
+  let y = bottomLimit - L.h;
+  ctx.fillStyle = "#ffffff";
+  ctx.shadowColor = "rgba(0,0,0,0.5)";
+  ctx.shadowBlur = 16;
   ctx.font = `700 ${size}px Inter`;
-  lines = wrap(ctx, cr.headline, maxW);
-  let y = H * (tall ? 0.2 : 0.12) + size;
-  for (const l of lines) { ctx.fillText(l, tx, y); y += size * 1.12; }
-  // Bonus aux vues : pastille jaune très visible sous le titre.
-  if (cr.bonus_line) {
-    ctx.shadowBlur = 0;
-    const bs = Math.round(W * (tall ? 0.05 : 0.043));
-    ctx.font = `700 ${bs}px Inter`;
-    const bl = wrap(ctx, cr.bonus_line, maxW - bs * 1.2);
-    const bw = Math.min(maxW, Math.max(...bl.map((l) => ctx.measureText(l).width)) + bs * 1.2);
-    const bh = bl.length * bs * 1.25 + bs * 0.7;
-    const bx = rtl ? W - pad - bw : pad, by = y - size * 0.55;
+  for (const l of L.hl) { y += size; ctx.fillText(l, tx, y); y += size * 0.1; }
+  ctx.shadowBlur = 0;
+  if (L.bl.length) {
+    y += size * 0.35;
+    ctx.font = `700 ${bonusS}px Inter`;
+    const bw = Math.min(maxW, Math.max(...L.bl.map((l) => ctx.measureText(l).width)) + bonusS * 1.2);
+    const bh = L.bl.length * bonusS * 1.25 + bonusS * 0.7;
+    const bx = rtl ? W - pad - bw : pad;
     ctx.fillStyle = "#ffd84d";
     ctx.beginPath();
-    ctx.roundRect(bx, by, bw, bh, bs * 0.35);
+    ctx.roundRect(bx, y, bw, bh, bonusS * 0.35);
     ctx.fill();
     ctx.fillStyle = "#00113E";
-    let ly = by + bs * 0.35 + bs;
-    for (const l of bl) { ctx.fillText(l, rtl ? bx + bw - bs * 0.6 : bx + bs * 0.6, ly); ly += bs * 1.25; }
+    let ly = y + bonusS * 0.35 + bonusS * 0.95;
+    for (const l of L.bl) { ctx.fillText(l, rtl ? bx + bw - bonusS * 0.6 : bx + bonusS * 0.6, ly); ly += bonusS * 1.25; }
+    y += bh;
+  }
+  if (L.ml.length) {
+    y += monthS * 0.5;
     ctx.fillStyle = "#ffffff";
-    ctx.shadowBlur = 18;
-    y = by + bh + size * 0.7;
+    ctx.shadowBlur = 12;
+    ctx.font = `600 ${monthS}px Inter`;
+    for (const l of L.ml) { y += monthS; ctx.fillText(l, tx, y); y += monthS * 0.3; }
+    ctx.shadowBlur = 0;
   }
-  if (cr.subline) {
-    const s = Math.round(size * (tall ? 0.4 : 0.42));
-    ctx.font = `500 ${s}px Inter`;
-    y += s * 0.4;
-    for (const l of wrap(ctx, cr.subline, maxW)) { ctx.fillText(l, tx, y); y += s * 1.3; }
-  }
-  ctx.shadowBlur = 0;
   // CTA
-  if (cr.cta) {
-    const s = Math.round(W * (tall ? 0.055 : 0.045));
-    ctx.font = `600 ${s}px Inter`;
-    const tw = ctx.measureText(cr.cta).width;
-    const bh = s * 2.1, bw = tw + s * 2.2, bx = rtl ? W - pad - bw : pad, by = H - pad - bh - s * 1.5;
-    ctx.textAlign = "left";
-    ctx.direction = "ltr";
-    ctx.fillStyle = "#ffffff";
-    ctx.beginPath();
-    ctx.roundRect(bx, by, bw, bh, bh / 2);
-    ctx.fill();
-    ctx.fillStyle = "#00113E";
-    ctx.direction = rtl ? "rtl" : "ltr";
-    ctx.textAlign = "center";
-    ctx.fillText(cr.cta, bx + bw / 2, by + bh / 2 + s * 0.36);
-    ctx.textAlign = "left";
-    ctx.direction = "ltr";
+  y += ctaS * 0.9;
+  ctx.font = `700 ${ctaS}px Inter`;
+  const tw = ctx.measureText(cr.cta ?? "").width;
+  const bh = ctaS * 2.1, bw = tw + ctaS * 2.2, bx = rtl ? W - pad - bw : pad;
+  ctx.fillStyle = "#ffffff";
+  ctx.beginPath();
+  ctx.roundRect(bx, y, bw, bh, bh / 2);
+  ctx.fill();
+  ctx.fillStyle = "#00113E";
+  ctx.textAlign = "center";
+  ctx.fillText(cr.cta ?? "", bx + bw / 2, y + bh / 2 + ctaS * 0.36);
+  ctx.textAlign = rtl ? "right" : "left";
+  y += bh;
+  if (L.nl.length) {
+    y += noteS * 0.6;
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    ctx.font = `500 ${noteS}px Inter`;
+    for (const l of L.nl) { y += noteS; ctx.fillText(l, tx, y); y += noteS * 0.35; }
   }
-  ctx.fillStyle = "rgba(255,255,255,0.85)";
-  ctx.font = `600 ${Math.round(W * 0.028)}px Inter`;
-  ctx.textAlign = "left";
-  ctx.fillText("Vik Studios", pad, H - pad * 0.6);
   return await new Promise<Blob>((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error("canvas"))), "image/png"));
 }
 
@@ -217,6 +232,13 @@ export default function Creatives() {
     const z = (zones.data ?? []).find((x: any) => x.code === c?.zone_code);
     return z && Number(z.rpm) > 0 ? formatMoney(Number(z.rpm), z.currency, c?.language ?? "en") : null;
   };
+  const zoneOfCode = (code: string) => (zones.data ?? []).find((x: any) => x.code === country(code)?.zone_code);
+  const perDayFor = (code: string) => Number(zoneOfCode(code)?.videos_per_day ?? 2);
+  /** Estimation mensuelle prudente : tarif × vidéos/jour × 30 (affichée « hasta … estimación »). */
+  const monthlyFor = (code: string) => {
+    const z = zoneOfCode(code);
+    return z ? formatMoney(Math.round(Number(z.price_per_video) * perDayFor(code) * 30), z.currency, country(code)?.language ?? "en") : null;
+  };
   const langOf = (code: string) => String(country(code)?.language ?? "en").split("-")[0];
   const selectZone = (zone: string) => setSel([...new Set([...sel, ...openCountries.filter((c: any) => c.zone_code === zone).map((c: any) => c.code)])]);
   const langsSelected = [...new Set(sel.map(langOf))];
@@ -232,9 +254,9 @@ export default function Creatives() {
     try {
       for (const code of sel) {
         const lang = langOf(code);
-        const copy = creativeCopy(lang, hook, priceFor(code), { bonus: bonusFor(code), country: code });
+        const copy = creativeCopy(lang, hook, priceFor(code), { bonus: bonusFor(code), country: code, monthly: monthlyFor(code), perDay: perDayFor(code) });
         for (const format of formats) {
-          const row = { country: code, language: copy.lang, format, headline: copy.headline, subline: copy.subline, cta: copy.cta, bonus_line: copy.bonus, status: "draft" };
+          const row = { country: code, language: copy.lang, format, headline: copy.headline, subline: copy.subline, cta: copy.cta, bonus_line: copy.bonus, monthly_line: copy.monthly, disclaimer: copy.disclaimer, hook, status: "draft" };
           const { data, error } = await supabase.from("recruitment_creatives").insert(row).select("*").single();
           if (error) throw error;
           await renderAndUpload(data);
@@ -277,7 +299,13 @@ export default function Creatives() {
   const aiBackground = async (cr: any) => {
     setBusy(cr.id);
     try {
-      await callFn("creatives", { action: "background", creative_id: cr.id });
+      const first = await callFn<any>("creatives", { action: "background", creative_id: cr.id });
+      if (first.status === "completed") { // fal : synchrone
+        await renderAndUpload({ ...cr, background_path: first.background_path });
+        toast("Visuel IA appliqué", "success");
+        refresh();
+        return;
+      }
       for (let i = 0; i < 45; i++) {
         await new Promise((r) => setTimeout(r, 4000));
         const r = await callFn<any>("creatives", { action: "poll", creative_id: cr.id });
@@ -386,7 +414,7 @@ export default function Creatives() {
                 <div className="flex flex-wrap gap-0.5 border-t border-separator pt-2">
                   <Button size="icon" variant="ghost" title="Valider" onClick={() => setStatus(cr, "approved")}><Check className="h-4 w-4" /></Button>
                   <Button size="icon" variant="ghost" title="Refuser" onClick={() => setStatus(cr, "rejected")}><X className="h-4 w-4" /></Button>
-                  <Button size="icon" variant="ghost" title="Fond IA (ElevenLabs, plan Pro)" loading={busy === cr.id} onClick={() => aiBackground(cr)}>{busy !== cr.id && <Sparkles className="h-4 w-4" />}</Button>
+                  <Button size="icon" variant="ghost" title="Visuel IA réaliste (fal)" loading={busy === cr.id} onClick={() => aiBackground(cr)}>{busy !== cr.id && <Sparkles className="h-4 w-4" />}</Button>
                   <Button size="icon" variant="ghost" title="Re-rendre" onClick={() => rerender(cr)}><RefreshCw className="h-4 w-4" /></Button>
                   <Button size="icon" variant="ghost" title="Supprimer" onClick={() => remove(cr)}><Trash2 className="h-4 w-4" /></Button>
                 </div>
