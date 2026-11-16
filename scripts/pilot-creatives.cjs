@@ -31,6 +31,17 @@ const countries = list.split(",");
     await p.getByText("Rendu et envoi…").waitFor({ state: "detached", timeout: 180000 });
     await p.waitForTimeout(1000);
   }
+  // Visuel IA réaliste (fal) sur chaque brouillon du lot, puis re-rendu dans le navigateur.
+  if (process.env.PHOTO === "1") {
+    await p.getByRole("button", { name: "Brouillons", exact: true }).first().click();
+    await p.waitForTimeout(2500);
+    const n = await p.locator("button[title='Visuel IA réaliste (fal)']").count();
+    for (let i = 0; i < n; i++) {
+      await p.locator("button[title='Visuel IA réaliste (fal)']").nth(i).click();
+      await p.getByText(/Visuel IA appliqué|fal:|refusée|missing/).first().waitFor({ timeout: 180000 });
+      await p.waitForTimeout(1200);
+    }
+  }
   console.log(JSON.stringify({ ok: true, errors }));
   await b.close();
 })().catch((e) => { console.error("ERREUR", e.message.split("\n")[0]); process.exit(1); });
