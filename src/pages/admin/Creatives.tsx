@@ -69,8 +69,9 @@ async function renderCard(cr: any): Promise<Blob> {
   const cx = (W - cw) / 2;
   const pad = cw * 0.075;
   const inner = cw - 2 * pad;
-  const avatar = W * (tall ? 0.085 : 0.075);
-  const metaS = Math.round(W * 0.03), lineS = Math.round(W * (tall ? 0.036 : 0.032)), ctaS = Math.round(W * (tall ? 0.04 : 0.036)), footS = Math.round(W * 0.026);
+  // 9:16 : tailles plus grandes pour remplir la zone utile (stories / reels lus en plein écran).
+  const avatar = W * (tall ? 0.11 : 0.075);
+  const metaS = Math.round(W * (tall ? 0.038 : 0.03)), lineS = Math.round(W * (tall ? 0.047 : 0.032)), ctaS = Math.round(W * (tall ? 0.054 : 0.036)), footS = Math.round(W * (tall ? 0.034 : 0.026));
   const maxCardH = tall ? H * 0.66 : H * 0.84;
   const measure = (titleS: number) => {
     ctx.font = `700 ${titleS}px Inter`;
@@ -82,7 +83,7 @@ async function renderCard(cr: any): Promise<Blob> {
       + ctaS * 1.6 + pad * 0.6 + footS * 2.4 + pad * 0.3;
     return { tl, ll, h };
   };
-  let titleS = Math.round(W * (tall ? 0.07 : 0.062));
+  let titleS = Math.round(W * (tall ? 0.09 : 0.062));
   let M = measure(titleS);
   while (titleS > 30 && M.h > maxCardH) { titleS -= 2; M = measure(titleS); }
   const ch = M.h;
@@ -393,6 +394,18 @@ export default function Creatives() {
     await supabase.from("recruitment_creatives").update({ status }).eq("id", cr.id);
     refresh();
   };
+  /** Rend (ou re-rend) tous les brouillons affichés : utile après un changement de tarif ou de texte. */
+  const bulkRender = async () => {
+    const rows = (list.data ?? []).filter((c: any) => c.status === "draft");
+    if (!rows.length) return toast("Aucun brouillon dans cette sélection");
+    setBusy("render");
+    setProgress({ done: 0, total: rows.length });
+    let n = 0;
+    try {
+      for (const cr of rows) { await renderAndUpload(cr); n++; setProgress({ done: n, total: rows.length }); }
+      toast(`${n} créas rendues`, "success");
+    } catch (e) { toast(`${n} rendues, puis erreur : ${(e as Error).message}`, "danger"); } finally { setBusy(null); setProgress(null); refresh(); }
+  };
   const bulkApprove = async () => {
     const ids = (list.data ?? []).filter((c: any) => c.status === "draft" && c.image_path).map((c: any) => c.id);
     if (!ids.length) return toast("Aucun brouillon à valider dans cette sélection");
@@ -521,7 +534,8 @@ export default function Creatives() {
           {Object.keys(FORMATS).map((x) => <option key={x} value={x}>{x}</option>)}
         </Select>
         <span className="text-xs text-subtle-foreground">{list.data?.length ?? 0} créa(s)</span>
-        <Button size="sm" variant="secondary" className="ml-auto" onClick={bulkApprove}><Check className="h-3.5 w-3.5" /> Valider les brouillons affichés</Button>
+        <Button size="sm" variant="secondary" className="ml-auto" loading={busy === "render"} onClick={bulkRender}><RefreshCw className="h-3.5 w-3.5" /> Rendre les brouillons affichés</Button>
+        <Button size="sm" variant="secondary" onClick={bulkApprove}><Check className="h-3.5 w-3.5" /> Valider les brouillons affichés</Button>
       </div>
       {list.isLoading ? <Spinner /> : (list.data ?? []).length === 0 ? <Empty title="Aucune créa" icon={<ImagePlus className="h-5 w-5" />}>Choisis des pays (ou une zone), une accroche et des formats, puis « Générer ». Les créas validées peuvent ensuite être poussées vers Meta depuis Campagnes Meta.</Empty> : (
         <div className="grid grid-cols-2 gap-5 md:grid-cols-3 xl:grid-cols-5">
@@ -534,7 +548,7 @@ export default function Creatives() {
                 <div className="flex items-center justify-between gap-1 text-xs">
                   <span className="truncate text-muted-foreground">{flag(cr.country)} {cr.country} · {cr.format} · {cr.language}</span>
                   <Badge tone={cr.status === "approved" ? "success" : cr.status === "rejected" ? "danger" : cr.status === "sent_to_meta" ? "accent" : "default"}>{({ draft: "Brouillon", approved: "Validée", rejected: "Refusée", sent_to_meta: "Meta" } as Record<string, string>)[cr.status] ?? cr.status}</Badge>
-                  {copyViolations([cr.headline, cr.subline, cr.bonus_line, cr.monthly_line, cr.disclaimer, cr.cta].filter(Boolean).join(" · "), cr.language ?? "en").length > 0 && <Badge tone="danger">⚠ texte non conforme</Badge>}
+                  {copyViolations([cr.headline, cr.subline, cr.bonus_line, cr.monthly_line, cr.disclaimer, cr.cta, cr.ad_text, cr.card?.title, ...(cr.card?.lines ?? [])].filter(Boolean).join(" · "), cr.language ?? "en").length > 0 && <Badge tone="danger">⚠ texte non conforme</Badge>}
                 </div>
                 <div className="flex flex-wrap gap-0.5 border-t border-separator pt-2">
                   <Button size="icon" variant="ghost" title="Valider" onClick={() => setStatus(cr, "approved")}><Check className="h-4 w-4" /></Button>
