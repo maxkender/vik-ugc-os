@@ -83,7 +83,7 @@ async function loadContext(db: SupabaseClient, posterId: string) {
     db.from("onboarding_events").select("poster_id, step, at").eq("poster_id", posterId).order("at", { ascending: false }).limit(5),
   ]);
   const zone = poster?.zone_code
-    ? (await db.from("zones").select("code, price_per_video, rpm, rpm_views, currency, videos_per_day").eq("code", poster.zone_code).maybeSingle()).data
+    ? (await db.from("zones").select("code, price_per_video, rpm, rpm_views, currency, videos_per_day, bonus_cap").eq("code", poster.zone_code).maybeSingle()).data
     : null;
   const byId = new Map<string, any>();
   for (const a of [...(assignments ?? []), ...(todays ?? [])]) byId.set(a.id, a);

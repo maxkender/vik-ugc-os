@@ -6,6 +6,7 @@ export interface ZoneRow {
   rpm_views: number;
   currency: string;
   videos_per_day: number;
+  bonus_cap?: number | null;
   active?: boolean;
 }
 export interface CountryRow {

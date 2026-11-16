@@ -6,7 +6,7 @@ import { addDays, DAY_MS, inWeek, isoDay } from "./dates.ts";
  * Semaine W (lundi → dimanche, UTC) :
  *   - base : chaque vidéo comptée publiée en W × tarif de zone ;
  *   - bonus : chaque vidéo dont le J+7 (posted_at + 7 j) tombe en W
- *     × vues à J+7 × RPM / rpm_views (1 000 par défaut).
+ *     × vues à J+7 × RPM / rpm_views (1 000 par défaut), plafonné par vidéo (bonus_cap de la zone).
  * Le bonus d'une vidéo publiée en fin de semaine est donc payé la semaine
  * suivante, quand ses vues J+7 sont connues. Rien n'est payé deux fois.
  */
@@ -16,6 +16,8 @@ export interface ZoneRate {
   rpm: number;
   rpm_views: number;
   currency: string;
+  /** Plafond du bonus aux vues par vidéo (null = sans plafond). Grille du 16/11 : A 300 $, B 150 $, C 60 $. */
+  bonus_cap?: number | null;
 }
 
 export interface PayAssignment {
@@ -57,10 +59,13 @@ export interface PayrollOptions {
   minViewsForBonus?: number;
 }
 
+/** Bonus d'une vidéo = min(vues J+7 / 1 000 × RPM, plafond de la zone). */
 export function bonusFor(views: number | null | undefined, zone: ZoneRate, minViews = 0): number {
   const v = Math.max(0, views ?? 0);
   if (v < minViews) return 0;
-  return money((v * zone.rpm) / Math.max(1, zone.rpm_views));
+  const raw = (v * zone.rpm) / Math.max(1, zone.rpm_views);
+  const cap = zone.bonus_cap === null || zone.bonus_cap === undefined ? Infinity : Number(zone.bonus_cap);
+  return money(Math.min(raw, cap > 0 ? cap : Infinity));
 }
 
 export function computePayout(

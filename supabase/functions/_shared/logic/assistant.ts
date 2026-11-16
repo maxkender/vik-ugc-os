@@ -163,7 +163,7 @@ Posters are content creators paid by Vik Studios to film and publish short UGC v
 
 ## Pay
 - Base: each validated video is paid the zone's price per video.
-- RPM bonus: at D+7, bonus = D+7 views × RPM ÷ RPM views (e.g. RPM 1 per 1,000 views → 50,000 views = 50 in bonus). The bonus of a video published late in a week is paid the following week, once D+7 views are known.
+- RPM bonus: at D+7, bonus = D+7 views × RPM ÷ RPM views, capped per video at the zone cap (rate.bonus_cap_per_video) (e.g. RPM 1 per 1,000 views → 50,000 views = 50 in bonus; 1,000,000 views with a 300 cap = 300). The bonus of a video published late in a week is paid the following week, once D+7 views are known.
 - Rejected videos are not paid.
 - Payment is weekly, every Monday, for the previous week (Monday→Sunday, UTC), through Ruul. The "Payments" tab shows each week, its lines and status (pending / paid).
 - Amounts shown by the assistant are estimates; only the payouts in the Payments tab are final.
@@ -229,7 +229,7 @@ export interface CtxPoster {
   status?: string | null; handles_status?: string | null; ruul_status?: string | null; daily_quota?: number | null;
   tiktok_handle?: string | null; instagram_handle?: string | null;
 }
-export interface CtxZone { code: string; price_per_video: number | string; rpm: number | string; rpm_views: number; currency: string; videos_per_day?: number | null }
+export interface CtxZone { code: string; price_per_video: number | string; rpm: number | string; rpm_views: number; currency: string; videos_per_day?: number | null; bonus_cap?: number | string | null }
 export interface CtxAssignment {
   id: string; poster_id: string; due_date: string; status: string; posted_at?: string | null; posted_url?: string | null;
   views_d2?: number | null; views_d7?: number | null; rejection_reason?: string | null;
@@ -247,7 +247,7 @@ export interface AssistantContext {
     country: string | null; zone: string | null; status: string | null; handles_status: string | null; ruul_status: string | null;
     daily_quota: number | null; handles: string[];
   } | null;
-  rate: { price_per_video: number; rpm: number; rpm_views: number; currency: string; videos_per_day: number | null } | null;
+  rate: { price_per_video: number; rpm: number; rpm_views: number; currency: string; videos_per_day: number | null; bonus_cap_per_video: number | null } | null;
   today_briefs: { title: string; hook: string; instructions: string; status: string }[];
   recent_assignments: { due_date: string; title: string; status: string; views_d2: number | null; views_d7: number | null; rejection_reason: string | null }[];
   payouts: { week_start: string; total: number; currency: string; status: string; videos: number | null }[];
@@ -293,7 +293,7 @@ export function buildAssistantContext(input: {
   const zone = input.zone && poster?.zone_code && input.zone.code === poster.zone_code ? input.zone : null;
 
   const rate = zone
-    ? { price_per_video: n(zone.price_per_video), rpm: n(zone.rpm), rpm_views: n(zone.rpm_views) || 1000, currency: zone.currency, videos_per_day: zone.videos_per_day ?? null }
+    ? { price_per_video: n(zone.price_per_video), rpm: n(zone.rpm), rpm_views: n(zone.rpm_views) || 1000, currency: zone.currency, videos_per_day: zone.videos_per_day ?? null, bonus_cap_per_video: zone.bonus_cap ? n(zone.bonus_cap) : null }
     : null;
 
   const todayBriefs = mine
