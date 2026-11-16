@@ -24,11 +24,6 @@ export function zoneOfCountry(country: string | null | undefined, countries: Cou
   return zones.find((z) => z.code === c.zone_code && z.active !== false) ?? null;
 }
 
-/** Revenu indicatif par mois : vidéos/jour × 30 × tarif (sans bonus). */
-export function monthlyEstimate(z: ZoneRow, days = 30): number {
-  return Math.round(z.videos_per_day * days * z.price_per_video);
-}
-
 export function formatMoney(amount: number, currency = "USD", locale = "en"): string {
   try {
     return new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: amount % 1 === 0 ? 0 : 2 }).format(amount);

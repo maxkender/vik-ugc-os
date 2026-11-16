@@ -476,7 +476,7 @@ export default function Creatives() {
   const selectZone = (zone: string) => setSel([...new Set([...sel, ...openCountries.filter((c: any) => c.zone_code === zone).map((c: any) => c.code)])]);
   const langsSelected = [...new Set(sel.map(langOf))];
   const total = sel.length * formats.length;
-  const sample = sel[0] ? jobCopy(langOf(sel[0]), hook, priceFor(sel[0]), sel[0]) : jobCopy("fr", hook, "5 $");
+  const sample = sel[0] ? jobCopy(langOf(sel[0]), hook, priceFor(sel[0]), sel[0]) : jobCopy("fr", hook, "10 $");
   const sampleIssues = copyViolations([sample.headline, sample.tag, sample.pay, sample.cta].filter(Boolean).join(" · "), sample.lang);
 
   const generate = async () => {
