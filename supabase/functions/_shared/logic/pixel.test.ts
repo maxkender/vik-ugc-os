@@ -77,5 +77,8 @@ describe("ciblage iPhone uniquement (16/11)", () => {
     expect(employmentViolations(t)).toEqual([]);
     const p = adsetPayload({ name: "x", campaignId: "1", country: "DE", countries: ["DE"], langs: ["de"], dailyBudget: 5, employment: true, beneficiary: "Vik Studios", objective: "leads", pixelId: "2" } as any);
     expect((p.targeting as any).user_os).toEqual(["iOS"]);
+    expect(t.publisher_platforms).toEqual(["instagram"]);
+    expect(t.instagram_positions).toEqual(["stream", "story", "reels", "explore_home", "profile_feed"]);
+    expect(t.instagram_positions).not.toContain("explore");
   });
 });

@@ -8,6 +8,15 @@ import { LaunchChecklist } from "./campaigns/LaunchChecklist";
 import { Badge, Button, Card, CardTitle, Dialog, Empty, Field, IconTile, Input, PageHeader, Spinner, Table, Td, Th, useToast } from "@/components/ui";
 import { dateFr, flag } from "@/lib/utils";
 
+const POSITION: Record<string, string> = { stream: "Fil", story: "Stories", reels: "Reels", explore_home: "Explorer", profile_feed: "Fil du profil", feed: "Fil", video_feeds: "Vidéos", marketplace: "Marketplace", search: "Recherche" };
+/** Placement lisible : plateformes + emplacements + appareils (ex. « Instagram · Fil, Stories, Reels… · iPhone »). */
+function placementLabel(t: any): string {
+  if (!t) return "Placement : —";
+  const pf = (t.publisher_platforms ?? []).map((x: string) => x === "instagram" ? "Instagram" : x === "facebook" ? "Facebook" : x).join(" + ") || "Advantage+ (toutes plateformes)";
+  const pos = [...(t.instagram_positions ?? []), ...(t.facebook_positions ?? [])].map((x: string) => POSITION[x] ?? x);
+  const os = (t.user_os ?? []).includes("iOS") ? "iPhone" : (t.device_platforms ?? []).join(", ");
+  return `Placement : ${pf}${pos.length ? ` · ${[...new Set(pos)].join(", ")}` : ""}${os ? ` · ${os}` : ""}`;
+}
 const EFFECTIVE: Record<string, string> = { PENDING_REVIEW: "En revue", IN_PROCESS: "En traitement", DISAPPROVED: "Refusée", WITH_ISSUES: "Problème", CAMPAIGN_PAUSED: "Campagne en pause", ADSET_PAUSED: "Ad set en pause" };
 const statusTone = (s: string) => (s === "ACTIVE" ? "success" : s === "PAUSED" ? "warning" : s === "DISAPPROVED" || s === "WITH_ISSUES" ? "danger" : "default") as any;
 /** Statut configuré (Active / En pause) + statut effectif Meta quand il diffère (en revue, refusée…), synchronisés chaque heure. */
@@ -234,7 +243,8 @@ export default function Campaigns() {
                   <tbody>
                     {(c.meta_adsets ?? []).map((a: any) => (
                       <tr key={a.id}>
-                        <Td><span className="mr-1.5">{a.country ? flag(a.country) : adsetCountries(a).map(flag).join("")}</span><span className="font-medium">{a.name}</span></Td>
+                        <Td><span className="mr-1.5">{a.country ? flag(a.country) : adsetCountries(a).map(flag).join("")}</span><span className="font-medium">{a.name}</span>
+                          <div className="mt-0.5 text-[11px] text-subtle-foreground" data-testid="placement">{placementLabel(a.targeting?.sent)}</div></Td>
                         <Td><StatusBadge s={a.status} eff={a.effective_status} /></Td>
                         <Td className="text-muted-foreground">{a.zone_code ?? "—"}</Td>
                         <Td><BudgetEditor value={Number(a.daily_budget)} max={cap} busy={busy === `budget-${a.id}`} onApply={(v) => setBudget(a, v)} /></Td>

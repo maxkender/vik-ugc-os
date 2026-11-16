@@ -384,7 +384,7 @@ serve(async (req, body, db) => {
     case "sync_insights":
       return await syncInsights(db, cfg);
     case "retarget_ios": {
-      // iPhone uniquement (16/11) : applique le ciblage par défaut (iOS + mobile) aux ad sets existants, PAUSED par défaut.
+      // Ciblage par défaut (iPhone + Instagram uniquement, 16/11) appliqué aux ad sets existants, PAUSED par défaut.
       const statuses: string[] = body.include_active ? ["PAUSED", "ACTIVE"] : ["PAUSED"];
       const { data: sets } = await db.from("meta_adsets").select("id, meta_id, country, targeting, status").in("status", statuses).not("country", "is", null);
       const { data: ctry } = await db.from("countries").select("code, language");
@@ -398,6 +398,15 @@ serve(async (req, body, db) => {
           await graph(cfg, a.meta_id, { method: "POST", params: { targeting: t } });
           await db.from("meta_adsets").update({ targeting: { ...(a.targeting ?? {}), sent: t } }).eq("id", a.id);
           out.push({ country: a.country, ok: true });
+        } catch (e) { out.push({ country: a.country, error: e instanceof Error ? e.message : String(e) }); }
+      }
+      // Ad sets actifs : lecture seule du ciblage réel sur Meta (affiché dans l'UI), aucune modification.
+      const { data: active } = await db.from("meta_adsets").select("id, meta_id, country, targeting").eq("status", "ACTIVE");
+      for (const a of body.include_active ? [] : active ?? []) {
+        try {
+          const m = await graph(cfg, a.meta_id, { params: { fields: "targeting" } });
+          await db.from("meta_adsets").update({ targeting: { ...(a.targeting ?? {}), sent: m.targeting } }).eq("id", a.id);
+          out.push({ country: a.country, refreshed: true });
         } catch (e) { out.push({ country: a.country, error: e instanceof Error ? e.message : String(e) }); }
       }
       await audit(db, userId(c), "meta.retarget_ios", "meta_adsets", null, { results: out });

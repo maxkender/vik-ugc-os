@@ -116,6 +116,10 @@ export function employmentTargeting(countries: string[], langs: string[]) {
     // iPhone uniquement (16/11, Max) : l'accès premium (codes promo Apple) et les créateurs sont iOS. Compatible EMPLOYMENT.
     user_os: ["iOS"],
     device_platforms: ["mobile"],
+    // Instagram uniquement (16/11, Max) : audience jeune sans ciblage d'âge (interdit en EMPLOYMENT).
+    // « explore » est refusé par l'API (obsolète) : « explore_home ».
+    publisher_platforms: ["instagram"],
+    instagram_positions: ["stream", "story", "reels", "explore_home", "profile_feed"],
     targeting_automation: { advantage_audience: 1 },
   };
 }
