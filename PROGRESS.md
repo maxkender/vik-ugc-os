@@ -1,4 +1,19 @@
-# PROGRESS : état au 15/11/2026 (V4)
+# PROGRESS : état au 16/11/2026 (lancement Meta)
+
+## Lancement Meta (16/11)
+
+- **Suivi** :
+  - Pixel dédié 2100580263915803, avec bandeau de consentement (30 langues). PageView, ViewContent et Lead sont envoyés depuis le navigateur.
+  - Conversions API : Lead côté serveur, même event_id. Testé bout en bout en prod : event_id identique côté navigateur et serveur, `events_received = 1`.
+  - Bouton « Vérifier CAPI » : envoie un événement technique (pas un Lead).
+- **Conformité EMPLOYMENT** : contrôle `employmentViolations` + tests ; le ciblage 18–25 / étudiants est retiré.
+- **Objectif** : OUTCOME_LEADS.
+- **Checklist de lancement** : bloque l'activation.
+- **Page** : Vik Studios.
+- **Pilote Mexique + Colombie** : campagne PAUSED, 2 ad sets à 15 €/jour, 12 créas validées (3 accroches × 9:16 et 1:1 par pays, `docs/screenshots/pilot/`).
+  - Publicités non créées : l'app Meta est en mode développement (voir SETUP §6).
+- **Reste ❌** : email Brevo réellement délivré (accord direct de Max attendu), app Meta en Live, validation finale des créas (case), pixel « reçoit des événements » (se met à jour quand Meta enregistre le premier événement), domaine vérifié et traductions relues (recommandés).
+
 
 ## V4 : lecture dans la carte, IA catégories + pertinence, tags, assets (15/11, soir)
 

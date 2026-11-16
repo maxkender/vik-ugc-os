@@ -51,3 +51,32 @@ export async function sendLead(db: SupabaseClient, p: {
   if (!ok) console.error(`capi Lead ${status} ${error ?? ""}`.trim());
   return { ok, events_received: received, error };
 }
+
+/**
+ * Vérification de la Conversions API sans fausse conversion : événement technique personnalisé « VikCapiCheck »
+ * (pas un Lead), données utilisateur minimales hachées. OK si Meta répond events_received >= 1.
+ */
+export async function capiHealthCheck(db: SupabaseClient): Promise<{ ok: boolean; events_received?: number; error?: string; pixel_id?: string }> {
+  const cfg = await getSetting<MetaTracking>(db, "meta");
+  const token = Deno.env.get("META_ACCESS_TOKEN");
+  if (!cfg.pixel_id) return { ok: false, error: "pixel_id manquant" };
+  if (!token) return { ok: false, error: "META_ACCESS_TOKEN manquant" };
+  const eventId = `check-${crypto.randomUUID()}`;
+  const body = new FormData();
+  body.append("data", JSON.stringify([{
+    event_name: "VikCapiCheck", event_time: Math.floor(Date.now() / 1000), event_id: eventId, action_source: "system_generated",
+    user_data: { em: [await sha256("capi-check@vik-qa.test")], client_user_agent: "vik-ugc-os capi_check" },
+  }]));
+  let ok = false, status = 0, received: number | undefined, error: string | undefined, trace: string | undefined;
+  try {
+    const res = await fetch(`https://graph.facebook.com/${cfg.api_version ?? "v21.0"}/${cfg.pixel_id}/events`, { method: "POST", headers: { Authorization: `Bearer ${token}` }, body, signal: AbortSignal.timeout(10_000) });
+    status = res.status;
+    const j = await res.json().catch(() => ({}));
+    received = j.events_received;
+    ok = res.ok && !j.error && (received ?? 0) >= 1;
+    error = j.error ? String(j.error.error_user_msg ?? j.error.message).slice(0, 300) : undefined;
+    trace = j.fbtrace_id ?? j.error?.fbtrace_id;
+  } catch (e) { error = e instanceof Error ? e.message.slice(0, 300) : String(e); }
+  await db.from("meta_events").insert({ event_name: "VikCapiCheck", event_id: eventId, ok, status_code: status || null, events_received: received ?? null, error: error ?? null, fbtrace_id: trace ?? null });
+  return { ok, events_received: received, error, pixel_id: cfg.pixel_id };
+}

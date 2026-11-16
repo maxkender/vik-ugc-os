@@ -50,10 +50,16 @@ Réglages → Emails :
 
 ## 6. Meta
 
-- Compte pub : `act_1369526108446948` (Sophia, EUR, plafond **50 €/jour** par défaut).
-- Page utilisée pour les pubs : « Sophia » (1209366402267598). À changer dans Réglages → Intégrations si besoin.
-- **Rien n'est jamais activé automatiquement.** Activation manuelle dans Recrutement → Campagnes Meta.
-- Deux campagnes de test PAUSED ont été créées pendant le build : « [TEST Vik UGC OS] Recrutement créateurs – validation API (PAUSED) » (52584959435009) et « [TEST Vik UGC OS] via edge function (PAUSED) » (52584960892209, 1 €/jour, FR). Tu peux les supprimer dans le Gestionnaire de publicités.
+- Compte pub : `act_1369526108446948` (EUR). Plafonds : **50 €/jour par ad set**, **100 €/jour au total**.
+- **Page : « Vik Studios » (1509793888874260)**, seule page promouvable du compte (assignée au system user le 16/11).
+- **Pixel dédié : « Vik UGC Recrutement » (2100580263915803)**. Chargé sur /join et /apply après consentement (PageView, ViewContent, Lead). Lead aussi envoyé côté serveur (Conversions API, même event_id), avec email, téléphone et pays hachés.
+- **Objectif** des nouvelles campagnes : Prospects (OUTCOME_LEADS, conversion Lead du pixel). Trafic en option.
+- **Ciblage EMPLOYMENT** : pays + langue + Advantage+ audience, 18–65. Ni genre, ni intérêts, ni code postal (contrôle automatique avant envoi).
+- **Checklist de lancement** (Recrutement → Campagnes Meta) : « Activer » est bloqué tant qu'un prérequis critique est ❌, sauf forçage admin (journalisé).
+- **À faire par Max : passer l'app Meta « Sophia Hub » (1076897012058637) en mode Live** (developers.facebook.com → App → Mode : Live ; URL de politique de confidentialité requise). Sinon Meta refuse de créer les publicités : « contenu créé par une application en cours de développement ».
+- **Rien n'est jamais activé automatiquement.** Activation manuelle uniquement.
+- Campagnes de test PAUSED du build : « [TEST Vik UGC OS] … » (52584959435009, 52584960892209). Elles peuvent être supprimées.
+- **Pilote** (16/11) : « [Pilote] Recrutement créateurs UGC – Mexique + Colombie » (52585282269809), PAUSED, 2 ad sets à 15 €/jour, 12 créas validées. Les publicités seront créées dès que l'app sera en Live (bouton « Créer les pubs » de la campagne).
 
 ## 7. Crons (déjà actifs, UTC)
 

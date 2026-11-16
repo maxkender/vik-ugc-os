@@ -27,6 +27,14 @@ export function LaunchChecklist() {
       await q.refetch();
     } catch (e) { toast((e as Error).message, "danger"); } finally { setBusy(null); }
   };
+  const capiCheck = async () => {
+    setBusy("check");
+    try {
+      const r = await callFn("meta", { action: "capi_check" });
+      toast(r.ok ? `Conversions API OK : events_received = ${r.events_received} (pixel ${r.pixel_id})` : `Échec : ${r.error ?? "?"}`, r.ok ? "success" : "danger");
+      await q.refetch();
+    } catch (e) { toast((e as Error).message, "danger"); } finally { setBusy(null); }
+  };
   const capiTest = async () => {
     setBusy("capi");
     try {
@@ -68,7 +76,8 @@ export function LaunchChecklist() {
               {i.key === "capi" && (
                 <span className="flex items-center gap-1.5">
                   <Input value={code} onChange={(e) => setCode(e.target.value.trim())} placeholder="code TEST…" className="h-8 w-32 text-xs" />
-                  <Button size="sm" variant="secondary" loading={busy === "capi"} onClick={capiTest}><FlaskConical className="h-3.5 w-3.5" /> Tester</Button>
+                  <Button size="sm" variant="secondary" loading={busy === "capi"} onClick={capiTest} disabled={!code} title="Avec un code « Tester les événements » d'Events Manager"><FlaskConical className="h-3.5 w-3.5" /> Tester</Button>
+                  <Button size="sm" loading={busy === "check"} onClick={capiCheck} title="Envoie un événement technique (pas un Lead) et vérifie events_received">Vérifier CAPI</Button>
                 </span>
               )}
             </li>

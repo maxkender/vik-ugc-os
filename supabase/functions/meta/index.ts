@@ -10,7 +10,7 @@ import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { audit, caller, getSetting, HttpError, requireAdmin, serve, userId } from "../_shared/http.ts";
 import { activationAllowed, adPayload, adsetPayload, blockingItems, campaignPayload, landingUrl, launchChecklist, toMinor, type MetaObjective } from "../_shared/logic/meta.ts";
 import { employmentViolations } from "../_shared/logic/pixel.ts";
-import { sendLead } from "../_shared/capi.ts";
+import { capiHealthCheck, sendLead } from "../_shared/capi.ts";
 
 interface MetaCfg {
   ad_account_id: string; page_id: string; api_version: string; max_daily_budget: number; global_daily_cap: number; beneficiary?: string;
@@ -103,7 +103,8 @@ async function checklist(db: SupabaseClient, cfg: MetaCfg) {
   const page = cfg.page_id ? await safe(() => graph(cfg, cfg.page_id, { params: { fields: "is_published" } }), null as any) : null;
   const pixels = await safe(() => graph(cfg, `${cfg.ad_account_id}/adspixels`, { params: { fields: "id,name,last_fired_time", limit: "50" } }), { data: [] } as any);
   const pixel = (pixels.data ?? []).find((p: any) => p.id === cfg.pixel_id);
-  const { data: capi } = await db.from("meta_events").select("created_at").eq("ok", true).not("test_code", "is", null).order("created_at", { ascending: false }).limit(1);
+  // CAPI validée : test avec test_event_code, « Vérifier CAPI » (events_received ≥ 1) ou un vrai Lead reçu.
+  const { data: capi } = await db.from("meta_events").select("created_at").eq("ok", true).gte("events_received", 1).order("created_at", { ascending: false }).limit(1);
   const landing = (await getSetting<{ base_url?: string }>(db, "landing")).base_url || Deno.env.get("APP_URL") || "";
   const landingOk = /^https:\/\//.test(landing) && await safe(async () => (await fetch(new URL("/join/fr", landing), { method: "GET", signal: AbortSignal.timeout(8000) })).ok, false);
   const { count: sent } = await db.from("email_outbox").select("id", { count: "exact", head: true }).eq("status", "sent");
@@ -253,6 +254,7 @@ serve(async (req, body, db) => {
       const items = await checklist(db, cfg);
       return { ok: true, items, blocking: blockingItems(items).map((x) => x.key), pixel_id: cfg.pixel_id, objective: cfg.objective, manual: cfg.checklist ?? {} };
     }
+    case "capi_check": return { ...(await capiHealthCheck(db)) };
     case "capi_test": {
       // Test de la Conversions API : événement Lead factice, envoyé UNIQUEMENT avec un test_event_code (apparaît dans
       // Events Manager → Tester les événements, jamais compté comme une vraie conversion).

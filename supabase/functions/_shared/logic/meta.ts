@@ -125,7 +125,7 @@ export function launchChecklist(i: ChecklistInput): ChecklistItem[] {
     { key: "page", label: "Page Facebook publiée", ok: i.pageOk, critical: true, detail: i.pageOk ? "page publiée" : "page absente ou non publiée" },
     { key: "pixel", label: "Pixel qui reçoit des événements", ok: !!i.pixelId && fresh(i.pixelLastFired, 7), critical: true,
       detail: !i.pixelId ? "aucun pixel réglé" : i.pixelLastFired ? `dernier événement ${i.pixelLastFired.slice(0, 16).replace("T", " ")}${i.pixelShared ? " (pixel partagé : pas forcément notre site)" : ""}` : "aucun événement reçu" },
-    { key: "capi", label: "Conversions API testée (test_event_code)", ok: fresh(i.capiTestedAt, 30), critical: true, detail: i.capiTestedAt ? `test OK le ${i.capiTestedAt.slice(0, 10)}` : "pas encore testée : code de test à saisir dans Réglages → Intégrations" },
+    { key: "capi", label: "Conversions API vérifiée", ok: fresh(i.capiTestedAt, 30), critical: true, detail: i.capiTestedAt ? `events_received ≥ 1 le ${i.capiTestedAt.slice(0, 10)}` : "pas encore vérifiée : « Vérifier CAPI » ou code de test" },
     { key: "landing", label: "Landing en ligne (https)", ok: i.landingOk, critical: true, detail: i.landingOk ? "répond 200" : "injoignable ou non https" },
     { key: "domain", label: "Domaine vérifié dans le Business Manager", ok: i.domainVerified, critical: false, manual: true, detail: "case à cocher après vérification" },
     { key: "emails", label: "Emails Brevo testés", ok: i.emailsSent > 0, critical: true, detail: i.emailsSent > 0 ? `${i.emailsSent} email(s) délivré(s)` : "aucun email réellement délivré" },
