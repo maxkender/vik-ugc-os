@@ -3,8 +3,8 @@
  * carte blanche avec avatar « V » + « Vik Studios · emploi », titre « on cherche des personnes pour publier sur TikTok
  * en [pays] [drapeau] », 2 lignes simples, « postule ici 👇 », pied « Emploi · [pays] ». AUCUN montant (le plus sûr
  * côté politique Meta). Texte de pub (primary text) avec des ✅, CTA APPLY_NOW.
- * Le job réel : chaque jour un brief (vidéo de référence, hook, consignes) ; le créateur tourne et publie lui-même
- * 2 vidéos par jour depuis son téléphone. Formulation neutre « on t'envoie le brief » en attendant la confirmation de Max.
+ * Le job (confirmé par Max le 16/11) : le créateur tourne SES PROPRES vidéos UGC de qualité (face cam, réaction, tuto…)
+ * pour promouvoir une app, 2 par jour sur TikTok / Instagram, avec régularité, à partir d'un brief quotidien.
  * Traductions hors ES / EN / FR générées puis à faire relire par un natif. {{country}} = nom du pays dans la langue.
  */
 import type { Hook } from "./creativeCopy.ts";
@@ -26,24 +26,24 @@ export interface CardPack {
 export const CARD_COPY: Record<string, CardPack> = {
   es: {
     label: "empleo", title: "buscamos personas para publicar en TikTok en {{country}}",
-    brief: "te enviamos el brief cada día, tú publicas 2 videos al día desde tu celular.",
+    brief: "grabas tus propios videos UGC de calidad para promocionar una app en TikTok e Instagram, 2 al día desde tu celular.",
     students: "ideal para estudiantes. pago cada semana. 18+.", nofollow: "no necesitas seguidores. pago cada semana. 18+.",
     flexible: "horario flexible. pago cada semana. 18+.", cta: "postúlate aquí 👇", footer: "Empleo · {{country}}",
-    primary: ["Buscamos creadores/as de contenido en {{country}} 📱", "✅ Te enviamos el brief cada día", "✅ Publicas 2 videos al día desde tu celular", "✅ No necesitas seguidores", "✅ Pago semanal · 18+", "Postúlate en 3 minutos 👇"],
+    primary: ["Buscamos creadores/as de contenido en {{country}} 📱", "✅ Grabas tus propios videos UGC de calidad para promocionar una app", "✅ 2 videos al día en TikTok e Instagram, con constancia", "✅ Te enviamos un brief y un video de referencia cada día", "✅ No necesitas seguidores · pago semanal · 18+", "Postúlate en 3 minutos 👇"],
   },
   en: {
     label: "job", title: "we're looking for people to post on TikTok in {{country}}",
-    brief: "we send you the brief every day, you post 2 videos a day from your phone.",
+    brief: "you film your own quality UGC videos to promote an app on TikTok and Instagram, 2 a day from your phone.",
     students: "ideal for students. paid every week. 18+.", nofollow: "no followers needed. paid every week. 18+.",
     flexible: "flexible hours. paid every week. 18+.", cta: "apply here 👇", footer: "Job · {{country}}",
-    primary: ["We're hiring content creators in {{country}} 📱", "✅ We send you the brief every day", "✅ You post 2 videos a day from your phone", "✅ No followers needed", "✅ Paid weekly · 18+", "Apply in 3 minutes 👇"],
+    primary: ["We're hiring content creators in {{country}} 📱", "✅ You film your own quality UGC videos to promote an app", "✅ 2 videos a day on TikTok and Instagram, consistently", "✅ We send you a brief and a reference video every day", "✅ No followers needed · paid weekly · 18+", "Apply in 3 minutes 👇"],
   },
   fr: {
     label: "emploi", title: "on cherche des personnes pour publier sur TikTok en {{country}}",
-    brief: "on t'envoie le brief chaque jour, tu publies 2 vidéos par jour depuis ton téléphone.",
+    brief: "tu tournes tes propres vidéos UGC de qualité pour promouvoir une app sur TikTok et Instagram, 2 par jour depuis ton téléphone.",
     students: "idéal pour les étudiant·e·s. payé chaque semaine. 18+.", nofollow: "pas besoin d'abonnés. payé chaque semaine. 18+.",
     flexible: "horaires flexibles. payé chaque semaine. 18+.", cta: "postule ici 👇", footer: "Emploi · {{country}}",
-    primary: ["On recrute des créateur·rice·s de contenu en {{country}} 📱", "✅ On t'envoie le brief chaque jour", "✅ Tu publies 2 vidéos par jour depuis ton téléphone", "✅ Pas besoin d'abonnés", "✅ Paiement chaque semaine · 18+", "Postule en 3 minutes 👇"],
+    primary: ["On recrute des créateur·rice·s de contenu en {{country}} 📱", "✅ Tu tournes tes propres vidéos UGC de qualité pour promouvoir une app", "✅ 2 vidéos par jour sur TikTok et Instagram, avec régularité", "✅ On t'envoie un brief et une vidéo de référence chaque jour", "✅ Pas besoin d'abonnés · paiement chaque semaine · 18+", "Postule en 3 minutes 👇"],
   },
   ...CARD_COPY_GENERATED,
 };

@@ -90,3 +90,10 @@ Chaque choix ci-dessous a été pris seul, pour ne pas bloquer. Tout est modifia
     - Textes dans `_shared/logic/jobCopy.ts`, pour 30 langues. Le contrôle `copyViolations` applique des listes de mots interdits par langue. Un test vérifie que tous les textes générés sont conformes, et la page Créas affiche « ⚠ texte non conforme ».
     - L'estimation mensuelle des créas v2 (« Hasta ~150 US$/mes ») est abandonnée.
 35. **Pixel et consentement.** Le pixel Meta ne se charge qu'après « Accepter » (bandeau en 30 langues). La Conversions API n'envoie un Lead que si la candidature porte ce consentement ; email, téléphone et pays sont hachés, et l'event_id est partagé avec le pixel pour la déduplication. Les comptes de test n'envoient jamais de Lead.
+36. **Le job et la rémunération sur la landing (16/11, Max).**
+    - Le posteur tourne ses propres vidéos UGC de qualité (face cam, réaction, tuto, avant/après), 2 par jour avec régularité ; seules les vidéos validées sont payées. Ce wording est repris dans les créas, la landing, le contrat et l'assistant.
+    - Seule la grille 10/6/3 $ par vidéo, RPM 1/0,5/0,2 et plafonds 300/150/60 compte. Le simulateur « Voir ma rémunération » montre zone, prix, RPM, plafond et un exemple neutre (1 vidéo validée à 10 000 vues), sans aucun montant mensuel.
+    - Encadré « si la rémunération ou le projet ne te convient pas, ne va pas plus loin » en fin de landing et juste avant l'envoi du formulaire.
+    - Exemples tirés de la bibliothèque : RPC publique `public_job_examples` (vidéos TikTok organiques compatibles Micabo, une par catégorie, langue du candidat en priorité), vignettes du bucket public, lien vers TikTok.
+    - Textes dans `src/i18n/landingJob.ts` (EN/FR/ES à la main, 36 langues générées par `scripts/translate-landing-job.mts`, à faire relire).
+    - Mentions légales : Vik Studios SAS, 30 boulevard de Sébastopol, 75004 Paris, support@vikstudios.com (SIREN masqué tant qu'il est vide).

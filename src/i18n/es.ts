@@ -31,7 +31,7 @@ const es: Dict = {
     steps: [
       ["Postúlate en 3 minutos", "Cuéntanos sobre ti y graba un vídeo corto de presentación (un \"yap\")."],
       ["Firma tu contrato online", "Contrato de creador/a independiente, firmado en un clic."],
-      ["Publica 2 vídeos al día", "Cada mañana recibes 2 briefs: un vídeo de referencia, un gancho e instrucciones sencillas."],
+      ["Graba y publica 2 vídeos al día", "Grabas tus propios vídeos UGC de calidad desde tu celular. Cada mañana: un brief, un vídeo de referencia y un gancho."],
       ["Cobra cada semana", "Por vídeo + bonus por visualizaciones, pagado cada semana a través de Ruul."],
     ],
     examples: "Ejemplos de lo que harás", faq: "Preguntas frecuentes",

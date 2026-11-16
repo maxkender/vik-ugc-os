@@ -2,15 +2,16 @@ import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Logo } from "@/components/brand/Logo";
 import { LangSwitcher } from "./Landing";
+import { COMPANY, companyLine } from "@/lib/company";
 
 /**
  * Pages publiques /privacy et /terms (ES / EN / FR ; repli EN). Requises par Meta pour passer l'app en Live
- * et pour la catégorie Emploi. Contact : support@vikstudios.com. L'adresse légale est à compléter (Réglages → Société).
+ * et pour la catégorie Emploi. Société, adresse et contact : src/lib/company.ts.
  */
 type Section = [title: string, paragraphs: string[]];
 type Doc = { title: string; updated: string; intro: string; sections: Section[] };
 
-const CONTACT = "support@vikstudios.com";
+const CONTACT = COMPANY.email;
 const UPDATED = "2026-11-16";
 
 const PRIVACY: Record<"es" | "en" | "fr", Doc> = {
@@ -181,6 +182,7 @@ export default function Legal() {
         <h1 className="text-[28px] font-semibold tracking-[-0.02em] text-foreground">{d.title}</h1>
         <p className="mt-1 text-sm text-subtle-foreground">{d.updated}</p>
         <p className="mt-6 text-[15px] leading-relaxed text-foreground">{d.intro}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{companyLine()}</p>
         {d.sections.map(([title, paras], i) => (
           <section key={title} id={i === d.sections.length - 1 && docs === PRIVACY ? "deletion" : undefined} className="mt-8">
             <h2 className="text-lg font-semibold text-foreground">{title}</h2>

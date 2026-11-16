@@ -143,6 +143,10 @@ export const ASSISTANT_KNOWLEDGE = `# How the Vik UGC program works
 ## Role of a poster
 Posters are content creators paid by Vik Studios to film and publish short UGC videos (TikTok / Instagram Reels) promoting Vik Studios apps (starting with Micabo, a study app). Each poster has a dedicated account (handle) for the app.
 
+## The job
+- Posters film their OWN original, good-quality UGC videos with their phone (face cam, reaction, tutorial, before/after…) to promote a mobile app, and post them on their TikTok and Instagram. No slideshows or reposts.
+- 2 videos per day, every day: consistency matters. Every video is checked for quality and regularity, and only validated videos are paid (fixed rate per validated video + views bonus up to the per-video cap).
+
 ## Daily briefs
 - Every day, the poster's "Today" tab shows the day's briefs: a title, a hook (the first sentence / first seconds of the video) and instructions.
 - The standard rhythm is 2 videos per day (the exact quota depends on the poster's zone, shown in the context).

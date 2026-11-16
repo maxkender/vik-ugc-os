@@ -9,6 +9,7 @@ import { attribution, newEventId, track } from "@/lib/pixel";
 import { ConsentBanner } from "@/components/public/ConsentBanner";
 import { Button, Field, IconTile, Input, Select, Spinner, Textarea, type Tint } from "@/components/ui";
 import { uiLangForCountry } from "@/i18n";
+import { JobWarning } from "@/components/public/JobWarning";
 import { ageOn } from "@shared/zones.ts";
 import { flag } from "@/lib/utils";
 import { LangSwitcher, keptParams, useOpenCountries } from "./Landing";
@@ -191,6 +192,7 @@ export default function Apply() {
               <label className="flex cursor-pointer items-start gap-3 text-sm text-foreground"><input type="checkbox" required className="mt-0.5 h-4 w-4 accent-[#004dff]" checked={f.consent} onChange={(e) => set("consent", e.target.checked)} /> {t("apply.consent", { brand: BRAND })}</label>
             </div>
             {messages.length > 0 && <div className="rounded-xl bg-tint-red px-4 py-3 text-sm text-[#a52326]">{messages.map((m) => <p key={m}>{m}</p>)}</div>}
+            <JobWarning lang={i18n.resolvedLanguage ?? "en"} />
             <Button type="submit" size="lg" className="h-12 w-full text-[15px]" loading={busy} disabled={underage || (progress !== null && !yapPath)}>{t("apply.submit")}</Button>
           </form>
         )}

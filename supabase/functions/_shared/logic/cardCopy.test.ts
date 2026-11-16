@@ -6,7 +6,7 @@ describe("carte offre d'emploi", () => {
   it("espagnol Mexique : titre avec pays et drapeau, aucun montant", () => {
     const c = cardCopy("es", "nofollow", "MX");
     expect(c.title).toBe("buscamos personas para publicar en TikTok en México 🇲🇽");
-    expect(c.lines).toEqual(["te enviamos el brief cada día, tú publicas 2 videos al día desde tu celular.", "no necesitas seguidores. pago cada semana. 18+."]);
+    expect(c.lines).toEqual(["grabas tus propios videos UGC de calidad para promocionar una app en TikTok e Instagram, 2 al día desde tu celular.", "no necesitas seguidores. pago cada semana. 18+."]);
     expect(c.footer).toBe("Empleo · México");
     expect(c.primary.split("\n")[0]).toBe("Buscamos creadores/as de contenido en México 📱");
     expect(JSON.stringify(c)).not.toMatch(/\d+[,.]?\d*\s*(US\$|\$|€)/);

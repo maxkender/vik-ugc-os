@@ -35,7 +35,7 @@ const en = {
     steps: [
       ["Apply in 3 minutes", "Tell us about you and record a short intro video (a \"yap\")."],
       ["Sign your contract online", "Independent creator agreement, signed in one click."],
-      ["Post 2 videos a day", "Every morning you get 2 briefs: a reference video, a hook, simple instructions."],
+      ["Film and post 2 videos a day", "You film your own quality UGC videos on your phone. Every morning: a brief, a reference video and a hook."],
       ["Get paid every week", "Per video + views bonus, paid weekly through Ruul."],
     ],
     examples: "Examples of what you'll make",

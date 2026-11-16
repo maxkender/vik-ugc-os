@@ -6,49 +6,33 @@ export const JOB_COPY_GENERATED: Record<string, JobPack> = {
     "job": "Starf: UGC efnishöfundur",
     "hiring": "Við leitum að UGC efnishöfundum",
     "students": "Tilvalið fyrir námsfólk",
-    "nofollow": "Þú þarft enga fylgjendur",
+    "nofollow": "Engir fylgjendur nauðsynlegir",
     "pay": "Greiðsla: {{price}} fyrir hvert myndband + bónus fyrir áhorf",
-    "cta": "Sæktu um"
+    "cta": "Sækja um"
   },
   "ka": {
     "job": "სამუშაო: UGC კონტენტის შემქმნელი",
     "hiring": "ვეძებთ UGC კონტენტის შემქმნელებს",
     "students": "იდეალურია სტუდენტებისთვის",
-    "nofollow": "მიმდევრები საჭირო არ არის",
+    "nofollow": "გამომწერები საჭირო არ არის",
     "pay": "ანაზღაურება: {{price}} თითო ვიდეოზე + ბონუსი ნახვებზე",
     "cta": "მიმართე"
   },
   "hy": {
     "job": "Աշխատանք՝ UGC կոնտենտ ստեղծող",
-    "hiring": "Մենք փնտրում ենք UGC կոնտենտ ստեղծողներ",
+    "hiring": "Մենք փնտրում ենք UGC կոնտենտ ստեղծողների",
     "students": "Իդեալական է ուսանողների համար",
     "nofollow": "Հետևորդներ պետք չեն",
-    "pay": "Վճարում՝ {{price}} մեկ տեսանյութի համար + բոնուս դիտումների համար",
+    "pay": "Վճար՝ {{price}} յուրաքանչյուր տեսանյութի համար + բոնուս դիտումների համար",
     "cta": "Դիմել"
   },
   "id": {
     "job": "Pekerjaan: kreator konten UGC",
-    "hiring": "Kami sedang mencari kreator konten UGC",
+    "hiring": "Kami membuka lowongan kreator konten UGC",
     "students": "Cocok untuk mahasiswa",
     "nofollow": "Tidak perlu punya pengikut",
-    "pay": "Bayaran: {{price}} per video + bonus tayangan",
+    "pay": "Bayaran: {{price}} per video + bonus views",
     "cta": "Daftar"
-  },
-  "hi": {
-    "job": "जॉब: UGC कंटेंट क्रिएटर",
-    "hiring": "हम UGC कंटेंट क्रिएटर्स को हायर कर रहे हैं",
-    "students": "स्टूडेंट्स के लिए एकदम सही",
-    "nofollow": "फॉलोअर्स की ज़रूरत नहीं",
-    "pay": "पेमेंट: {{price}} प्रति वीडियो + व्यूज़ बोनस",
-    "cta": "अप्लाई करें"
-  },
-  "vi": {
-    "job": "Công việc: creator nội dung UGC",
-    "hiring": "Chúng tôi đang tuyển creator nội dung UGC",
-    "students": "Phù hợp với sinh viên",
-    "nofollow": "Không cần có người theo dõi",
-    "pay": "Thù lao: {{price}} mỗi video + thưởng theo lượt xem",
-    "cta": "Ứng tuyển"
   },
   "ms": {
     "job": "Kerja: pencipta kandungan UGC",
@@ -58,6 +42,14 @@ export const JOB_COPY_GENERATED: Record<string, JobPack> = {
     "pay": "Bayaran: {{price}} setiap video + bonus tontonan",
     "cta": "Mohon"
   },
+  "vi": {
+    "job": "Công việc: người sáng tạo nội dung UGC",
+    "hiring": "Chúng tôi đang tuyển người sáng tạo nội dung UGC",
+    "students": "Phù hợp với sinh viên",
+    "nofollow": "Không cần nhiều người theo dõi",
+    "pay": "Thù lao: {{price}} mỗi video + thưởng theo lượt xem",
+    "cta": "Ứng tuyển"
+  },
   "th": {
     "job": "งาน: ครีเอเตอร์คอนเทนต์ UGC",
     "hiring": "เรากำลังรับสมัครครีเอเตอร์คอนเทนต์ UGC",
@@ -66,12 +58,20 @@ export const JOB_COPY_GENERATED: Record<string, JobPack> = {
     "pay": "ค่าตอบแทน: {{price}} ต่อวิดีโอ + โบนัสยอดวิว",
     "cta": "สมัครเลย"
   },
+  "hi": {
+    "job": "जॉब: UGC कंटेंट क्रिएटर",
+    "hiring": "हम UGC कंटेंट क्रिएटर्स को हायर कर रहे हैं",
+    "students": "स्टूडेंट्स के लिए बढ़िया",
+    "nofollow": "फॉलोअर्स की ज़रूरत नहीं",
+    "pay": "पे: {{price}} प्रति वीडियो + व्यूज़ बोनस",
+    "cta": "अप्लाई करें"
+  },
   "kk": {
     "job": "Жұмыс: UGC контент жасаушы",
-    "hiring": "UGC контент жасаушыларды іздейміз",
+    "hiring": "Біз UGC контент жасаушыларды іздейміз",
     "students": "Студенттерге өте қолайлы",
     "nofollow": "Жазылушылар қажет емес",
     "pay": "Төлем: әр видео үшін {{price}} + қаралым бонусы",
-    "cta": "Өтінім жіберу"
+    "cta": "Өтінім қалдыру"
   }
 };

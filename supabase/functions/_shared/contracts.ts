@@ -18,6 +18,8 @@ export async function createContract(db: SupabaseClient, applicationId: string) 
   const cur = zone?.currency ?? "USD";
   const full = renderContract(tpl.body_md, {
     company_name: company?.value?.name ?? "Vik Studios SAS",
+    company_address: company?.value?.legal_address ?? "30 boulevard de Sébastopol, 75004 Paris, France",
+    company_siren: company?.value?.siren ? `, SIREN ${company.value.siren}` : "",
     full_name: `${a.first_name} ${a.last_name}`,
     birthdate: a.birthdate,
     country_name: country?.name ?? a.country,
