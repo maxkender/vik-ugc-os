@@ -6,6 +6,7 @@ import { useCountries, useZones } from "@/lib/hooks";
 import { formatMoney } from "@shared/zones.ts";
 import { CREATIVE_LANGS, HOOKS, RTL_LANGS, type Hook } from "@shared/creativeCopy.ts";
 import { copyViolations, jobCopy } from "@shared/jobCopy.ts";
+import { cardCopy } from "@shared/cardCopy.ts";
 import { Badge, Button, Card, Empty, Field, PageHeader, Select, Spinner, useToast, Chip, Section } from "@/components/ui";
 import { flag } from "@/lib/utils";
 
@@ -46,7 +47,110 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, maxW: number): string
  * logo Vik Studios, bloc texte ancré en bas. En 9:16, tout le texte reste dans les safe zones des stories / reels
  * (rien dans les 14 % du haut ni les 20 % du bas). Sans photo : fond dégradé de marque.
  */
+/**
+ * Style « carte offre d'emploi » (pub Serbie de Max) : fond jaune Vik, carte blanche arrondie, avatar « V »,
+ * « Vik Studios · emploi », titre, 2 lignes, « postule ici 👇 », pied « Emploi · Pays ». Aucun montant.
+ * En 9:16, la carte reste entre 14 % et 80 % de la hauteur (safe zones).
+ */
+async function renderCard(cr: any): Promise<Blob> {
+  const [W, H] = FORMATS[cr.format] ?? [1080, 1080];
+  const tall = H / W > 1.5;
+  const card = cr.card ?? {};
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d")!;
+  await document.fonts.ready;
+  await Promise.all(["700 80px Inter", "500 40px Inter", "600 40px Inter"].map((f) => document.fonts.load(f).catch(() => null)));
+  ctx.fillStyle = "#FFBB43";
+  ctx.fillRect(0, 0, W, H);
+  const rtl = RTL_LANGS.has(String(cr.language ?? "").split("-")[0]);
+  const cw = W * (tall ? 0.86 : 0.84);
+  const cx = (W - cw) / 2;
+  const pad = cw * 0.075;
+  const inner = cw - 2 * pad;
+  const avatar = W * (tall ? 0.085 : 0.075);
+  const metaS = Math.round(W * 0.03), lineS = Math.round(W * (tall ? 0.036 : 0.032)), ctaS = Math.round(W * (tall ? 0.04 : 0.036)), footS = Math.round(W * 0.026);
+  const maxCardH = tall ? H * 0.66 : H * 0.84;
+  const measure = (titleS: number) => {
+    ctx.font = `700 ${titleS}px Inter`;
+    const tl = wrap(ctx, card.title ?? cr.headline ?? "", inner);
+    ctx.font = `500 ${lineS}px Inter`;
+    const ll = (card.lines ?? []).map((l: string) => wrap(ctx, l, inner));
+    const h = pad + avatar + pad * 0.7 + tl.length * titleS * 1.15 + pad * 0.5
+      + ll.reduce((n: number, x: string[]) => n + x.length * lineS * 1.35 + lineS * 0.6, 0)
+      + ctaS * 1.6 + pad * 0.6 + footS * 2.4 + pad * 0.3;
+    return { tl, ll, h };
+  };
+  let titleS = Math.round(W * (tall ? 0.07 : 0.062));
+  let M = measure(titleS);
+  while (titleS > 30 && M.h > maxCardH) { titleS -= 2; M = measure(titleS); }
+  const ch = M.h;
+  const cy = tall ? H * 0.14 + (H * 0.66 - ch) / 2 : (H - ch) / 2;
+  // carte
+  ctx.shadowColor = "rgba(0,17,62,0.18)";
+  ctx.shadowBlur = W * 0.04;
+  ctx.shadowOffsetY = W * 0.01;
+  ctx.fillStyle = "#ffffff";
+  ctx.beginPath();
+  ctx.roundRect(cx, cy, cw, ch, W * 0.045);
+  ctx.fill();
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+  ctx.direction = rtl ? "rtl" : "ltr";
+  const left = rtl ? cx + cw - pad : cx + pad;
+  ctx.textAlign = rtl ? "right" : "left";
+  // en-tête : avatar « V » + Vik Studios · emploi
+  let y = cy + pad;
+  const ax = rtl ? cx + cw - pad - avatar : cx + pad;
+  ctx.fillStyle = "#00113E";
+  ctx.beginPath();
+  ctx.arc(ax + avatar / 2, y + avatar / 2, avatar / 2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#FFBB43";
+  ctx.font = `700 ${Math.round(avatar * 0.5)}px Inter`;
+  ctx.textAlign = "center";
+  ctx.fillText("V", ax + avatar / 2, y + avatar * 0.68);
+  ctx.textAlign = rtl ? "right" : "left";
+  const tx = rtl ? ax - avatar * 0.3 : ax + avatar * 1.3;
+  ctx.fillStyle = "#0b1530";
+  ctx.font = `700 ${metaS}px Inter`;
+  ctx.fillText("Vik Studios", tx, y + avatar * 0.45);
+  ctx.fillStyle = "#6b7280";
+  ctx.font = `500 ${metaS}px Inter`;
+  ctx.fillText(card.label ?? "", tx, y + avatar * 0.45 + metaS * 1.3);
+  y += avatar + pad * 0.7;
+  // titre
+  ctx.fillStyle = "#0b1530";
+  ctx.font = `700 ${titleS}px Inter`;
+  for (const l of M.tl) { y += titleS; ctx.fillText(l, left, y); y += titleS * 0.15; }
+  y += pad * 0.5;
+  // lignes
+  ctx.fillStyle = "#374151";
+  ctx.font = `500 ${lineS}px Inter`;
+  for (const para of M.ll) { for (const l of para) { y += lineS; ctx.fillText(l, left, y); y += lineS * 0.35; } y += lineS * 0.6; }
+  // appel
+  ctx.fillStyle = "#0b1530";
+  ctx.font = `700 ${ctaS}px Inter`;
+  y += ctaS * 1.1;
+  ctx.fillText(card.cta ?? cr.cta ?? "", left, y);
+  y += ctaS * 0.5 + pad * 0.6;
+  // pied
+  ctx.strokeStyle = "#e5e7eb";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(cx + pad, y);
+  ctx.lineTo(cx + cw - pad, y);
+  ctx.stroke();
+  ctx.fillStyle = "#6b7280";
+  ctx.font = `600 ${footS}px Inter`;
+  ctx.fillText(card.footer ?? "", left, y + footS * 1.7);
+  return await new Promise<Blob>((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error("canvas"))), "image/png"));
+}
+
 export async function renderCreative(cr: any): Promise<Blob> {
+  if (cr.style === "card") return renderCard(cr);
   const [W, H] = FORMATS[cr.format] ?? [1080, 1080];
   const tall = H / W > 1.5;
   const canvas = document.createElement("canvas");
@@ -218,6 +322,7 @@ export default function Creatives() {
   const [sel, setSel] = useState<string[]>([]);
   const [formats, setFormats] = useState<string[]>(["1:1", "4:5", "9:16"]);
   const [hook, setHook] = useState<Hook>("student");
+  const [style, setStyle] = useState<"card" | "photo" | "text">("card");
   const [busy, setBusy] = useState<string | null>(null);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [f, setF] = useState({ country: "", language: "", format: "", status: "" });
@@ -261,7 +366,12 @@ export default function Creatives() {
         // Format offre d'emploi (règle Meta du 16/11) : titre de poste, rémunération, étiquette ; ni revenus ni montants mensuels.
         const copy = jobCopy(lang, hook, priceFor(code), code);
         for (const format of formats) {
-          const row = { country: code, language: copy.lang, format, headline: copy.headline, subline: copy.tag, cta: copy.cta, bonus_line: copy.pay, monthly_line: null, disclaimer: null, hook, status: "draft" };
+          const card = cardCopy(lang, hook, code);
+          const row: Record<string, unknown> = style === "card"
+            ? { country: code, language: card.lang, format, style, hook, status: "draft", headline: copy.headline, subline: null, cta: copy.cta, bonus_line: null,
+                monthly_line: null, disclaimer: null, card: { label: card.label, title: card.title, lines: card.lines, cta: card.cta, footer: card.footer }, ad_text: card.primary }
+            : { country: code, language: copy.lang, format, style, hook, status: "draft", headline: copy.headline, subline: copy.tag, cta: copy.cta, bonus_line: copy.pay,
+                monthly_line: null, disclaimer: null, ad_text: card.primary };
           const { data, error } = await supabase.from("recruitment_creatives").insert(row).select("*").single();
           if (error) throw error;
           await renderAndUpload(data);
@@ -354,6 +464,13 @@ export default function Creatives() {
             </div>
           </Field>
           <div className="space-y-5">
+            <Field label="Style">
+              <div className="flex flex-wrap gap-2">
+                {([["card", "Carte offre d'emploi"], ["photo", "Photo UGC (visuel IA ensuite)"], ["text", "Texte simple"]] as const).map(([v, l]) => (
+                  <Chip key={v} active={style === v} onClick={() => setStyle(v)}>{l}</Chip>
+                ))}
+              </div>
+            </Field>
             <Field label="2 · Accroche">
               <Select value={hook} onChange={(e) => setHook(e.target.value as Hook)}>{HOOKS.map((h) => <option key={h.value} value={h.value}>{h.label}</option>)}</Select>
             </Field>

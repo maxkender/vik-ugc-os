@@ -86,7 +86,7 @@ async function createAd(db: SupabaseClient, cfg: MetaCfg, adset: any, cr: any, o
     method: "POST",
     params: {
       name: `${cr.headline.slice(0, 60)} – ${cr.format}`,
-      object_story_spec: { page_id: cfg.page_id, link_data: { image_hash: hash.hash, link, message: o.message ?? cr.subline ?? cr.headline, name: o.headline ?? cr.headline, call_to_action: { type: "APPLY_NOW", value: { link } } } },
+      object_story_spec: { page_id: cfg.page_id, link_data: { image_hash: hash.hash, link, message: o.message ?? cr.ad_text ?? cr.subline ?? cr.headline, name: o.headline ?? cr.headline, call_to_action: { type: "APPLY_NOW", value: { link } } } },
     },
   });
   const name = `${adset.name} – ${cr.country} ${cr.format}`;
@@ -207,7 +207,7 @@ serve(async (req, body, db) => {
       const results: any[] = [];
       for (const set of sets ?? []) {
         const setCountries: string[] = set.country ? [set.country] : (set.targeting?.countries ?? []);
-        const mine = (crs ?? []).filter((cr) => setCountries.includes(cr.country)).slice(0, 6);
+        const mine = (crs ?? []).filter((cr) => setCountries.includes(cr.country)).slice(0, 12);
         for (const cr of mine) {
           try {
             results.push({ adset: set.name, creative: cr.id, ...(await createAd(db, cfg, set, cr, {})) });

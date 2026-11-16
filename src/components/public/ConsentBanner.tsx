@@ -9,7 +9,7 @@ const T: Record<string, [string, string, string]> = {
   es: ["Usamos cookies de Meta para medir nuestros anuncios y mostrar esta oferta a más creadores.", "Aceptar", "Rechazar"],
   de: ["Wir nutzen Meta-Cookies, um unsere Anzeigen zu messen und dieses Angebot mehr Creator:innen zu zeigen.", "Akzeptieren", "Ablehnen"],
   it: ["Usiamo i cookie di Meta per misurare i nostri annunci e mostrare questa offerta a più creator.", "Accetta", "Rifiuta"],
-  pt: ["Usamos cookies da Meta para medir os nossos anúncios e mostrar esta oferta a mais criadores.", "Aceitar", "Recusar"],
+  pt: ["Usamos cookies da Meta para medir nossos anúncios e mostrar esta oferta a mais criadores.", "Aceitar", "Recusar"],
   nl: ["We gebruiken Meta-cookies om onze advertenties te meten en dit aanbod aan meer creators te tonen.", "Accepteren", "Weigeren"],
   pl: ["Używamy plików cookie Meta, aby mierzyć nasze reklamy i pokazywać tę ofertę większej liczbie twórców.", "Akceptuję", "Odrzucam"],
   sv: ["Vi använder Metas cookies för att mäta våra annonser och visa erbjudandet för fler kreatörer.", "Godkänn", "Avböj"],
@@ -34,6 +34,15 @@ const T: Record<string, [string, string, string]> = {
   he: ["אנו משתמשים בעוגיות של Meta כדי למדוד את המודעות שלנו ולהציג את ההצעה ליותר יוצרים.", "אישור", "דחייה"],
   uk: ["Ми використовуємо файли cookie Meta, щоб вимірювати рекламу й показувати пропозицію більшій кількості авторів.", "Прийняти", "Відхилити"],
   sr: ["Користимо Meta колачиће за мерење огласа и приказ понуде већем броју креатора.", "Прихватам", "Одбијам"],
+  is: ["Við notum vafrakökur frá Meta til að mæla auglýsingarnar okkar og sýna fleiri efnishöfundum þetta tilboð.", "Samþykkja", "Hafna"],
+  hy: ["Մենք օգտագործում ենք Meta-ի cookie-ները՝ մեր գովազդները չափելու և այս առաջարկը ավելի շատ կրեատորների ցույց տալու համար։", "Ընդունել", "Մերժել"],
+  ka: ["ვიყენებთ Meta-ს ქუქი-ფაილებს ჩვენი რეკლამების გასაზომად და ამ შეთავაზების მეტი კრეატორისთვის საჩვენებლად.", "მიღება", "უარყოფა"],
+  kk: ["Жарнамаларымызды өлшеу және бұл ұсынысты көбірек креаторларға көрсету үшін Meta cookie файлдарын қолданамыз.", "Қабылдау", "Бас тарту"],
+  hi: ["हम अपने विज्ञापनों को मापने और यह ऑफ़र ज़्यादा क्रिएटर्स तक पहुँचाने के लिए Meta कुकीज़ का इस्तेमाल करते हैं।", "स्वीकार करें", "अस्वीकार करें"],
+  id: ["Kami menggunakan cookie Meta untuk mengukur iklan kami dan menampilkan penawaran ini ke lebih banyak kreator.", "Terima", "Tolak"],
+  ms: ["Kami menggunakan kuki Meta untuk mengukur iklan kami dan menunjukkan tawaran ini kepada lebih ramai pencipta.", "Terima", "Tolak"],
+  th: ["เราใช้คุกกี้ของ Meta เพื่อวัดผลโฆษณาและแสดงข้อเสนอนี้ให้ครีเอเตอร์มากขึ้น", "ยอมรับ", "ปฏิเสธ"],
+  vi: ["Chúng tôi dùng cookie của Meta để đo lường quảng cáo và giới thiệu ưu đãi này đến nhiều creator hơn.", "Chấp nhận", "Từ chối"],
 };
 
 /** Bandeau de consentement publicitaire (RGPD) : le pixel ne se charge qu'après « Accepter ». */

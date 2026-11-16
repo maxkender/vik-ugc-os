@@ -10,6 +10,7 @@
  * Traductions du build : à faire relire par un natif.
  */
 import type { Hook } from "./creativeCopy.ts";
+import { JOB_COPY_GENERATED } from "./jobCopy.generated.ts";
 
 export interface JobPack { job: string; hiring: string; students: string; nofollow: string; pay: string; cta: string }
 
@@ -44,6 +45,7 @@ export const JOB_COPY: Record<string, JobPack> = {
   et: { job: "Töö: UGC sisulooja", hiring: "Otsime UGC sisuloojaid", students: "Sobib tudengitele", nofollow: "Jälgijaid pole vaja", pay: "Tasu: {{price}} video eest + vaatamiste boonus", cta: "Kandideeri" },
   lv: { job: "Darbs: UGC satura veidotājs", hiring: "Meklējam UGC satura veidotājus", students: "Ideāli studentiem", nofollow: "Sekotāji nav vajadzīgi", pay: "Samaksa: {{price}} par video + bonuss par skatījumiem", cta: "Piesakies" },
   lt: { job: "Darbas: UGC turinio kūrėjas", hiring: "Ieškome UGC turinio kūrėjų", students: "Puikiai tinka studentams", nofollow: "Sekėjų nereikia", pay: "Atlygis: {{price}} už vaizdo įrašą + peržiūrų premija", cta: "Teik paraišką" },
+  ...JOB_COPY_GENERATED,
 };
 
 /** Expressions interdites (get-rich-quick, revenus, montants mensuels, questions sur un attribut personnel). */
