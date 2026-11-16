@@ -96,22 +96,18 @@ Le build a laissé une candidature de démonstration complète (« Zoé Martin-E
 
 ## 10. Comptes de test (QA)
 
-Créés le 15/11 avec l'accord de Max, pour tester l'app connecté (Playwright) :
+**Supprimés le 16/11** à la demande de Max : 5 comptes (qa-admin, qa-controller, qa-poster, qa-candidate, e2e-candidate@example.com), avec leurs candidatures, contrats, PDF, vidéos, emails et événements Meta de test.
+- Aucun script ni seed ne recrée de comptes. Les scripts de test connectés (`scripts/*.cjs`) sont opt-in : ils lisent les identifiants dans l'environnement et n'en créent pas.
+- Pour recréer des comptes de test, il faut que Max le demande. Le domaine `@vik-qa.test` est alors automatiquement marqué `is_test`, exclu de la paie, des emails et des statistiques.
+- **Nettoyage** :
+  - un candidat : bouton corbeille dans Candidats, « Supprimer ce candidat et ses données » ;
+  - tous les comptes de test : `recruit` → `purge_test_data`. Sans argument, c'est un aperçu ; la suppression exige `confirm: "PURGE"`.
 
-| Email | Rôle |
-|---|---|
-| `qa-admin@vik-qa.test` | admin |
-| `qa-controller@vik-qa.test` | contrôleur |
-| `qa-poster@vik-qa.test` | posteur (FR, zone A) |
+## 11. Emails
 
-- Domaine non routable (`.test`) : aucun email ne peut leur parvenir. Les mots de passe sont aléatoires et ne sont gardés que dans l'environnement de la session de build : ils ne sont ni dans le repo, ni dans les logs.
-- Marqués `profiles.is_test = true` et exclus :
-  - de la **paie** (calcul hebdo) ;
-  - des **emails** (`@vik-qa.test` → statut `cancelled`, raison `test_account`, jamais envoyé) ;
-  - des **statistiques** du tableau de bord.
-- Pour les tester toi-même : Réglages → Équipe → changer le mot de passe n'est pas prévu. Le plus simple est de te connecter avec ton propre compte, en changeant ton rôle.
-- **Suppression** (SQL Editor) :
-  ```sql
-  delete from auth.users where email like '%@vik-qa.test';   -- cascade : profiles, posters, assignations
-  ```
-- Script de captures (connecté) : `QA_EMAIL=… QA_PASSWORD=… node scripts/screenshots.cjs <url> <dossier> [pages…]`.
+Configurés le 16/11 :
+- expéditeur **Vik Studios <noreply@vikstudios.com>** (domaine authentifié dans Brevo) ;
+- **mode test actif** : tous les emails partent vers `maximilienkender@gmail.com`, avec `[TEST → destinataire]` dans l'objet ;
+- premier envoi réel : « Candidature reçue » (test), délivré par Brevo.
+
+Pour envoyer aux vrais candidats : Réglages → Emails → désactiver le mode test.
