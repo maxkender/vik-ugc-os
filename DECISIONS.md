@@ -97,3 +97,12 @@ Chaque choix ci-dessous a été pris seul, pour ne pas bloquer. Tout est modifia
     - Exemples tirés de la bibliothèque : RPC publique `public_job_examples` (vidéos TikTok organiques compatibles Micabo, une par catégorie, langue du candidat en priorité), vignettes du bucket public, lien vers TikTok.
     - Textes dans `src/i18n/landingJob.ts` (EN/FR/ES à la main, 36 langues générées par `scripts/translate-landing-job.mts`, à faire relire).
     - Mentions légales : Vik Studios SAS, 30 boulevard de Sébastopol, 75004 Paris, support@vikstudios.com (SIREN masqué tant qu'il est vide).
+37. **1 vidéo par jour (16/11, Max).** Zones, quota des posteurs, réglage `briefs.per_day`, répartition (1 brief/jour/posteur, testée), objectif du dashboard, contrat v2 (la v1 reste pour les contrats déjà envoyés), emails, landing (40 langues), créas, assistant. Les anciens textes de créas v2 (« Gagne X par vidéo », « Jusqu'à ~X/mois ») sont supprimés.
+38. **Style de créa « Notes iPhone ».** Fond blanc, « < Notes » et « ⋯ » orange iOS, date, titre « job étudiant dispo en ce moment : », 4 lignes fléchées, aucun montant ni témoignage. Textes `notesCopy.ts` (EN/FR/ES à la main, autres générés et contrôlés par `copyViolations`).
+39. **10 pays de test et structure Meta par zone (16/11, Max).**
+    - Pays : A = FR, DE, BE (FR) ; B = ES, IT, PL ; C = RS, RO, BG, MX. Les autres pays restent ouverts sur la landing, sans créa ni ad set.
+    - 3 styles (carte, Notes, photo UGC) × 1:1 et 9:16 par pays = 60 brouillons, 1 photo IA par pays (fal flux/dev, filtre de sécurité, prompt neutre « étudiant·e qui vit dans [pays] »). Script : `scripts/test-markets-creatives.mts`.
+    - Serbe en alphabet latin (comme la pub Serbie de Max) : `scripts/sr-latin.py`, noms de pays et dates en `sr-Latn`.
+    - Meta : 1 campagne PAUSED par zone (le pilote MX/CO devient la zone C), 1 ad set PAUSED par pays à 5 €/jour, action `zone_structure` idempotente. Plafond global inchangé.
+    - Pubs : bouton « Créer les pubs » + cron horaire `create_pending_ads` pour les créas validées ; tant que l'app Meta est en mode développement, l'action s'arrête et réessaie.
+    - Checklist : relecture des traductions par pays (FR/BE/ES/MX par Max ; DE, IT, PL, SR latin, RO, BG par un natif).

@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, ClipboardCheck, FlaskConical, RefreshCw, XCircle } from "lucide-react";
 import { Badge, Button, Card, Input, Spinner, useToast } from "@/components/ui";
 import { callFn, supabase } from "@/lib/supabase";
-import { cn } from "@/lib/utils";
+import { cn, flag } from "@/lib/utils";
 
 interface Item { key: string; label: string; ok: boolean; critical: boolean; detail: string; manual?: boolean }
 const MANUAL: Record<string, string> = { domain: "domain_verified", translations: "translations_reviewed", creatives: "creatives_validated" };
@@ -27,6 +27,18 @@ export function LaunchChecklist() {
       await q.refetch();
     } catch (e) { toast((e as Error).message, "danger"); } finally { setBusy(null); }
   };
+  /** Relecture par pays de test (FR/ES par Max, autres langues par un natif). */
+  const toggleCountry = async (country: string, done: boolean) => {
+    setBusy(`tr-${country}`);
+    try {
+      const { data } = await supabase.from("settings").select("value").eq("key", "meta").single();
+      const v = (data?.value ?? {}) as any;
+      const list = (v.checklist?.translations ?? []).map((t: any) => (t.country === country ? { ...t, done } : t));
+      await supabase.from("settings").update({ value: { ...v, checklist: { ...(v.checklist ?? {}), translations: list } } }).eq("key", "meta");
+      await q.refetch();
+    } catch (e) { toast((e as Error).message, "danger"); } finally { setBusy(null); }
+  };
+  const trList: Array<{ country: string; lang: string; reviewer: string; done: boolean }> = q.data?.manual?.translations ?? [];
   const capiCheck = async () => {
     setBusy("check");
     try {
@@ -72,6 +84,16 @@ export function LaunchChecklist() {
                   <input type="checkbox" disabled={busy === i.key} checked={!!q.data?.manual?.[MANUAL[i.key]]}
                     onChange={(e) => toggle(i.key, e.target.checked)} /> fait
                 </label>
+              )}
+              {i.key === "translations" && trList.length > 0 && (
+                <div className="flex w-full flex-wrap gap-x-4 gap-y-1.5 pl-7">
+                  {trList.map((t) => (
+                    <label key={t.country} className="flex items-center gap-1.5 text-xs text-muted-foreground" title={`Relecture : ${t.reviewer}`}>
+                      <input type="checkbox" disabled={busy === `tr-${t.country}`} checked={t.done} onChange={(e) => toggleCountry(t.country, e.target.checked)} />
+                      {flag(t.country)} {t.country} · {t.lang.toUpperCase()} <span className="text-subtle-foreground">({t.reviewer})</span>
+                    </label>
+                  ))}
+                </div>
               )}
               {i.key === "capi" && (
                 <span className="flex items-center gap-1.5">

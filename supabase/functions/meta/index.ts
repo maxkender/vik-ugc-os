@@ -6,15 +6,19 @@
 //   activate { level: campaign|adset|ad, id }                                 admin (jamais cron) : budget ≤ plafond
 //   pause { level, id }                                                      admin
 //   sync_insights                                                            cron / admin : dépense, clics, CPC (7 derniers jours)
+//   zone_structure { countries[], daily_budget? }   admin / cron : 1 campagne PAUSED par zone (A/B/C) + 1 ad set PAUSED par pays (5 €/j par défaut)
+//   create_pending_ads                               admin / cron (horaire) : crée les pubs (PAUSED) des créas validées sans pub ;
+//                                                    s'arrête proprement tant que l'app Meta est en mode développement
+//   archive { level, id }                            admin (clic) : ARCHIVED côté Meta (irréversible)
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { audit, caller, getSetting, HttpError, requireAdmin, serve, userId } from "../_shared/http.ts";
-import { activationAllowed, adPayload, adsetPayload, blockingItems, campaignPayload, landingUrl, launchChecklist, toMinor, type MetaObjective } from "../_shared/logic/meta.ts";
+import { type TranslationReview, activationAllowed, adPayload, adsetPayload, blockingItems, campaignPayload, landingUrl, launchChecklist, toMinor, type MetaObjective } from "../_shared/logic/meta.ts";
 import { employmentViolations } from "../_shared/logic/pixel.ts";
 import { capiHealthCheck, sendLead } from "../_shared/capi.ts";
 
 interface MetaCfg {
   ad_account_id: string; page_id: string; api_version: string; max_daily_budget: number; global_daily_cap: number; beneficiary?: string;
-  pixel_id?: string; objective?: MetaObjective; checklist?: { translations_reviewed?: boolean; creatives_validated?: boolean; domain_verified?: boolean };
+  pixel_id?: string; objective?: MetaObjective; checklist?: { translations_reviewed?: boolean; creatives_validated?: boolean; domain_verified?: boolean; translations?: TranslationReview[] };
 }
 
 async function graph(cfg: MetaCfg, path: string, init: { method?: string; params?: Record<string, unknown> } = {}) {
@@ -96,6 +100,95 @@ async function createAd(db: SupabaseClient, cfg: MetaCfg, adset: any, cr: any, o
   return { ad_id: ad.id };
 }
 
+const ZONE_NAME = (z: string) => `Recrutement créateurs UGC – Zone ${z}`;
+
+/**
+ * Structure par zone (16/11) : une campagne PAUSED par zone, un ad set PAUSED par pays au budget par défaut.
+ * Idempotent : réutilise la campagne de la zone (le pilote MX/CO devient la zone C), ne recrée pas un ad set existant,
+ * ajuste seulement son budget. Plafonds par ad set et global vérifiés.
+ */
+async function zoneStructure(db: SupabaseClient, cfg: MetaCfg, company: any, body: any, c: any) {
+  const countries: string[] = (body.countries ?? []).map((x: string) => String(x).toUpperCase()).filter((x: string) => /^[A-Z]{2}$/.test(x));
+  if (!countries.length) throw new HttpError(400, "countries");
+  const budget = Number(body.daily_budget ?? 5);
+  if (!(budget > 0) || budget > cfg.max_daily_budget) throw new HttpError(400, `Budget entre 0 et ${cfg.max_daily_budget} €/jour par ad set`);
+  if (!cfg.pixel_id) throw new HttpError(409, "pixel_id manquant");
+  const { data: ctry } = await db.from("countries").select("code, zone_code, language").in("code", countries);
+  const zoneOf = new Map((ctry ?? []).map((r) => [r.code, r.zone_code as string]));
+  const langOf = new Map((ctry ?? []).map((r) => [r.code, String(r.language ?? "en")]));
+  const report: any[] = [];
+  for (const z of [...new Set(countries.map((x) => zoneOf.get(x)).filter(Boolean))] as string[]) {
+    const zc = countries.filter((x) => zoneOf.get(x) === z);
+    const { data: camps } = await db.from("meta_campaigns").select("*").eq("zone_code", z).not("status", "in", "(ARCHIVED,DELETED)").order("created_at").limit(1);
+    let camp = camps?.[0];
+    const { data: existing } = camp ? await db.from("meta_adsets").select("*").eq("campaign_id", camp.id).not("status", "in", "(ARCHIVED,DELETED)") : { data: [] as any[] };
+    const allCountries = [...new Set([...(camp?.countries ?? []), ...zc])];
+    if (!camp) {
+      const name = ZONE_NAME(z);
+      const m = await createPaused(cfg, "campaigns", campaignPayload(name, allCountries, cfg.objective ?? "leads"));
+      const { data } = await db.from("meta_campaigns").insert({ meta_id: m.id, name, status: "PAUSED", daily_budget_cap: cfg.max_daily_budget, countries: allCountries, zone_code: z, created_by: c.kind === "user" ? userId(c) : null }).select("*").single();
+      camp = data;
+      report.push({ zone: z, campaign: "créée", meta_id: m.id });
+    } else {
+      // Nom de zone + pays autorisés de la catégorie spéciale EMPLOYMENT (sinon Meta refuse les nouveaux ad sets).
+      await graph(cfg, camp.meta_id, { method: "POST", params: { name: ZONE_NAME(z), special_ad_category_country: allCountries } });
+      await db.from("meta_campaigns").update({ name: ZONE_NAME(z), countries: allCountries }).eq("id", camp.id);
+      report.push({ zone: z, campaign: "réutilisée", meta_id: camp.meta_id });
+    }
+    for (const code of zc) {
+      const row = (existing ?? []).find((a: any) => a.country === code);
+      const used = await committedBudget(db);
+      if (row) {
+        if (Number(row.daily_budget) !== budget) {
+          if (used - Number(row.daily_budget) + budget > cfg.global_daily_cap) throw new HttpError(400, `Plafond global dépassé (${code})`);
+          await graph(cfg, row.meta_id, { method: "POST", params: { daily_budget: String(toMinor(budget)), name: `${ZONE_NAME(z)} – ${code}` } });
+          await db.from("meta_adsets").update({ daily_budget: budget, name: `${ZONE_NAME(z)} – ${code}` }).eq("id", row.id);
+        }
+        report.push({ zone: z, country: code, adset: "existant", budget });
+        continue;
+      }
+      if (used + budget > cfg.global_daily_cap) throw new HttpError(400, `Plafond global dépassé : ${used} + ${budget} > ${cfg.global_daily_cap} €/jour`);
+      const p = adsetPayload({ name: `${ZONE_NAME(z)} – ${code}`, campaignId: camp.meta_id, country: code, countries: [code], langs: [langOf.get(code) ?? "en"],
+        dailyBudget: budget, employment: true, beneficiary: company.brand ?? "Vik Studios", objective: cfg.objective ?? "leads", pixelId: cfg.pixel_id });
+      const v = employmentViolations(p.targeting as any);
+      if (v.length) throw new HttpError(500, `Ciblage non conforme EMPLOYMENT : ${v.join(", ")}`);
+      const a = await createPaused(cfg, "adsets", p);
+      await db.from("meta_adsets").insert({ campaign_id: camp.id, meta_id: a.id, name: p.name, country: code, zone_code: z, daily_budget: budget, age_min: 18, age_max: 65, status: "PAUSED", targeting: { sent: p.targeting, countries: [code], objective: cfg.objective ?? "leads" } });
+      report.push({ zone: z, country: code, adset: "créé", meta_id: a.id, budget });
+    }
+  }
+  await audit(db, c.kind === "user" ? userId(c) : null, "meta.zone_structure", "meta_campaigns", null, { countries, budget });
+  return { ok: true, committed: await committedBudget(db), report };
+}
+
+/** Pubs des créas validées qui n'en ont pas encore (une par créa et par ad set de son pays). Tout en PAUSED. */
+async function createPendingAds(db: SupabaseClient, cfg: MetaCfg) {
+  if (!cfg.page_id) return { ok: false, skipped: "page_id" };
+  const { data: sets } = await db.from("meta_adsets").select("*, meta_campaigns(name, landing_url, status)").not("status", "in", "(ARCHIVED,DELETED)").not("country", "is", null);
+  const { data: crs } = await db.from("recruitment_creatives").select("*").eq("status", "approved").not("image_path", "is", null).limit(300);
+  const { data: done } = await db.from("meta_ads").select("adset_id, creative_id");
+  const has = new Set((done ?? []).map((d) => `${d.adset_id}:${d.creative_id}`));
+  const results: any[] = [];
+  for (const set of sets ?? []) {
+    if (["ARCHIVED", "DELETED"].includes(set.meta_campaigns?.status)) continue;
+    for (const cr of (crs ?? []).filter((x) => x.country === set.country && !has.has(`${set.id}:${x.id}`)).slice(0, 12)) {
+      try {
+        results.push({ adset: set.name, creative: cr.id, ...(await createAd(db, cfg, set, cr, {})) });
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        // App Meta encore en mode développement : on s'arrête, on réessaiera à la prochaine heure.
+        if (/development mode|mode de développement|app.*not.*live|is in development/i.test(msg)) {
+          await db.from("settings").upsert({ key: "meta_ads_pending", value: { blocked: "app_dev_mode", at: new Date().toISOString(), message: msg.slice(0, 300) } });
+          return { ok: false, blocked: "app_dev_mode", created: results.filter((r) => !r.error).length, message: msg };
+        }
+        results.push({ adset: set.name, creative: cr.id, error: msg });
+      }
+    }
+  }
+  await db.from("settings").upsert({ key: "meta_ads_pending", value: { blocked: null, at: new Date().toISOString(), created: results.filter((r) => !r.error).length } });
+  return { ok: true, created: results.filter((r) => !r.error).length, results };
+}
+
 /** État des prérequis de lancement (lecture seule ; ne touche à aucune campagne). */
 async function checklist(db: SupabaseClient, cfg: MetaCfg) {
   const safe = async <T,>(f: () => Promise<T>, d: T) => { try { return await f(); } catch { return d; } };
@@ -113,7 +206,7 @@ async function checklist(db: SupabaseClient, cfg: MetaCfg) {
     accountStatus: account?.account_status ?? null, hasFunding: !!account?.funding_source_details, pageOk: page?.is_published === true,
     pixelId: cfg.pixel_id || null, pixelLastFired: pixel?.last_fired_time ? new Date(pixel.last_fired_time).toISOString() : null,
     pixelShared: /sophia/i.test(pixel?.name ?? ""), capiTestedAt: capi?.[0]?.created_at ?? null, landingOk,
-    domainVerified: !!cfg.checklist?.domain_verified, emailsSent: sent ?? 0, translationsReviewed: !!cfg.checklist?.translations_reviewed,
+    domainVerified: !!cfg.checklist?.domain_verified, emailsSent: sent ?? 0, translationsReviewed: !!cfg.checklist?.translations_reviewed, translations: cfg.checklist?.translations ?? [],
     approvedCreatives: creatives ?? 0, creativesValidated: !!cfg.checklist?.creatives_validated,
     globalCap: cfg.global_daily_cap, committedBudget: await committedBudget(db),
   });
@@ -277,6 +370,21 @@ serve(async (req, body, db) => {
     }
     case "sync_insights":
       return await syncInsights(db, cfg);
+    case "zone_structure":
+      return await zoneStructure(db, cfg, company, body, c);
+    case "create_pending_ads":
+      return await createPendingAds(db, cfg);
+    case "archive": {
+      if (c.kind !== "user") throw new HttpError(403, "archivage manuel uniquement");
+      const level = String(body.level);
+      const table = level === "campaign" ? "meta_campaigns" : level === "adset" ? "meta_adsets" : "meta_ads";
+      const { data: row } = await db.from(table).select("id, meta_id").eq("id", body.id).single();
+      if (!row) throw new HttpError(404, "not found");
+      await graph(cfg, row.meta_id, { method: "POST", params: { status: "ARCHIVED" } });
+      await db.from(table).update({ status: "ARCHIVED" }).eq("id", row.id);
+      await audit(db, userId(c), `meta.archive.${level}`, table, row.id, {});
+      return { ok: true };
+    }
     default:
       throw new HttpError(400, "unknown action");
   }

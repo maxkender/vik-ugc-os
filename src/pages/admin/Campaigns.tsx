@@ -89,6 +89,18 @@ export default function Campaigns() {
       return r;
     }, "Pubs créées en PAUSED");
   };
+  /** Pubs de toutes les créas validées sans pub (aussi lancé chaque heure ; attend que l'app Meta soit en Live). */
+  const createPending = () => act("pending", async () => {
+    const r = await callFn<any>("meta", { action: "create_pending_ads" });
+    if (r.blocked === "app_dev_mode") throw new Error("L'app Meta « Sophia Hub » est encore en mode développement : passe-la en Live, les pubs seront créées automatiquement dans l'heure.");
+    if (r.created === 0) throw new Error("Aucune nouvelle pub à créer : valide d'abord des créas (Recrutement → Créas)");
+    return r;
+  }, "Pubs créées en PAUSED");
+  const archive = (level: string, row: any) => {
+    if (!window.confirm(`Archiver « ${row.name} » sur Meta ? C'est irréversible (l'objet ne pourra plus être réactivé).`)) return;
+    act(`arch-${row.id}`, () => callFn("meta", { action: "archive", level, id: row.id }), "Archivé");
+  };
+  const pendingState = useQuery({ queryKey: ["meta-ads-pending"], queryFn: async () => (await supabase.from("settings").select("value").eq("key", "meta_ads_pending").maybeSingle()).data?.value as any });
   const adsetLabel = (a: any) => a.country ?? `Zone ${a.zone_code ?? "?"}`;
   const adsetCountries = (a: any): string[] => (a.country ? [a.country] : a.targeting?.countries ?? []);
 
@@ -156,6 +168,10 @@ export default function Campaigns() {
             <div className="h-full rounded-full" style={{ width: `${Math.max(2, Math.min(100, (committed / Math.max(globalCap, 1)) * 100))}%`, background: committed > globalCap * 0.9 ? "#fe504f" : "#004dff" }} />
           </div>
           <p className="mt-2 text-xs text-subtle-foreground">Actifs + en pause · dont actifs : {activeBudget} €</p>
+          <Button size="sm" className="mt-3 w-full" loading={busy === "pending"} onClick={createPending}><Upload className="h-3.5 w-3.5" /> Créer les pubs</Button>
+          <p className="mt-1.5 text-[11px] leading-snug text-subtle-foreground">
+            {pendingState.data?.blocked === "app_dev_mode" ? "En attente : app Meta en mode développement (réessai automatique chaque heure)." : "Créas validées → pubs PAUSED, aussi automatiquement chaque heure."}
+          </p>
         </Card>
       </div>
 
@@ -209,7 +225,8 @@ export default function Campaigns() {
                           <Button size="sm" variant="ghost" onClick={() => setAdFor(a)}><Plus className="h-3.5 w-3.5" /> Pub</Button>{" "}
                           {a.status === "ACTIVE"
                             ? <Button size="sm" variant="secondary" loading={busy === `pause-${a.id}`} onClick={() => pause("adset", a)}>Pause</Button>
-                            : <Button size="sm" variant="secondary" loading={busy === `act-${a.id}`} onClick={() => activate("adset", a, Number(a.daily_budget))}>Activer</Button>}
+                            : <Button size="sm" variant="secondary" loading={busy === `act-${a.id}`} onClick={() => activate("adset", a, Number(a.daily_budget))}>Activer</Button>}{" "}
+                          {a.status !== "ARCHIVED" && a.status !== "ACTIVE" && <Button size="sm" variant="ghost" loading={busy === `arch-${a.id}`} onClick={() => archive("adset", a)} title="Archiver sur Meta (irréversible)">Archiver</Button>}
                         </Td>
                       </tr>
                     ))}

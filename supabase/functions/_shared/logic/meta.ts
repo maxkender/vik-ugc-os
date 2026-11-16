@@ -106,13 +106,16 @@ export interface ChecklistInput {
   landingOk: boolean;                     // landing https joignable
   domainVerified: boolean;                // case manuelle (Business Manager → Domaines)
   emailsSent: number;                     // emails réellement délivrés par Brevo
-  translationsReviewed: boolean;          // case manuelle
+  translationsReviewed: boolean;          // case manuelle (globale, ancienne)
+  /** Relecture par pays de test : FR/ES par Max, autres langues par un natif (16/11). Prioritaire sur la case globale. */
+  translations?: TranslationReview[];
   approvedCreatives: number;
   creativesValidated: boolean;            // case manuelle
   globalCap: number;
   committedBudget: number;
   now?: Date;
 }
+export interface TranslationReview { country: string; lang: string; reviewer: string; done: boolean }
 export interface ChecklistItem { key: string; label: string; ok: boolean; critical: boolean; detail: string; manual?: boolean }
 
 const DAY = 86_400_000;
@@ -129,7 +132,11 @@ export function launchChecklist(i: ChecklistInput): ChecklistItem[] {
     { key: "landing", label: "Landing en ligne (https)", ok: i.landingOk, critical: true, detail: i.landingOk ? "répond 200" : "injoignable ou non https" },
     { key: "domain", label: "Domaine vérifié dans le Business Manager", ok: i.domainVerified, critical: false, manual: true, detail: "case à cocher après vérification" },
     { key: "emails", label: "Emails Brevo testés", ok: i.emailsSent > 0, critical: true, detail: i.emailsSent > 0 ? `${i.emailsSent} email(s) délivré(s)` : "aucun email réellement délivré" },
-    { key: "translations", label: "Traductions relues", ok: i.translationsReviewed, critical: false, manual: true, detail: "case à cocher après relecture native" },
+    i.translations?.length
+      ? { key: "translations", label: "Traductions relues (pays de test)", ok: i.translations.every((t) => t.done), critical: false,
+        detail: i.translations.every((t) => t.done) ? `${i.translations.length} pays relus`
+          : `à relire : ${i.translations.filter((t) => !t.done).map((t) => `${t.country} ${t.lang.toUpperCase()} (${t.reviewer})`).join(", ")}` }
+      : { key: "translations", label: "Traductions relues", ok: i.translationsReviewed, critical: false, manual: true, detail: "case à cocher après relecture native" },
     { key: "creatives", label: "Créas validées", ok: i.approvedCreatives > 0 && i.creativesValidated, critical: true, manual: true, detail: `${i.approvedCreatives} créa(s) approuvée(s)${i.creativesValidated ? "" : " · validation finale à cocher"}` },
     { key: "budget", label: "Budget global plafonné", ok: i.globalCap > 0 && i.committedBudget <= i.globalCap, critical: true, detail: `${i.committedBudget} € engagés / plafond ${i.globalCap} €/jour` },
   ];
