@@ -76,3 +76,17 @@ Chaque choix ci-dessous a été pris seul, pour ne pas bloquer. Tout est modifia
 31. **Suivi des emails par nos propres liens** (`track` : pixel 1×1 + redirection du bouton, limitée à `APP_URL` et à Supabase). Ça marche même en mode test. Le webhook Brevo (POST sur `/functions/v1/track`) est accepté mais n'est pas enregistré côté Brevo.
 32. **Contrat.** Résumé en langage simple dans la langue du créateur (EN, FR, ES, DE, IT, PT), plus le résumé en anglais, plus le contrat complet **en anglais**, qui fait foi. Traduire le texte juridique complet dans 30 langues demande une validation juridique. [À VALIDER PAR MAX/JURIDIQUE]
 33. **Handles.** Aucun compte n'est créé à la place du créateur : les CGU de TikTok et d'Instagram l'interdisent. On génère des handles d'après les modèles de l'app, on vérifie leur disponibilité, puis on contrôle l'existence et la bio des comptes que le créateur crée lui-même.
+34. **Créas de recrutement au format offre d'emploi (16/11).** Catégorie Emploi de Meta et règles sur les revenus : une créa présente un poste, pas une façon de gagner de l'argent.
+    - Contenu de chaque créa :
+      - titre de poste (« Trabajo: creador/a de contenido UGC », « Buscamos creadores/as de contenido UGC ») ;
+      - rémunération du poste (« Pago: 2,50 US$ por video + bono por vistas ») ;
+      - étiquette facultative (« Ideal para estudiantes », « Sin necesidad de seguidores ») ;
+      - CTA « Postúlate », visuel UGC réaliste (fal) et logo Vik Studios.
+    - Interdit :
+      - « gagner de l'argent », « argent facile », « depuis chez soi », « revenus », montants mensuels ou totaux, « jusqu'à X » ;
+      - flèches et billets, tout ce qui évoque le get-rich-quick ou le MLM ;
+      - questions sur un attribut personnel (« Étudiant ? »).
+    - Le détail (zone, RPM, J+7, conditions) reste sur la landing.
+    - Textes dans `_shared/logic/jobCopy.ts`, pour 30 langues. Le contrôle `copyViolations` applique des listes de mots interdits par langue. Un test vérifie que tous les textes générés sont conformes, et la page Créas affiche « ⚠ texte non conforme ».
+    - L'estimation mensuelle des créas v2 (« Hasta ~150 US$/mes ») est abandonnée.
+35. **Pixel et consentement.** Le pixel Meta ne se charge qu'après « Accepter » (bandeau en 30 langues). La Conversions API n'envoie un Lead que si la candidature porte ce consentement ; email, téléphone et pays sont hachés, et l'event_id est partagé avec le pixel pour la déduplication. Les comptes de test n'envoient jamais de Lead.

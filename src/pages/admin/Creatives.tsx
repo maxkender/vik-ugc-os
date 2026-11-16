@@ -4,7 +4,8 @@ import { Check, ImagePlus, RefreshCw, Sparkles, Trash2, X } from "lucide-react";
 import { supabase, callFn, publicUrl } from "@/lib/supabase";
 import { useCountries, useZones } from "@/lib/hooks";
 import { formatMoney } from "@shared/zones.ts";
-import { creativeCopy, CREATIVE_LANGS, HOOKS, RTL_LANGS, type Hook } from "@shared/creativeCopy.ts";
+import { CREATIVE_LANGS, HOOKS, RTL_LANGS, type Hook } from "@shared/creativeCopy.ts";
+import { copyViolations, jobCopy } from "@shared/jobCopy.ts";
 import { Badge, Button, Card, Empty, Field, PageHeader, Select, Spinner, useToast, Chip, Section } from "@/components/ui";
 import { flag } from "@/lib/utils";
 
@@ -113,7 +114,9 @@ export async function renderCreative(cr: any): Promise<Blob> {
   const noteS = Math.round(W * (tall ? 0.024 : 0.022));
   const bonusS = Math.round(W * (tall ? 0.046 : 0.04));
   const monthS = Math.round(W * (tall ? 0.04 : 0.035));
-  const second = cr.monthly_line ?? (photo ? null : cr.subline);
+  const second = cr.monthly_line ?? null;
+  const tagS = Math.round(W * (tall ? 0.036 : 0.032));
+  const tag: string | null = cr.monthly_line ? null : cr.subline ?? null; // étiquette (« Ideal para estudiantes »)
   ctx.textAlign = rtl ? "right" : "left";
   ctx.direction = rtl ? "rtl" : "ltr";
   const tx = rtl ? W - pad : pad;
@@ -126,7 +129,7 @@ export async function renderCreative(cr: any): Promise<Blob> {
     const ml = second ? wrap(ctx, second, maxW) : [];
     ctx.font = `500 ${noteS}px Inter`;
     const nl = cr.disclaimer ? wrap(ctx, cr.disclaimer, maxW) : [];
-    const h = hl.length * size * 1.1 + (bl.length ? bl.length * bonusS * 1.25 + bonusS * 0.7 + size * 0.35 : 0)
+    const h = (tag ? tagS * 2.1 + tagS * 0.8 : 0) + hl.length * size * 1.1 + (bl.length ? bl.length * bonusS * 1.25 + bonusS * 0.7 + size * 0.35 : 0)
       + (ml.length ? ml.length * monthS * 1.3 + monthS * 0.5 : 0) + ctaS * 2.1 + ctaS * 0.9 + (nl.length ? nl.length * noteS * 1.35 + noteS * 0.6 : 0);
     return { hl, bl, ml, nl, h };
   };
@@ -134,6 +137,19 @@ export async function renderCreative(cr: any): Promise<Blob> {
   let L = lay(size);
   while (size > 40 && L.h > bottomLimit - topLimit) { size -= 4; L = lay(size); }
   let y = bottomLimit - L.h;
+  if (tag) {
+    ctx.font = `700 ${tagS}px Inter`;
+    const tw0 = ctx.measureText(tag).width, th = tagS * 2.1, tw = tw0 + tagS * 1.6, tx0 = rtl ? W - pad - tw : pad;
+    ctx.fillStyle = "rgba(255,255,255,0.95)";
+    ctx.beginPath();
+    ctx.roundRect(tx0, y, tw, th, th / 2);
+    ctx.fill();
+    ctx.fillStyle = "#0040d6";
+    ctx.textAlign = "center";
+    ctx.fillText(tag, tx0 + tw / 2, y + th / 2 + tagS * 0.36);
+    ctx.textAlign = rtl ? "right" : "left";
+    y += th + tagS * 0.8;
+  }
   ctx.fillStyle = "#ffffff";
   ctx.shadowColor = "rgba(0,0,0,0.5)";
   ctx.shadowBlur = 16;
@@ -226,24 +242,12 @@ export default function Creatives() {
     const z = (zones.data ?? []).find((x: any) => x.code === c?.zone_code);
     return z ? formatMoney(Number(z.price_per_video), z.currency, c?.language ?? "en") : "";
   };
-  /** Bonus aux vues de la zone (RPM pour 1 000 vues à J+7). */
-  const bonusFor = (code: string) => {
-    const c = country(code);
-    const z = (zones.data ?? []).find((x: any) => x.code === c?.zone_code);
-    return z && Number(z.rpm) > 0 ? formatMoney(Number(z.rpm), z.currency, c?.language ?? "en") : null;
-  };
-  const zoneOfCode = (code: string) => (zones.data ?? []).find((x: any) => x.code === country(code)?.zone_code);
-  const perDayFor = (code: string) => Number(zoneOfCode(code)?.videos_per_day ?? 2);
-  /** Estimation mensuelle prudente : tarif × vidéos/jour × 30 (affichée « hasta … estimación »). */
-  const monthlyFor = (code: string) => {
-    const z = zoneOfCode(code);
-    return z ? formatMoney(Math.round(Number(z.price_per_video) * perDayFor(code) * 30), z.currency, country(code)?.language ?? "en") : null;
-  };
   const langOf = (code: string) => String(country(code)?.language ?? "en").split("-")[0];
   const selectZone = (zone: string) => setSel([...new Set([...sel, ...openCountries.filter((c: any) => c.zone_code === zone).map((c: any) => c.code)])]);
   const langsSelected = [...new Set(sel.map(langOf))];
   const total = sel.length * formats.length;
-  const sample = sel[0] ? creativeCopy(langOf(sel[0]), hook, priceFor(sel[0]), { bonus: bonusFor(sel[0]), country: sel[0] }) : creativeCopy("fr", hook, "5 $", { bonus: "1 $" });
+  const sample = sel[0] ? jobCopy(langOf(sel[0]), hook, priceFor(sel[0]), sel[0]) : jobCopy("fr", hook, "5 $");
+  const sampleIssues = copyViolations([sample.headline, sample.tag, sample.pay, sample.cta].filter(Boolean).join(" · "), sample.lang);
 
   const generate = async () => {
     if (!sel.length || !formats.length) return toast("Choisis des pays et des formats", "danger");
@@ -254,9 +258,10 @@ export default function Creatives() {
     try {
       for (const code of sel) {
         const lang = langOf(code);
-        const copy = creativeCopy(lang, hook, priceFor(code), { bonus: bonusFor(code), country: code, monthly: monthlyFor(code), perDay: perDayFor(code) });
+        // Format offre d'emploi (règle Meta du 16/11) : titre de poste, rémunération, étiquette ; ni revenus ni montants mensuels.
+        const copy = jobCopy(lang, hook, priceFor(code), code);
         for (const format of formats) {
-          const row = { country: code, language: copy.lang, format, headline: copy.headline, subline: copy.subline, cta: copy.cta, bonus_line: copy.bonus, monthly_line: copy.monthly, disclaimer: copy.disclaimer, hook, status: "draft" };
+          const row = { country: code, language: copy.lang, format, headline: copy.headline, subline: copy.tag, cta: copy.cta, bonus_line: copy.pay, monthly_line: null, disclaimer: null, hook, status: "draft" };
           const { data, error } = await supabase.from("recruitment_creatives").insert(row).select("*").single();
           if (error) throw error;
           await renderAndUpload(data);
@@ -363,12 +368,14 @@ export default function Creatives() {
             </Field>
             <div className="rounded-xl border border-[#d8e3ff] bg-tint-blue p-4 text-sm">
               <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-subtle-foreground">Aperçu · {sel[0] ? `${flag(sel[0])} ${langName(langOf(sel[0]))}` : "fr"}</p>
+              {sample.tag && <span className="mt-1.5 inline-block rounded-full border border-[#cddcff] bg-white px-2 py-0.5 text-[11px] font-semibold text-[#0040d6]">{sample.tag}</span>}
               <p className="mt-1.5 text-[15px] font-semibold text-foreground">{sample.headline}</p>
-              {sample.bonus && <span className="mt-1.5 inline-block rounded-md bg-[#ffd84d] px-2 py-0.5 text-xs font-bold text-[#00113E]">{sample.bonus}</span>}
-              <p className="text-muted-foreground">{sample.subline}</p>
+              <span className="mt-1.5 inline-block rounded-md bg-[#ffd84d] px-2 py-0.5 text-xs font-bold text-[#00113E]">{sample.pay}</span>
               <span className="mt-2 inline-block rounded-full bg-accent px-3 py-1 text-xs font-medium text-white">{sample.cta}</span>
             </div>
-            <p className="text-xs text-subtle-foreground">Textes par langue dans <code>_shared/logic/creativeCopy.ts</code> : traductions du build, à faire relire par un natif avant gros budget.</p>
+            {sampleIssues.length > 0 && <p className="rounded-lg bg-tint-red px-3 py-2 text-xs text-[#c42a2d]">⚠ Formulation interdite détectée ({sampleIssues.join(", ")}) : à corriger avant d'envoyer à Meta.</p>}
+            <p className="text-xs text-subtle-foreground"><b>Règles Meta (offre d'emploi)</b> : titre de poste + rémunération (« Pago: X por video + bono por vistas »). Interdit : « gagner de l'argent », « argent facile », « depuis chez soi », « revenus », montants mensuels, « jusqu'à », 💸, questions sur un attribut personnel (« Étudiant ? »). Le détail reste sur la landing.</p>
+            <p className="text-xs text-subtle-foreground">Textes par langue dans <code>_shared/logic/jobCopy.ts</code> : traductions du build, à faire relire par un natif avant gros budget.</p>
           </div>
         </div>
         {progress && (
@@ -410,6 +417,7 @@ export default function Creatives() {
                 <div className="flex items-center justify-between gap-1 text-xs">
                   <span className="truncate text-muted-foreground">{flag(cr.country)} {cr.country} · {cr.format} · {cr.language}</span>
                   <Badge tone={cr.status === "approved" ? "success" : cr.status === "rejected" ? "danger" : cr.status === "sent_to_meta" ? "accent" : "default"}>{({ draft: "Brouillon", approved: "Validée", rejected: "Refusée", sent_to_meta: "Meta" } as Record<string, string>)[cr.status] ?? cr.status}</Badge>
+                  {copyViolations([cr.headline, cr.subline, cr.bonus_line, cr.monthly_line, cr.disclaimer, cr.cta].filter(Boolean).join(" · "), cr.language ?? "en").length > 0 && <Badge tone="danger">⚠ texte non conforme</Badge>}
                 </div>
                 <div className="flex flex-wrap gap-0.5 border-t border-separator pt-2">
                   <Button size="icon" variant="ghost" title="Valider" onClick={() => setStatus(cr, "approved")}><Check className="h-4 w-4" /></Button>
