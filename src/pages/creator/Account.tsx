@@ -7,6 +7,7 @@ import { callFn, supabase } from "@/lib/supabase";
 import { READ_ONLY_HINT, useCreatorIdentity } from "./shared";
 import { bioFor, displayNameFor } from "@shared/handles.ts";
 import { WarmupStep } from "./Warmup";
+import { PremiumAccess } from "@/components/creator/PremiumAccess";
 
 type Avail = "available" | "taken" | "unknown";
 interface Suggestion { handle: string; tiktok: Avail; instagram: Avail }
@@ -165,6 +166,9 @@ export default function Account() {
 
       {/* 4. Warm-up de 24 h, obligatoire avant le 1er brief */}
       <WarmupStep />
+
+      {/* Accès premium à l'app (code promo Apple attribué automatiquement) */}
+      <PremiumAccess />
     </div>
   );
 

@@ -153,6 +153,12 @@ Posters are content creators paid by Vik Studios to film and publish short UGC v
 - The 24-hour timer starts when they tap "I've started" in the Account tab → Warm-up step. After 24 hours they tick every box and tap "Validate my warm-up" (optional screenshot of their "For You" feed). No brief is assigned before the warm-up is validated.
 - Do NOT: use a VPN, use an emulator or automation tools, run several accounts on one phone, put a link in the bio during the first days, post right after creating the account, buy followers/likes/views or mass follow/unfollow.
 
+## Premium access to the app (to film the demo)
+- Every creator gets free premium access to the app (Micabo) through a personal, single-use Apple promo code, assigned automatically after signing (or when the warm-up starts).
+- To activate: open the Account tab (or the brief's "App demo" section) ON THE IPHONE, tap "Activate my access": the App Store opens on the redemption page with the code pre-filled; confirm with the Apple ID, then open the app. Then tap "I've activated it".
+- If the App Store says the code is already used or invalid, or if the card says access is being prepared: escalate (the team can reassign a new code).
+- iPhone only. If the creator uses Android: there is no premium access for Android yet; tell them to contact us (escalate) and that the team will find a solution. Never invent a code and never ask for or repeat a code in the chat.
+
 ## Creator onboarding
 - At first login the poster sees a few welcome screens: who Vik Studios is (a small studio building mobile apps), win-win (only continue if you can be consistent and the rates suit you), warmed-up account first, good videos (edit in CapCut or Edits, good light, speak clearly, recreate the reference video), the rhythm (1 video a day, we provide all assets), the community (Slack), getting paid with Ruul. The last button leads to the warm-up.
 - Good videos: vertical 9:16, 15–30 s, hook in the first 2 seconds, subtitles, readable on-screen text in the safe zones, clear sound, natural light, face visible, no other app's watermark. Structure: hook → app demo → call to action. The reference video must be RECREATED, never reposted (never reuse the original video or the original voice). Post the same video on TikTok AND Instagram Reels and paste both links. The full Guide is in the "Guide" tab.

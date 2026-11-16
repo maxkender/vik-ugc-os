@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { playSources } from "@shared/playback.ts";
 import { VideoSurface } from "@/components/video/VideoSurface";
 import { guideText } from "@/i18n/guide";
+import { PremiumAccess } from "@/components/creator/PremiumAccess";
 import { READ_ONLY_HINT, todayIso, useCreatorIdentity, useMyPoster } from "./shared";
 
 interface RefVideo { id: string; url: string | null; thumbnail_path: string | null; thumbnail_src: string | null; video_path: string | null; video_src?: string | null; external_id?: string | null; caption: string | null; platform: string }
@@ -167,6 +168,7 @@ function BriefCard({ a, index }: { a: Assignment; index: number }) {
           )}
           {b?.demo_notes && <p className="mt-2 text-[14px] text-foreground"><b>{G.brief.whatToFilm}</b> : {b.demo_notes}</p>}
           {b?.app_access && <p className="mt-2 text-[14px] text-foreground"><b>{G.brief.access}</b> : {b.app_access}</p>}
+          <div className="mt-3"><PremiumAccess compact /></div>
           <div className="mt-3"><BriefFiles files={(b?.brief_assets ?? []).map((x) => x.assets).filter((x): x is BriefFile => !!x)} /></div>
         </BriefSection>
         <BriefSection title={G.brief.publish}>

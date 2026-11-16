@@ -7,6 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useApps } from "@/lib/hooks";
+import { OfferCodes } from "./OfferCodes";
 import { Badge, Button, Dialog, Empty, Field, Input, PageHeader, Spinner, Switch, Table, Td, Textarea, Th, useToast } from "@/components/ui";
 import { bioFor, displayNameFor, generateHandles } from "@shared/handles.ts";
 
@@ -93,6 +94,7 @@ export default function Apps() {
           </div>
         )}
       </Dialog>
+      <OfferCodes />
     </>
   );
 }

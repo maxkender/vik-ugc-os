@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { guideText } from "@/i18n/guide";
+import { PremiumAccess } from "./PremiumAccess";
 
 export interface OnboardingScreen { key: string; language: string; sort: number; title: string; body: string; button_label: string | null }
 
@@ -71,6 +72,8 @@ export function CreatorOnboarding({ lang, onDone, onRuul, onClose, preview }: {
               <a href={slack} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex"><Button variant="secondary" size="lg" className="h-12"><ExternalLink className="h-4 w-4" /> {s.button_label}</Button></a>
             )}
             {s.key === "community" && !slack && preview && <p className="mt-4 rounded-lg bg-tint-yellow px-3 py-2 text-xs text-[#8a5a00]">Aperçu : lien Slack à renseigner dans Réglages → Contenus & aperçus → Onboarding créateur (bouton masqué tant qu'il est vide).</p>}
+            {s.sort === 5 && !preview && <div className="mt-6"><PremiumAccess compact /></div>}
+            {s.sort === 5 && preview && <p className="mt-6 rounded-lg bg-tint-yellow px-3 py-2 text-xs text-[#8a5a00]">Aperçu : ici, la carte « Ton accès premium à Micabo » avec le bouton « Activer mon accès » (code promo Apple du posteur).</p>}
             {s.key === "ruul" && s.button_label && (
               <span className="mt-6 inline-flex"><Button variant="secondary" size="lg" className="h-12" onClick={onRuul}>{s.button_label}</Button></span>
             )}
