@@ -1,0 +1,135 @@
+// Généré par scripts/translate-launch.mts : à faire relire par un natif.
+import type { SpaceDict } from "./types";
+const de: SpaceDict = {
+  "account": {
+    "nav": "Konto",
+    "title": "Deine Creator-Accounts",
+    "intro": "Du erstellst deine TikTok- und Instagram-Accounts selbst (wir dürfen sie nicht für dich erstellen: Die Regeln von TikTok und Instagram verbieten das, und der Account muss dir gehören). Wir machen es dir leicht: Handle auswählen, Bio kopieren, fertig.",
+    "step1": "1. Benutzernamen auswählen",
+    "step1Hint": "Diese Benutzernamen waren bei unserer Prüfung auf TikTok und Instagram noch frei. Schnapp dir schnell einen!",
+    "regenerate": "Andere Ideen",
+    "generating": "Verfügbarkeit wird geprüft…",
+    "noSuggestion": "Noch kein Vorschlag. Klicke auf « Andere Ideen ».",
+    "available": "frei",
+    "taken": "vergeben",
+    "unknown": "unsicher",
+    "copy": "Kopieren",
+    "copied": "Kopiert ✓",
+    "step2": "2. Profil einrichten",
+    "displayName": "Anzeigename",
+    "bio": "Bio",
+    "linkInBio": "Link in der Bio",
+    "photo": "Profilbild",
+    "bioWarn": "Lass die Bio genau so, wie sie ist: Wir prüfen, ob {{app}} darin erwähnt wird.",
+    "step3": "3. Sag uns deine Benutzernamen",
+    "tiktok": "Dein TikTok-Benutzername",
+    "instagram": "Dein Instagram-Benutzername (optional)",
+    "save": "Speichern",
+    "verify": "Meine Accounts prüfen",
+    "checking": "Wird geprüft…",
+    "status": {
+      "none": "Nicht gestartet",
+      "proposed": "Benutzernamen vorgeschlagen",
+      "submitted": "Wartet auf Prüfung",
+      "verified": "Accounts OK ✓",
+      "failed": "Es fehlt etwas"
+    },
+    "exists": "Account gefunden",
+    "missing": "Account nicht gefunden",
+    "bioOk": "Bio OK",
+    "bioMissing": "Bio erwähnt {{app}} nicht",
+    "notChecked": "noch nicht geprüft",
+    "saved": "Gespeichert ✓"
+  },
+  "login": {
+    "title": "Anmelden",
+    "email": "E-Mail",
+    "send": "Schick mir einen Login-Link",
+    "sent": "Schau in dein Postfach: Wir haben dir einen Login-Link geschickt.",
+    "password": "Passwort",
+    "withPassword": "Mit Passwort anmelden",
+    "denied": "Dieser Account hat keinen Zugriff auf diesen Bereich."
+  },
+  "creator": {
+    "nav": {
+      "today": "Heute",
+      "stats": "Aufrufe",
+      "payments": "Zahlungen",
+      "feedback": "Feedback"
+    },
+    "hello": "Hallo {{name}}",
+    "todayTitle": "Dein Briefing für heute",
+    "none": "Noch kein Briefing für heute. Neue Briefings kommen jeden Morgen.",
+    "due": "Fällig am {{date}}",
+    "hook": "Hook",
+    "instructions": "Anweisungen",
+    "reference": "Referenzvideo",
+    "openOriginal": "Original öffnen",
+    "assets": "Dateien für dieses Video",
+    "download": "Herunterladen",
+    "postedLink": "Link zu deinem veröffentlichten Video",
+    "submit": "Einreichen",
+    "submitted": "Eingereicht ✓",
+    "feedback": {
+      "title": "Feedback zu deinen Videos",
+      "empty": "Noch kein Feedback. Sobald das Team eines deiner Videos prüft, erscheint es hier.",
+      "new": "Neu",
+      "verdict": {
+        "validated": "Freigegeben",
+        "changes_requested": "Zu korrigieren",
+        "rejected": "Abgelehnt"
+      },
+      "points": "Verbesserungspunkte",
+      "moments": "Bestimmte Stellen",
+      "fixed": "Ich habe es korrigiert",
+      "fixedHint": "Poste das korrigierte Video und füge dann hier den neuen Link ein.",
+      "newLink": "Neuer Videolink",
+      "send": "Neuen Link senden",
+      "sent": "Neuer Link gesendet, das Team wird ihn prüfen",
+      "brief": "Briefing"
+    },
+    "status": {
+      "todo": "Offen",
+      "posted": "Veröffentlicht",
+      "validated": "Freigegeben",
+      "rejected": "Änderungen nötig",
+      "changes_requested": "Zu korrigieren"
+    },
+    "earlier": "Frühere Briefings",
+    "rejectedReason": "Feedback: {{reason}}",
+    "statsTitle": "Deine Aufrufe",
+    "d2": "Aufrufe T+2",
+    "d7": "Aufrufe T+7",
+    "totalViews": "Aufrufe gesamt (T+7)",
+    "videosPosted": "Veröffentlichte Videos",
+    "avgViews": "Durchschnittliche Aufrufe (T+7)",
+    "paymentsTitle": "Zahlungen",
+    "ruulTitle": "Bezahlt werden mit Ruul",
+    "ruulSteps": [
+      "Gib die E-Mail-Adresse ein, die du bei Ruul nutzen möchtest, und speichere sie.",
+      "Wir fügen dich bei Ruul hinzu und schicken dir eine E-Mail: Nimm die Einladung in deinem Ruul-Konto an.",
+      "Erstelle dein Ruul-Konto, verifiziere deine Identität und füge deine Auszahlungsmethode hinzu.",
+      "Komm hierher zurück und klicke auf \"Erledigt\"."
+    ],
+    "ruulEmail": "Deine Ruul-E-Mail",
+    "ruulSave": "Speichern",
+    "ruulDone": "Erledigt",
+    "ruulStatus": {
+      "none": "Nicht gestartet",
+      "email_given": "Wir müssen dich noch bei Ruul hinzufügen",
+      "added": "Einladung gesendet: Schließe dein Ruul-Setup ab",
+      "done": "Bereit für die Auszahlung ✓",
+      "stopped": "Gestoppt"
+    },
+    "weekOf": "Woche vom {{week}}",
+    "videos": "{{n}} Videos",
+    "base": "Videos",
+    "bonus": "Aufrufe-Bonus",
+    "total": "Gesamt",
+    "paid": "Bezahlt",
+    "pending": "Ausstehend",
+    "noPayouts": "Noch keine Zahlung. Deine erste Wochenabrechnung erscheint nach deinen ersten freigegebenen Videos.",
+    "rate": "Dein Satz: {{price}} pro Video + {{rpm}} pro {{views}} Aufrufe (T+7)."
+  }
+};
+export default de;

@@ -1,0 +1,135 @@
+// Généré par scripts/translate-launch.mts : à faire relire par un natif.
+import type { SpaceDict } from "./types";
+const it: SpaceDict = {
+  "account": {
+    "nav": "Account",
+    "title": "I tuoi account creator",
+    "intro": "Crei tu i tuoi account TikTok e Instagram (non possiamo crearli noi per te: le regole di TikTok e Instagram lo vietano, e l'account deve essere tuo). Noi ti facilitiamo le cose: scegli un nome utente, copia la bio e il gioco è fatto.",
+    "step1": "1. Scegli un nome utente",
+    "step1Hint": "Questi nomi utente risultavano liberi su TikTok e Instagram quando abbiamo controllato. Prendine uno in fretta!",
+    "regenerate": "Altre idee",
+    "generating": "Verifica della disponibilità…",
+    "noSuggestion": "Ancora nessun suggerimento. Clicca su « Altre idee ».",
+    "available": "libero",
+    "taken": "occupato",
+    "unknown": "non sicuro",
+    "copy": "Copia",
+    "copied": "Copiato ✓",
+    "step2": "2. Configura il tuo profilo",
+    "displayName": "Nome visualizzato",
+    "bio": "Bio",
+    "linkInBio": "Link in bio",
+    "photo": "Foto profilo",
+    "bioWarn": "Lascia la bio esattamente così com'è: controlliamo che menzioni {{app}}.",
+    "step3": "3. Dicci i tuoi nomi utente",
+    "tiktok": "Il tuo nome utente TikTok",
+    "instagram": "Il tuo nome utente Instagram (facoltativo)",
+    "save": "Salva",
+    "verify": "Controlla i miei account",
+    "checking": "Controllo in corso…",
+    "status": {
+      "none": "Non iniziato",
+      "proposed": "Nomi utente suggeriti",
+      "submitted": "In attesa di verifica",
+      "verified": "Account OK ✓",
+      "failed": "Manca qualcosa"
+    },
+    "exists": "account trovato",
+    "missing": "account non trovato",
+    "bioOk": "bio OK",
+    "bioMissing": "la bio non menziona {{app}}",
+    "notChecked": "non ancora controllato",
+    "saved": "Salvato ✓"
+  },
+  "login": {
+    "title": "Accedi",
+    "email": "Email",
+    "send": "Inviami un link di accesso",
+    "sent": "Controlla la tua casella di posta: ti abbiamo inviato un link di accesso.",
+    "password": "Password",
+    "withPassword": "Accedi con password",
+    "denied": "Questo account non ha accesso a quest'area."
+  },
+  "creator": {
+    "nav": {
+      "today": "Oggi",
+      "stats": "Visualizzazioni",
+      "payments": "Pagamenti",
+      "feedback": "Feedback"
+    },
+    "hello": "Ciao {{name}}",
+    "todayTitle": "Il tuo brief di oggi",
+    "none": "Ancora nessun brief per oggi. I nuovi brief arrivano ogni mattina.",
+    "due": "Scadenza {{date}}",
+    "hook": "Hook",
+    "instructions": "Istruzioni",
+    "reference": "Video di riferimento",
+    "openOriginal": "Apri l'originale",
+    "assets": "File per questo video",
+    "download": "Scarica",
+    "postedLink": "Link al tuo video pubblicato",
+    "submit": "Invia",
+    "submitted": "Inviato ✓",
+    "feedback": {
+      "title": "Feedback sui tuoi video",
+      "empty": "Ancora nessun feedback. Quando il team revisiona uno dei tuoi video, compare qui.",
+      "new": "Nuovo",
+      "verdict": {
+        "validated": "Validato",
+        "changes_requested": "Da correggere",
+        "rejected": "Rifiutato"
+      },
+      "points": "Punti da migliorare",
+      "moments": "Momenti specifici",
+      "fixed": "Ho corretto",
+      "fixedHint": "Pubblica il video corretto, poi incolla qui il nuovo link.",
+      "newLink": "Link del nuovo video",
+      "send": "Invia il nuovo link",
+      "sent": "Nuovo link inviato, il team lo revisionerà",
+      "brief": "Brief"
+    },
+    "status": {
+      "todo": "Da fare",
+      "posted": "Pubblicato",
+      "validated": "Validato",
+      "rejected": "Da modificare",
+      "changes_requested": "Da correggere"
+    },
+    "earlier": "Brief precedenti",
+    "rejectedReason": "Feedback: {{reason}}",
+    "statsTitle": "Le tue visualizzazioni",
+    "d2": "Visualizzazioni G+2",
+    "d7": "Visualizzazioni G+7",
+    "totalViews": "Visualizzazioni totali (G+7)",
+    "videosPosted": "Video pubblicati",
+    "avgViews": "Visualizzazioni medie (G+7)",
+    "paymentsTitle": "Pagamenti",
+    "ruulTitle": "Fatti pagare con Ruul",
+    "ruulSteps": [
+      "Inserisci l'email che vuoi usare su Ruul e salva.",
+      "Ti aggiungiamo su Ruul e ti mandiamo un'email: accetta l'invito nel tuo account Ruul.",
+      "Crea il tuo account Ruul, verifica la tua identità e aggiungi il metodo di pagamento.",
+      "Torna qui e clicca su \"Fatto\"."
+    ],
+    "ruulEmail": "La tua email Ruul",
+    "ruulSave": "Salva",
+    "ruulDone": "Fatto",
+    "ruulStatus": {
+      "none": "Non iniziato",
+      "email_given": "In attesa che ti aggiungiamo su Ruul",
+      "added": "Invito inviato: completa la configurazione di Ruul",
+      "done": "Pronto per essere pagato ✓",
+      "stopped": "Interrotto"
+    },
+    "weekOf": "Settimana del {{week}}",
+    "videos": "{{n}} video",
+    "base": "Video",
+    "bonus": "Bonus visualizzazioni",
+    "total": "Totale",
+    "paid": "Pagato",
+    "pending": "In sospeso",
+    "noPayouts": "Ancora nessun pagamento. Il tuo primo estratto conto settimanale comparirà dopo i tuoi primi video validati.",
+    "rate": "La tua tariffa: {{price}} per video + {{rpm}} ogni {{views}} visualizzazioni (G+7)."
+  }
+};
+export default it;

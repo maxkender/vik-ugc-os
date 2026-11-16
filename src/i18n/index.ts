@@ -6,6 +6,7 @@ import es from "./es";
 import fr from "./fr";
 import { LOCALES, LOCALE_LABELS } from "./locales";
 import { LANDING_JOB } from "./landingJob";
+import { SPACE } from "./locales/space";
 
 /** Langues proposées : English, Español, Français d'abord, puis le reste trié par nom natif. */
 export const LANGS: { code: string; label: string }[] = [
@@ -24,7 +25,7 @@ const resources: Resource = {
   es: { translation: es },
   fr: { translation: fr },
 };
-for (const [code, dict] of Object.entries(LOCALES)) resources[code] = { translation: dict };
+for (const [code, dict] of Object.entries(LOCALES)) resources[code] = { translation: { ...dict, ...(SPACE[code] ?? {}) } };
 // Titre et sous-titre de la landing au format offre d'emploi (16/11) : une seule source, landingJob.ts (40 langues).
 for (const [code, r] of Object.entries(resources)) {
   const job = LANDING_JOB[code];
