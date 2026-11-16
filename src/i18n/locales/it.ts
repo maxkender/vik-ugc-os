@@ -3,15 +3,14 @@ const it: PublicDict = {
   common: { loading: "Caricamento…", save: "Salva", cancel: "Annulla", logout: "Esci", error: "Qualcosa è andato storto", language: "Lingua" },
   landing: {
     badge: "Programma creator retribuito",
-    title: "Fatti pagare per fare video. Diventa creator {{brand}}.",
-    subtitle: "Pubblica 2 brevi video al giorno sulle app che gli studenti adorano. Guadagna {{price}} a video, più un bonus sulle visualizzazioni.",
+    title: "Lavoro: creator di contenuti UGC per un'app mobile",
+    subtitle: "Giri i tuoi video UGC di qualità con il telefono e li pubblichi su TikTok e Instagram per promuovere un'app (per iniziare, un'app di studio con IA). 1 video al giorno, pagato per ogni video validato più un bonus sulle visualizzazioni.",
     perVideo: "a video", bonus: "bonus visualizzazioni", bonusDetail: "{{rpm}} ogni {{views}} visualizzazioni",
-    monthly: "fino a {{amount}}/mese", monthlyHint: "2 video al giorno, bonus escluso",
     cta: "Candidati ora", how: "Come funziona",
     steps: [
       ["Candidati in 3 minuti", "Raccontaci di te e registra un breve video di presentazione (uno \"yap\")."],
       ["Firma il contratto online", "Contratto da creator indipendente, firmato in un clic."],
-      ["Pubblica 2 video al giorno", "Ogni mattina ricevi 2 brief: un video di riferimento, un hook e istruzioni semplici."],
+      ["Gira e pubblica 1 video al giorno", "Giri con il telefono il tuo video UGC di qualità. Ogni mattina ricevi: un brief, un video di riferimento e un hook."],
       ["Pagamento ogni settimana", "A video + bonus visualizzazioni, pagato ogni settimana tramite Ruul."],
     ],
     examples: "Esempi di video che farai", faq: "Domande frequenti",

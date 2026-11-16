@@ -3,15 +3,14 @@ const hu: PublicDict = {
   common: { loading: "Betöltés…", save: "Mentés", cancel: "Mégse", logout: "Kijelentkezés", error: "Valami hiba történt", language: "Nyelv" },
   landing: {
     badge: "Fizetett tartalomgyártó program",
-    title: "Kapj fizetést a videóidért. Legyél {{brand}} alkotó.",
-    subtitle: "Posztolj napi 2 rövid videót olyan appokról, amiket a diákok imádnak. Keress {{price}}-t videónként, plusz bónuszt a megtekintések után.",
+    title: "Munka: UGC-tartalomgyártó egy mobilappnak",
+    subtitle: "Forgasd le a saját, jó minőségű UGC-videóidat a telefonoddal, és posztold őket TikTokon és Instagramon, hogy népszerűsíts egy appot (kezdésnek egy AI-alapú tanulóappot). Napi 1 videó, jóváhagyott videónként fizetünk, plusz megtekintési bónusz jár hozzá.",
     perVideo: "videónként", bonus: "megtekintési bónusz", bonusDetail: "{{rpm}} / {{views}} megtekintés",
-    monthly: "akár {{amount}}/hó", monthlyHint: "napi 2 videó, bónusz nélkül",
     cta: "Jelentkezem", how: "Így működik",
     steps: [
       ["Jelentkezz 3 perc alatt", "Mesélj magadról, és vegyél fel egy rövid bemutatkozó videót (egy „yap”-et)."],
       ["Írd alá a szerződést online", "Független alkotói szerződés, egy kattintással aláírva."],
-      ["Posztolj napi 2 videót", "Minden reggel 2 briefet kapsz: egy mintavideót, egy hookot és egyszerű utasításokat."],
+      ["Forgass és posztolj napi 1 videót", "Saját, minőségi UGC-videót forgatsz a telefonoddal. Minden reggel kapsz: egy briefet, egy referenciavideót és egy hookot."],
       ["Heti kifizetés", "Videónként + megtekintési bónusz, hetente fizetve a Ruulon keresztül."],
     ],
     examples: "Példák arra, amit készíteni fogsz", faq: "Gyakori kérdések",

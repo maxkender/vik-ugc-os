@@ -25,13 +25,13 @@ const es: Dict = {
   landing: {
     badge: "Programa de creadores remunerado",
     title: "Trabajo: creador/a de contenido UGC para una app móvil",
-    subtitle: "Grabas tus propios videos UGC de calidad con tu celular y los publicas en TikTok e Instagram para promocionar una app. 2 videos al día, pago por video validado más un bono por vistas.",
+    subtitle: "Grabas tus propios videos UGC de calidad con tu celular y los publicas en TikTok e Instagram para promocionar una app. 1 video al día, pago por video validado más un bono por vistas.",
     perVideo: "por video", bonus: "bonus por visualizaciones", bonusDetail: "{{rpm}} por cada {{views}} visualizaciones",
-    monthly: "hasta {{amount}}/mes", monthlyHint: "2 videos al día, sin contar el bonus", cta: "Postularme", how: "Cómo funciona",
+    cta: "Postularme", how: "Cómo funciona",
     steps: [
       ["Postúlate en 3 minutos", "Cuéntanos sobre ti y graba un video corto de presentación (un \"yap\")."],
       ["Firma tu contrato online", "Contrato de creador/a independiente, firmado en un clic."],
-      ["Graba y publica 2 videos al día", "Grabas tus propios videos UGC de calidad desde tu celular. Cada mañana: un brief, un video de referencia y un gancho."],
+      ["Graba y publica 1 video al día", "Grabas tu propio video UGC de calidad desde tu celular. Cada mañana: un brief, un video de referencia y un gancho."],
       ["Cobra cada semana", "Por video + bonus por visualizaciones, pagado cada semana a través de Ruul."],
     ],
     examples: "Ejemplos de lo que harás", faq: "Preguntas frecuentes",
@@ -68,7 +68,7 @@ const es: Dict = {
   creator: {
     nav: { today: "Hoy", stats: "Visualizaciones", payments: "Pagos", feedback: "Comentarios" },
     hello: "Hola {{name}}",
-    todayTitle: "Tus briefs de hoy", none: "Aún no hay brief para hoy. Los nuevos llegan cada mañana.",
+    todayTitle: "Tu brief de hoy", none: "Aún no hay brief para hoy. Los nuevos llegan cada mañana.",
     due: "Para el {{date}}", hook: "Gancho", instructions: "Instrucciones", reference: "Video de referencia", openOriginal: "Abrir el original", assets: "Archivos para este video", download: "Descargar",
     postedLink: "Enlace de tu video publicado", submit: "Enviar", submitted: "Enviado ✓",
     feedback: {

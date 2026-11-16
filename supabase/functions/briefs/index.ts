@@ -18,7 +18,7 @@ async function dispatch(db: SupabaseClient, day: string) {
   const { data: today } = await db.from("brief_assignments").select("poster_id").eq("due_date", day);
   const { data: totals } = await db.from("brief_assignments").select("poster_id").gte("due_date", isoDay(new Date(Date.now() - 30 * 86_400_000)));
   const count = (rows: any[] | null, id: string) => (rows ?? []).filter((r) => r.poster_id === id).length;
-  const perDay = Number(cfg.per_day ?? 2);
+  const perDay = Number(cfg.per_day ?? 1);
   const dp = (posters ?? []).map((p) => ({
     id: p.id, country: p.country, language: p.language, daily_quota: p.daily_quota ?? perDay,
     assigned_today: count(today, p.id), total_assigned: count(totals, p.id),

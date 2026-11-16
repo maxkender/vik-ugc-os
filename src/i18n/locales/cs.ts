@@ -3,15 +3,14 @@ const cs: PublicDict = {
   common: { loading: "Načítání…", save: "Uložit", cancel: "Zrušit", logout: "Odhlásit se", error: "Něco se pokazilo", language: "Jazyk" },
   landing: {
     badge: "Placený program pro tvůrce",
-    title: "Vydělávej natáčením videí. Staň se tvůrcem {{brand}}.",
-    subtitle: "Zveřejňuj 2 krátká videa denně o aplikacích, které studenti milují. Vydělej {{price}} za video plus bonus za zhlédnutí.",
+    title: "Práce: tvůrce/tvůrkyně UGC obsahu pro mobilní aplikaci",
+    subtitle: "Natáčej vlastní kvalitní UGC videa na telefon a zveřejňuj je na TikToku a Instagramu, abys propagoval/a aplikaci (pro začátek AI aplikaci na učení). 1 video denně, platí se za každé schválené video plus bonus za zhlédnutí.",
     perVideo: "za video", bonus: "bonus za zhlédnutí", bonusDetail: "{{rpm}} za {{views}} zhlédnutí",
-    monthly: "až {{amount}} měsíčně", monthlyHint: "2 videa denně, bez bonusu",
     cta: "Přihlásit se", how: "Jak to funguje",
     steps: [
       ["Přihlas se za 3 minuty", "Řekni nám něco o sobě a natoč krátké představovací video (tzv. „yap“)."],
       ["Podepiš smlouvu online", "Smlouva nezávislého tvůrce, podepsaná jedním kliknutím."],
-      ["Zveřejňuj 2 videa denně", "Každé ráno dostaneš 2 briefy: referenční video, hook a jednoduché pokyny."],
+      ["Natoč a zveřejni 1 video denně", "Své kvalitní UGC video natáčíš na telefon. Každé ráno dostaneš: zadání, referenční video a hook."],
       ["Výplata každý týden", "Za video + bonus za zhlédnutí, vypláceno každý týden přes Ruul."],
     ],
     examples: "Ukázky videí, která budeš točit", faq: "Časté dotazy",

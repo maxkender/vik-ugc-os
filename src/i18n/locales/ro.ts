@@ -3,15 +3,14 @@ const ro: PublicDict = {
   common: { loading: "Se încarcă…", save: "Salvează", cancel: "Anulează", logout: "Deconectare", error: "Ceva n-a mers bine", language: "Limbă" },
   landing: {
     badge: "Program plătit pentru creatori",
-    title: "Câștigă bani făcând videoclipuri. Devino creator {{brand}}.",
-    subtitle: "Postează 2 clipuri scurte pe zi despre aplicații pe care studenții le adoră. Câștigi {{price}} pe clip, plus bonus pentru vizualizări.",
+    title: "Job: creator de conținut UGC pentru o aplicație mobilă",
+    subtitle: "Îți filmezi singur/ă propriile videoclipuri UGC de calitate cu telefonul și le postezi pe TikTok și Instagram pentru a promova o aplicație (la început, o aplicație de studiu cu AI). 1 videoclip pe zi, plătit per videoclip validat, plus un bonus în funcție de vizualizări.",
     perVideo: "pe clip", bonus: "bonus de vizualizări", bonusDetail: "{{rpm}} la {{views}} vizualizări",
-    monthly: "până la {{amount}}/lună", monthlyHint: "2 clipuri pe zi, fără bonus",
     cta: "Aplică acum", how: "Cum funcționează",
     steps: [
       ["Aplică în 3 minute", "Spune-ne câte ceva despre tine și filmează un scurt clip de prezentare (un „yap”)."],
       ["Semnează contractul online", "Contract de creator independent, semnat cu un singur click."],
-      ["Postează 2 clipuri pe zi", "În fiecare dimineață primești 2 brief-uri: un clip de referință, un hook și instrucțiuni simple."],
+      ["Filmează și postează 1 videoclip pe zi", "Filmezi singur, cu telefonul, un videoclip UGC de calitate. În fiecare dimineață primești: un brief, un videoclip de referință și un hook."],
       ["Plată în fiecare săptămână", "Pe clip + bonus de vizualizări, plătit săptămânal prin Ruul."],
     ],
     examples: "Exemple de clipuri pe care le vei face", faq: "Întrebări frecvente",

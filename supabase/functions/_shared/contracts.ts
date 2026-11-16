@@ -24,7 +24,7 @@ export async function createContract(db: SupabaseClient, applicationId: string) 
     birthdate: a.birthdate,
     country_name: country?.name ?? a.country,
     date: new Date().toISOString().slice(0, 10),
-    videos_per_day: zone?.videos_per_day ?? 2,
+    videos_per_day: zone?.videos_per_day ?? 1,
     price_per_video: formatMoney(Number(zone?.price_per_video ?? 0), cur),
     rpm: formatMoney(Number(zone?.rpm ?? 0), cur),
     rpm_views: new Intl.NumberFormat("en").format(zone?.rpm_views ?? 1000),
@@ -40,7 +40,7 @@ export async function createContract(db: SupabaseClient, applicationId: string) 
     rpm: formatMoney(Number(zone?.rpm ?? 0), cur),
     rpmViews: new Intl.NumberFormat("en").format(zone?.rpm_views ?? 1000),
     bonusCap: zone?.bonus_cap ? formatMoney(Number(zone.bonus_cap), cur) : null,
-    videosPerDay: zone?.videos_per_day ?? 2,
+    videosPerDay: zone?.videos_per_day ?? 1,
     zone: zone?.code ?? "?",
     companyName: company?.value?.name ?? "Vik Studios SAS",
   }, full);

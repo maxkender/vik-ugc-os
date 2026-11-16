@@ -3,15 +3,14 @@ const is: PublicDict = {
   common: { loading: "Hleður…", save: "Vista", cancel: "Hætta við", logout: "Skrá út", error: "Eitthvað fór úrskeiðis", language: "Tungumál" },
   landing: {
     badge: "Launað verkefni fyrir efnishöfunda",
-    title: "Fáðu borgað fyrir myndbönd. Gerstu {{brand}} efnishöfundur.",
-    subtitle: "Birtu 2 stutt myndbönd á dag um öpp sem nemendur elska. Fáðu {{price}} á myndband auk bónuss fyrir áhorf.",
+    title: "Starf: UGC efnisskapari fyrir snjallforrit",
+    subtitle: "Þú tekur upp þín eigin vönduðu UGC myndbönd með símanum og birtir þau á TikTok og Instagram til að kynna app (fyrst um sinn námsapp með gervigreind). 1 myndband á dag, greitt fyrir hvert samþykkt myndband auk bónuss fyrir áhorf.",
     perVideo: "á myndband", bonus: "áhorfsbónus", bonusDetail: "{{rpm}} fyrir hver {{views}} áhorf",
-    monthly: "allt að {{amount}}/mánuði", monthlyHint: "2 myndbönd á dag, án áhorfsbónuss",
     cta: "Sækja um", how: "Svona virkar þetta",
     steps: [
       ["Sæktu um á 3 mínútum", "Segðu okkur frá þér og taktu upp stutt kynningarmyndband (\"yap\")."],
       ["Skrifaðu undir samning á netinu", "Samningur sem sjálfstæður efnishöfundur, undirritaður með einum smelli."],
-      ["Birtu 2 myndbönd á dag", "Á hverjum morgni færðu 2 verklýsingar: tilvísunarmyndband, krók (hook) og einfaldar leiðbeiningar."],
+      ["Taktu upp og birtu 1 myndband á dag", "Þú tekur sjálf(ur) upp vandað UGC-myndband á símann þinn. Á hverjum morgni færðu: brief, viðmiðunarmyndband og hook."],
       ["Fáðu borgað vikulega", "Á myndband + áhorfsbónus, greitt vikulega í gegnum Ruul."],
     ],
     examples: "Dæmi um það sem þú býrð til", faq: "Algengar spurningar",

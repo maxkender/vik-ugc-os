@@ -3,15 +3,14 @@ const et: PublicDict = {
   common: { loading: "Laadimine…", save: "Salvesta", cancel: "Tühista", logout: "Logi välja", error: "Midagi läks valesti", language: "Keel" },
   landing: {
     badge: "Tasustatud loojaprogramm",
-    title: "Teeni videote tegemisega. Hakka {{brand}} loojaks.",
-    subtitle: "Postita päevas 2 lühivideot rakendustest, mida tudengid armastavad. Teeni {{price}} video eest pluss vaatamiste boonus.",
+    title: "Töö: UGC-sisuloojaks mobiilirakendusele",
+    subtitle: "Filmi telefoniga oma kvaliteetseid UGC-videoid ja postita need TikTokis ja Instagramis, et reklaamida rakendust (alustuseks tehisintellektil põhinev õpirakendus). 1 video päevas, tasu valideeritud video eest pluss vaatamiste boonus.",
     perVideo: "video kohta", bonus: "vaatamiste boonus", bonusDetail: "{{rpm}} iga {{views}} vaatamise eest",
-    monthly: "kuni {{amount}} kuus", monthlyHint: "2 videot päevas, ilma boonuseta",
     cta: "Kandideeri", how: "Kuidas see töötab",
     steps: [
       ["Kandideeri 3 minutiga", "Räägi meile endast ja salvesta lühike tutvustusvideo (nn „yap“)."],
       ["Allkirjasta leping veebis", "Iseseisva looja leping, allkirjastatud ühe klikiga."],
-      ["Postita 2 videot päevas", "Igal hommikul saad 2 briifi: näidisvideo, hook ja lihtsad juhised."],
+      ["Filmi ja postita 1 video päevas", "Filmid oma telefoniga ise kvaliteetse UGC-video. Igal hommikul saad: briifi, võrdlusvideo ja hooki."],
       ["Väljamakse iga nädal", "Video eest + vaatamiste boonus, makstakse iga nädal Ruuli kaudu."],
     ],
     examples: "Näiteid videotest, mida teed", faq: "KKK",

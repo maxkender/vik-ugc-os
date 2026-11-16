@@ -3,15 +3,14 @@ const pl: PublicDict = {
   common: { loading: "Ładowanie…", save: "Zapisz", cancel: "Anuluj", logout: "Wyloguj się", error: "Coś poszło nie tak", language: "Język" },
   landing: {
     badge: "Płatny program dla twórców",
-    title: "Zarabiaj na tworzeniu filmików. Zostań twórcą {{brand}}.",
-    subtitle: "Publikuj 2 krótkie filmiki dziennie o aplikacjach, które uwielbiają studenci. Zarabiaj {{price}} za filmik plus bonus za wyświetlenia.",
+    title: "Praca: twórca/twórczyni treści UGC dla aplikacji mobilnej",
+    subtitle: "Nagrywasz własne, dobrej jakości filmy UGC telefonem i publikujesz je na TikToku i Instagramie, żeby promować aplikację (na początek aplikację do nauki z AI). 1 film dziennie, płatność za każdy zatwierdzony film plus bonus za wyświetlenia.",
     perVideo: "za filmik", bonus: "bonus za wyświetlenia", bonusDetail: "{{rpm}} za każde {{views}} wyświetleń",
-    monthly: "do {{amount}}/miesiąc", monthlyHint: "2 filmiki dziennie, bez bonusu",
     cta: "Aplikuj teraz", how: "Jak to działa",
     steps: [
       ["Aplikuj w 3 minuty", "Opowiedz nam o sobie i nagraj krótkie wideo powitalne (tzw. „yap”)."],
       ["Podpisz umowę online", "Umowa niezależnego twórcy, podpisana jednym kliknięciem."],
-      ["Publikuj 2 filmiki dziennie", "Każdego ranka dostajesz 2 briefy: filmik referencyjny, hook i proste instrukcje."],
+      ["Nagraj i opublikuj 1 film dziennie", "Samodzielnie nagrywasz telefonem własny, wysokiej jakości film UGC. Każdego ranka dostajesz: brief, film referencyjny i hook."],
       ["Wypłata co tydzień", "Za filmik + bonus za wyświetlenia, wypłacane co tydzień przez Ruul."],
     ],
     examples: "Przykłady filmików, które zrobisz", faq: "Najczęstsze pytania",

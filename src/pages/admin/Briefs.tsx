@@ -81,7 +81,7 @@ export default function Briefs() {
   return (
     <PlayCtx.Provider value={setPlaying}>
     <div>
-      <PageHeader title="Briefs" description="Chaque posteur reçoit 2 briefs par jour. Les briefs « pool » sont répartis automatiquement chaque matin (5 h UTC)."
+      <PageHeader title="Briefs" description="Chaque posteur reçoit 1 brief par jour. Les briefs « pool » sont répartis automatiquement chaque matin (5 h UTC)."
         actions={<>
           {isAdmin && <Button variant="secondary" onClick={dispatch} loading={busy}><Shuffle className="h-4 w-4" /> Répartir maintenant</Button>}
           <Button onClick={() => setCreating(true)}><Plus className="h-4 w-4" /> Nouveau brief</Button>

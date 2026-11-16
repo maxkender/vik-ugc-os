@@ -24,14 +24,14 @@ const fr: Dict = {
   common: { loading: "Chargement…", save: "Enregistrer", cancel: "Annuler", logout: "Se déconnecter", error: "Une erreur est survenue", language: "Langue" },
   landing: {
     badge: "Programme créateurs rémunéré",
-    title: "Fais des vidéos, sois payé·e. Deviens créateur·rice {{brand}}.",
-    subtitle: "Publie 2 vidéos courtes par jour sur des apps que les étudiants adorent. Gagne {{price}} par vidéo, plus un bonus sur tes vues.",
+    title: "Job : créateur·rice de contenu UGC pour une app mobile",
+    subtitle: "Tu tournes tes propres vidéos UGC de qualité avec ton téléphone et tu les publies sur TikTok et Instagram pour promouvoir une app. 1 vidéo par jour, payée par vidéo validée plus un bonus aux vues.",
     perVideo: "par vidéo", bonus: "bonus aux vues", bonusDetail: "{{rpm}} pour {{views}} vues",
-    monthly: "jusqu'à {{amount}}/mois", monthlyHint: "2 vidéos par jour, hors bonus", cta: "Je postule", how: "Comment ça marche",
+    cta: "Je postule", how: "Comment ça marche",
     steps: [
       ["Postule en 3 minutes", "Parle-nous de toi et filme une courte vidéo de présentation (un « yap »)."],
       ["Signe ton contrat en ligne", "Contrat de créateur indépendant, signé en un clic."],
-      ["Tourne et publie 2 vidéos par jour", "Tu tournes tes propres vidéos UGC de qualité au téléphone. Chaque matin : un brief, une vidéo de référence et un hook."],
+      ["Tourne et publie 1 vidéo par jour", "Tu tournes ta propre vidéo UGC de qualité au téléphone. Chaque matin : un brief, une vidéo de référence et un hook."],
       ["Sois payé·e chaque semaine", "Par vidéo + bonus aux vues, payé chaque semaine via Ruul."],
     ],
     examples: "Exemples de vidéos", faq: "Questions fréquentes",
@@ -68,7 +68,7 @@ const fr: Dict = {
   creator: {
     nav: { today: "Aujourd'hui", stats: "Vues", payments: "Paiements", feedback: "Retours" },
     hello: "Salut {{name}}",
-    todayTitle: "Tes briefs du jour", none: "Pas encore de brief aujourd'hui. Les nouveaux arrivent chaque matin.",
+    todayTitle: "Ton brief du jour", none: "Pas encore de brief aujourd'hui. Les nouveaux arrivent chaque matin.",
     due: "Pour le {{date}}", hook: "Hook", instructions: "Consignes", reference: "Vidéo de référence", openOriginal: "Ouvrir l'original", assets: "Fichiers à utiliser", download: "Télécharger",
     postedLink: "Lien de ta vidéo publiée", submit: "Envoyer", submitted: "Envoyé ✓",
     feedback: {

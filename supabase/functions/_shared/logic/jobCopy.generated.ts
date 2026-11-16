@@ -4,71 +4,71 @@ import type { JobPack } from "./jobCopy.ts";
 export const JOB_COPY_GENERATED: Record<string, JobPack> = {
   "is": {
     "job": "Starf: UGC efnishöfundur",
-    "hiring": "Við leitum að UGC efnishöfundum",
-    "students": "Tilvalið fyrir námsfólk",
+    "hiring": "Við erum að ráða UGC efnishöfunda",
+    "students": "Tilvalið fyrir námsmenn",
     "nofollow": "Engir fylgjendur nauðsynlegir",
     "pay": "Greiðsla: {{price}} fyrir hvert myndband + bónus fyrir áhorf",
-    "cta": "Sækja um"
+    "cta": "Sæktu um"
   },
   "ka": {
-    "job": "სამუშაო: UGC კონტენტის შემქმნელი",
-    "hiring": "ვეძებთ UGC კონტენტის შემქმნელებს",
+    "job": "სამუშაო: UGC კონტენტ-კრეატორი",
+    "hiring": "ვეძებთ UGC კონტენტ-კრეატორებს",
     "students": "იდეალურია სტუდენტებისთვის",
-    "nofollow": "გამომწერები საჭირო არ არის",
+    "nofollow": "გამომწერები არ გჭირდება",
     "pay": "ანაზღაურება: {{price}} თითო ვიდეოზე + ბონუსი ნახვებზე",
-    "cta": "მიმართე"
+    "cta": "გაგზავნე განაცხადი"
   },
   "hy": {
     "job": "Աշխատանք՝ UGC կոնտենտ ստեղծող",
     "hiring": "Մենք փնտրում ենք UGC կոնտենտ ստեղծողների",
     "students": "Իդեալական է ուսանողների համար",
     "nofollow": "Հետևորդներ պետք չեն",
-    "pay": "Վճար՝ {{price}} յուրաքանչյուր տեսանյութի համար + բոնուս դիտումների համար",
+    "pay": "Վճարում՝ {{price}} մեկ տեսանյութի համար + բոնուս դիտումների համար",
     "cta": "Դիմել"
-  },
-  "id": {
-    "job": "Pekerjaan: kreator konten UGC",
-    "hiring": "Kami membuka lowongan kreator konten UGC",
-    "students": "Cocok untuk mahasiswa",
-    "nofollow": "Tidak perlu punya pengikut",
-    "pay": "Bayaran: {{price}} per video + bonus views",
-    "cta": "Daftar"
   },
   "ms": {
     "job": "Kerja: pencipta kandungan UGC",
     "hiring": "Kami sedang mencari pencipta kandungan UGC",
     "students": "Sesuai untuk pelajar",
-    "nofollow": "Tak perlu pengikut",
+    "nofollow": "Tidak perlu pengikut",
     "pay": "Bayaran: {{price}} setiap video + bonus tontonan",
     "cta": "Mohon"
   },
+  "id": {
+    "job": "Pekerjaan: kreator konten UGC",
+    "hiring": "Kami sedang mencari kreator konten UGC",
+    "students": "Cocok untuk mahasiswa",
+    "nofollow": "Tidak perlu followers",
+    "pay": "Bayaran: {{price}} per video + bonus views",
+    "cta": "Daftar"
+  },
   "vi": {
-    "job": "Công việc: người sáng tạo nội dung UGC",
-    "hiring": "Chúng tôi đang tuyển người sáng tạo nội dung UGC",
+    "job": "Công việc: creator nội dung UGC",
+    "hiring": "Chúng tôi đang tuyển creator nội dung UGC",
     "students": "Phù hợp với sinh viên",
-    "nofollow": "Không cần nhiều người theo dõi",
-    "pay": "Thù lao: {{price}} mỗi video + thưởng theo lượt xem",
+    "nofollow": "Không cần có lượng người theo dõi",
+    "pay": "Thanh toán: {{price}} mỗi video + thưởng theo lượt xem",
     "cta": "Ứng tuyển"
+  },
+  "hi": {
+    "job": "जॉब: UGC कंटेंट क्रिएटर",
+    "hiring": "हमें UGC कंटेंट क्रिएटर्स की तलाश है",
+    "students": "स्टूडेंट्स के लिए बढ़िया",
+    "nofollow": "फॉलोअर्स की ज़रूरत नहीं",
+    "pay": "पेमेंट: {{price}} प्रति वीडियो + व्यूज़ बोनस",
+    "cta": "अप्लाई करें"
   },
   "th": {
     "job": "งาน: ครีเอเตอร์คอนเทนต์ UGC",
     "hiring": "เรากำลังรับสมัครครีเอเตอร์คอนเทนต์ UGC",
     "students": "เหมาะสำหรับนักเรียนนักศึกษา",
     "nofollow": "ไม่ต้องมีผู้ติดตาม",
-    "pay": "ค่าตอบแทน: {{price}} ต่อวิดีโอ + โบนัสยอดวิว",
+    "pay": "ค่าตอบแทน: {{price}} ต่อวิดีโอ + โบนัสตามยอดวิว",
     "cta": "สมัครเลย"
-  },
-  "hi": {
-    "job": "जॉब: UGC कंटेंट क्रिएटर",
-    "hiring": "हम UGC कंटेंट क्रिएटर्स को हायर कर रहे हैं",
-    "students": "स्टूडेंट्स के लिए बढ़िया",
-    "nofollow": "फॉलोअर्स की ज़रूरत नहीं",
-    "pay": "पे: {{price}} प्रति वीडियो + व्यूज़ बोनस",
-    "cta": "अप्लाई करें"
   },
   "kk": {
     "job": "Жұмыс: UGC контент жасаушы",
-    "hiring": "Біз UGC контент жасаушыларды іздейміз",
+    "hiring": "Біз UGC контент жасаушыларды іздеп жатырмыз",
     "students": "Студенттерге өте қолайлы",
     "nofollow": "Жазылушылар қажет емес",
     "pay": "Төлем: әр видео үшін {{price}} + қаралым бонусы",

@@ -56,7 +56,7 @@ export function ContractTab() {
   const body = selected && used && scopeKey(selected) === scopeKey(used) ? form.body_md : used?.body_md ?? form.body_md;
   const vars = {
     company_name: companyName, full_name: person.full_name, birthdate: person.birthdate, country_name: country?.name ?? person.country,
-    date: new Date().toISOString().slice(0, 10), videos_per_day: zone?.videos_per_day ?? 2,
+    date: new Date().toISOString().slice(0, 10), videos_per_day: zone?.videos_per_day ?? 1,
     price_per_video: formatMoney(Number(zone?.price_per_video ?? 0), cur), rpm: formatMoney(Number(zone?.rpm ?? 0), cur),
     rpm_views: new Intl.NumberFormat("en").format(zone?.rpm_views ?? 1000), zone_code: zone?.code ?? "?", currency: cur,
     country_clauses: country?.contract_clauses ?? "",

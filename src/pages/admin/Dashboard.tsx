@@ -92,7 +92,7 @@ export default function Dashboard() {
           hint={`${s.funnel.applied} au total`} to="/admin/recruitment/candidates" />
         <KpiCard label="Créateurs actifs" value={s.totals.active_posters} icon={<Users />} tint="cyan" series={s.posts} hint="Posteurs actifs" to="/admin/posters" />
         <KpiCard label="Posts aujourd'hui" value={<>{s.totals.posts_today}<span className="text-base font-medium text-subtle-foreground"> / {s.totals.posts_goal}</span></>}
-          icon={<Clapperboard />} tint="green" series={s.posts} delta={delta(s.posts)} hint="Objectif : 2 par créateur actif" to="/admin/briefs" />
+          icon={<Clapperboard />} tint="green" series={s.posts} delta={delta(s.posts)} hint="Objectif : 1 par créateur actif" to="/admin/briefs" />
         <KpiCard label={isAdmin ? "Spend Meta UGC OS (7 j)" : "Coût Apify (7 j)"} value={isAdmin ? money(sum(s.spend.slice(7))) : `${sum(s.apify.slice(7)).toFixed(2)} $`}
           icon={<Megaphone />} tint="yellow" series={isAdmin ? s.spend : s.apify}
           hint={`Apify : ${sum(s.apify.slice(7)).toFixed(2)} $ sur 7 j`} to={isAdmin ? "/admin/recruitment/campaigns" : undefined} />

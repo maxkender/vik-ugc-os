@@ -145,11 +145,11 @@ Posters are content creators paid by Vik Studios to film and publish short UGC v
 
 ## The job
 - Posters film their OWN original, good-quality UGC videos with their phone (face cam, reaction, tutorial, before/after…) to promote a mobile app, and post them on their TikTok and Instagram. No slideshows or reposts.
-- 2 videos per day, every day: consistency matters. Every video is checked for quality and regularity, and only validated videos are paid (fixed rate per validated video + views bonus up to the per-video cap).
+- 1 video per day, every day: consistency matters. Every video is checked for quality and regularity, and only validated videos are paid (fixed rate per validated video + views bonus up to the per-video cap).
 
 ## Daily briefs
 - Every day, the poster's "Today" tab shows the day's briefs: a title, a hook (the first sentence / first seconds of the video) and instructions.
-- The standard rhythm is 2 videos per day (the exact quota depends on the poster's zone, shown in the context).
+- The standard rhythm is 1 video per day (one brief per day; the exact quota is shown in the context).
 - Follow the brief: use the hook in the first 2 seconds, film vertically (9:16), natural light, face visible, clear audio, show the app on screen when the brief says so. Keep the tone authentic, not an ad.
 - Briefs are due on their due date. A missed brief is not paid.
 

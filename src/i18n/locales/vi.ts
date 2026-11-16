@@ -3,15 +3,14 @@ const vi: PublicDict = {
   common: { loading: "Đang tải…", save: "Lưu", cancel: "Hủy", logout: "Đăng xuất", error: "Đã xảy ra lỗi", language: "Ngôn ngữ" },
   landing: {
     badge: "Chương trình creator có trả phí",
-    title: "Làm video và được trả tiền. Trở thành creator của {{brand}}.",
-    subtitle: "Đăng 2 video ngắn mỗi ngày về những ứng dụng sinh viên yêu thích. Nhận {{price}} mỗi video, cộng thêm thưởng theo lượt xem.",
+    title: "Việc làm: Nhà sáng tạo nội dung UGC cho một ứng dụng di động",
+    subtitle: "Tự quay những video UGC chất lượng bằng điện thoại và đăng lên TikTok và Instagram để quảng bá một ứng dụng (bắt đầu với một ứng dụng học tập bằng AI). 1 video mỗi ngày, được trả tiền theo từng video được duyệt, cộng thêm thưởng theo lượt xem.",
     perVideo: "mỗi video", bonus: "thưởng lượt xem", bonusDetail: "{{rpm}} cho mỗi {{views}} lượt xem",
-    monthly: "lên đến {{amount}}/tháng", monthlyHint: "2 video mỗi ngày, chưa tính thưởng lượt xem",
     cta: "Ứng tuyển ngay", how: "Cách hoạt động",
     steps: [
       ["Ứng tuyển trong 3 phút", "Kể cho chúng mình về bạn và quay một video giới thiệu ngắn (\"yap\")."],
       ["Ký hợp đồng online", "Hợp đồng creator tự do, ký chỉ với một cú nhấp."],
-      ["Đăng 2 video mỗi ngày", "Mỗi sáng bạn nhận 2 brief: một video mẫu, một hook và hướng dẫn đơn giản."],
+      ["Quay và đăng 1 video mỗi ngày", "Bạn tự quay video UGC chất lượng bằng điện thoại. Mỗi sáng bạn sẽ nhận được: brief, video tham khảo và hook."],
       ["Nhận tiền mỗi tuần", "Theo video + thưởng lượt xem, thanh toán hằng tuần qua Ruul."],
     ],
     examples: "Ví dụ về video bạn sẽ làm", faq: "Câu hỏi thường gặp",

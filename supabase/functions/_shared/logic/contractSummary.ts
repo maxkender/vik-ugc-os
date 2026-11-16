@@ -18,7 +18,7 @@ const L: Record<Lang, { title: string; lines: (i: SummaryInput) => string[]; not
     title: "In plain words",
     lines: (i) => [
       `You get **${i.price} per validated video** (zone ${i.zone}).`,
-      `You post **${i.videosPerDay} videos per day** on your own TikTok / Instagram account, following the briefs in your creator space.`,
+      `You post **${i.videosPerDay === 1 ? "1 video per day" : `${i.videosPerDay} videos per day`}** on your own TikTok / Instagram account, following the briefs in your creator space.`,
       `**Views bonus:** ${i.rpm} per ${i.rpmViews} views, counted 7 days after posting (D+7)${i.bonusCap ? `, capped at ${i.bonusCap} per video` : ""}.`,
       `You are paid **every week through Ruul**.`,
       `**No fixed duration:** the agreement runs until you or ${i.companyName} end it.`,
@@ -31,7 +31,7 @@ const L: Record<Lang, { title: string; lines: (i: SummaryInput) => string[]; not
     title: "En clair",
     lines: (i) => [
       `Tu gagnes **${i.price} par vidéo validée** (zone ${i.zone}).`,
-      `Tu publies **${i.videosPerDay} vidéos par jour** sur ton propre compte TikTok / Instagram, en suivant les briefs de ton espace.`,
+      `Tu publies **${i.videosPerDay === 1 ? "1 vidéo par jour" : `${i.videosPerDay} vidéos par jour`}** sur ton propre compte TikTok / Instagram, en suivant les briefs de ton espace.`,
       `**Bonus aux vues :** ${i.rpm} pour ${i.rpmViews} vues, comptées 7 jours après la publication (J+7)${i.bonusCap ? `, plafonné à ${i.bonusCap} par vidéo` : ""}.`,
       `Tu es payé·e **chaque semaine via Ruul**.`,
       `**Pas de durée fixe :** le contrat court jusqu'à ce que toi ou ${i.companyName} y mettiez fin.`,
@@ -44,7 +44,7 @@ const L: Record<Lang, { title: string; lines: (i: SummaryInput) => string[]; not
     title: "En pocas palabras",
     lines: (i) => [
       `Ganas **${i.price} por vídeo validado** (zona ${i.zone}).`,
-      `Publicas **${i.videosPerDay} vídeos al día** en tu propia cuenta de TikTok / Instagram, siguiendo los briefs de tu espacio.`,
+      `Publicas **${i.videosPerDay === 1 ? "1 video al día" : `${i.videosPerDay} videos al día`}** en tu propia cuenta de TikTok / Instagram, siguiendo los briefs de tu espacio.`,
       `**Bonus por visualizaciones:** ${i.rpm} por cada ${i.rpmViews} visualizaciones, contadas 7 días después de publicar (D+7)${i.bonusCap ? `, con un tope de ${i.bonusCap} por video` : ""}.`,
       `Cobras **cada semana a través de Ruul**.`,
       `**Sin duración fija:** el contrato sigue hasta que tú o ${i.companyName} lo terminéis.`,
@@ -57,7 +57,7 @@ const L: Record<Lang, { title: string; lines: (i: SummaryInput) => string[]; not
     title: "Kurz und klar",
     lines: (i) => [
       `Du bekommst **${i.price} pro freigegebenem Video** (Zone ${i.zone}).`,
-      `Du postest **${i.videosPerDay} Videos pro Tag** auf deinem eigenen TikTok-/Instagram-Konto nach den Briefings in deinem Bereich.`,
+      `Du postest **${i.videosPerDay === 1 ? "1 Video pro Tag" : `${i.videosPerDay} Videos pro Tag`}** auf deinem eigenen TikTok-/Instagram-Konto nach den Briefings in deinem Bereich.`,
       `**Views-Bonus:** ${i.rpm} pro ${i.rpmViews} Aufrufe, gezählt 7 Tage nach dem Posten (T+7)${i.bonusCap ? `, maximal ${i.bonusCap} pro Video` : ""}.`,
       `Du wirst **jede Woche über Ruul** bezahlt.`,
       `**Keine feste Laufzeit:** Die Vereinbarung gilt, bis du oder ${i.companyName} sie beendet.`,
@@ -83,7 +83,7 @@ const L: Record<Lang, { title: string; lines: (i: SummaryInput) => string[]; not
     title: "Em poucas palavras",
     lines: (i) => [
       `Você ganha **${i.price} por vídeo validado** (zona ${i.zone}).`,
-      `Você publica **${i.videosPerDay} vídeos por dia** na sua própria conta de TikTok / Instagram, seguindo os briefs do seu espaço.`,
+      `Você publica **${i.videosPerDay === 1 ? "1 vídeo por dia" : `${i.videosPerDay} vídeos por dia`}** na sua própria conta de TikTok / Instagram, seguindo os briefs do seu espaço.`,
       `**Bônus por visualizações:** ${i.rpm} a cada ${i.rpmViews} visualizações, contadas 7 dias após a publicação (D+7)${i.bonusCap ? `, com limite de ${i.bonusCap} por vídeo` : ""}.`,
       `Você recebe **toda semana via Ruul**.`,
       `**Sem duração fixa:** o contrato vale até você ou a ${i.companyName} encerrá-lo.`,

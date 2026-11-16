@@ -3,15 +3,14 @@ const lv: PublicDict = {
   common: { loading: "Ielādē…", save: "Saglabāt", cancel: "Atcelt", logout: "Iziet", error: "Kaut kas nogāja greizi", language: "Valoda" },
   landing: {
     badge: "Apmaksāta satura veidotāju programma",
-    title: "Pelni, filmējot video. Kļūsti par {{brand}} satura veidotāju.",
-    subtitle: "Publicē 2 īsus video dienā par lietotnēm, kuras studenti mīl. Nopelni {{price}} par video, plus bonusu par skatījumiem.",
+    title: "Darbs: UGC satura veidotājs/-a mobilajai lietotnei",
+    subtitle: "Filmē pats/pati savus kvalitatīvos UGC video ar telefonu un publicē tos TikTok un Instagram, lai popularizētu lietotni (sākumā – mākslīgā intelekta mācību lietotni). 1 video dienā, apmaksa par katru apstiprināto video plus bonuss par skatījumiem.",
     perVideo: "par video", bonus: "skatījumu bonuss", bonusDetail: "{{rpm}} par {{views}} skatījumiem",
-    monthly: "līdz {{amount}} mēnesī", monthlyHint: "2 video dienā, bez bonusa",
     cta: "Pieteikties", how: "Kā tas notiek",
     steps: [
       ["Piesakies 3 minūtēs", "Pastāsti mums par sevi un ieraksti īsu iepazīšanās video (“yap”)."],
       ["Paraksti līgumu tiešsaistē", "Neatkarīga satura veidotāja līgums, parakstāms ar vienu klikšķi."],
-      ["Publicē 2 video dienā", "Katru rītu saņem 2 briefus: paraugvideo, hook un vienkāršus norādījumus."],
+      ["Nofilmē un publicē 1 video dienā", "Ar telefonu pats nofilmē kvalitatīvu UGC video. Katru rītu saņem: brīfu, atsauces video un hooku."],
       ["Izmaksa katru nedēļu", "Par video + skatījumu bonuss, izmaksāts katru nedēļu caur Ruul."],
     ],
     examples: "Piemēri video, ko veidosi", faq: "Biežākie jautājumi",

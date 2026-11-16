@@ -3,15 +3,14 @@ const nl: PublicDict = {
   common: { loading: "Laden…", save: "Opslaan", cancel: "Annuleren", logout: "Uitloggen", error: "Er ging iets mis", language: "Taal" },
   landing: {
     badge: "Betaald creatorprogramma",
-    title: "Word betaald om video's te maken. Word {{brand}}-creator.",
-    subtitle: "Post 2 korte video's per dag over apps waar studenten dol op zijn. Verdien {{price}} per video, plus een bonus op je views.",
+    title: "Job: UGC-contentmaker voor een mobiele app",
+    subtitle: "Film zelf kwalitatieve UGC-video's met je telefoon en post ze op TikTok en Instagram om een app te promoten (om te beginnen een AI-studieapp). 1 video per dag, betaald per goedgekeurde video plus een bonus op basis van views.",
     perVideo: "per video", bonus: "viewsbonus", bonusDetail: "{{rpm}} per {{views}} views",
-    monthly: "tot {{amount}}/maand", monthlyHint: "2 video's per dag, zonder viewsbonus",
     cta: "Nu solliciteren", how: "Zo werkt het",
     steps: [
       ["Solliciteer in 3 minuten", "Vertel iets over jezelf en neem een korte introvideo op (een \"yap\")."],
       ["Teken je contract online", "Overeenkomst als zelfstandige creator, in één klik getekend."],
-      ["Post 2 video's per dag", "Elke ochtend krijg je 2 briefs: een referentievideo, een hook en simpele instructies."],
+      ["Film en post 1 video per dag", "Je filmt zelf een kwalitatieve UGC-video met je telefoon. Elke ochtend krijg je: een brief, een referentievideo en een hook."],
       ["Elke week betaald", "Per video + viewsbonus, wekelijks uitbetaald via Ruul."],
     ],
     examples: "Voorbeelden van wat je maakt", faq: "Veelgestelde vragen",

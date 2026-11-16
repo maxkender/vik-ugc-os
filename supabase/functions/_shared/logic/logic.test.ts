@@ -69,7 +69,7 @@ describe("paie", () => {
 });
 
 describe("zones", () => {
-  const zones = [{ code: "A", price_per_video: 5, rpm: 1, rpm_views: 1000, currency: "USD", videos_per_day: 2 }];
+  const zones = [{ code: "A", price_per_video: 5, rpm: 1, rpm_views: 1000, currency: "USD", videos_per_day: 1 }];
   const countries = [{ code: "FR", name: "France", zone_code: "A", language: "fr", open: true }, { code: "XX", name: "?", zone_code: null, language: "en", open: true }];
   it("zone du pays", () => {
     expect(zoneOfCountry("fr", countries, zones)?.code).toBe("A");
@@ -83,15 +83,31 @@ describe("zones", () => {
 });
 
 describe("répartition des briefs", () => {
-  const P = (id: string, extra: any = {}) => ({ id, country: "FR", language: "fr", daily_quota: 2, assigned_today: 0, total_assigned: 0, ...extra });
+  const P = (id: string, extra: any = {}) => ({ id, country: "FR", language: "fr", daily_quota: 1, assigned_today: 0, total_assigned: 0, ...extra });
   const B = (id: string, extra: any = {}) => ({ id, created_at: `2026-11-14T0${id.length}:00:00Z`, member_ids: [], target_countries: [], language: null, remaining: 1, already_assigned: [], ...extra });
 
-  it("respecte le quota de 2 par jour", () => {
+  it("1 brief par jour et par posteur (décision du 16/11)", () => {
     const out = dispatchBriefs([P("p1")], [B("b1"), B("b2"), B("b3")], "2026-11-14");
-    expect(out.map((o) => o.brief_id)).toEqual(["b1", "b2"]);
+    expect(out.map((o) => o.brief_id)).toEqual(["b1"]);
+  });
+  it("plusieurs posteurs : chacun reçoit exactement 1 brief, jamais 2", () => {
+    const posters = [P("p1"), P("p2"), P("p3")];
+    const out = dispatchBriefs(posters, [B("b1", { remaining: 5 }), B("b2", { remaining: 5 })], "2026-11-14");
+    const per = new Map<string, number>();
+    for (const o of out) per.set(o.poster_id, (per.get(o.poster_id) ?? 0) + 1);
+    expect([...per.values()]).toEqual([1, 1, 1]);
+    expect(out).toHaveLength(3);
+  });
+  it("rien de plus pour un posteur qui a déjà son brief du jour", () => {
+    const out = dispatchBriefs([P("p1", { assigned_today: 1 }), P("p2")], [B("b1", { remaining: 5 })], "2026-11-14");
+    expect(out.map((o) => o.poster_id)).toEqual(["p2"]);
+  });
+  it("un quota individuel plus élevé reste respecté (réglage admin)", () => {
+    const out = dispatchBriefs([P("p1", { daily_quota: 2 })], [B("b1"), B("b2"), B("b3")], "2026-11-14");
+    expect(out).toHaveLength(2);
   });
   it("équilibre la charge et filtre pays / langue / pool / déjà reçu", () => {
-    const posters = [P("p1", { total_assigned: 10 }), P("p2"), P("p3", { country: "ES", language: "es" }), P("p4", { assigned_today: 2 })];
+    const posters = [P("p1", { total_assigned: 10 }), P("p2"), P("p3", { country: "ES", language: "es" }), P("p4", { assigned_today: 1 })];
     const out = dispatchBriefs(posters, [B("b1", { remaining: 2, target_countries: ["FR"], language: "fr", already_assigned: [] })], "d");
     expect(out.map((o) => o.poster_id)).toEqual(["p2", "p1"]);
     const out2 = dispatchBriefs(posters, [B("b1", { remaining: 5, member_ids: ["p3"] })], "d");

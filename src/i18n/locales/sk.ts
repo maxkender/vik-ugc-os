@@ -3,15 +3,14 @@ const sk: PublicDict = {
   common: { loading: "Načítava sa…", save: "Uložiť", cancel: "Zrušiť", logout: "Odhlásiť sa", error: "Niečo sa pokazilo", language: "Jazyk" },
   landing: {
     badge: "Platený program pre tvorcov",
-    title: "Zarábaj natáčaním videí. Staň sa tvorcom {{brand}}.",
-    subtitle: "Zverejňuj 2 krátke videá denne o aplikáciách, ktoré študenti milujú. Zarob {{price}} za video plus bonus za pozretia.",
+    title: "Práca: tvorca/tvorkyňa UGC obsahu pre mobilnú aplikáciu",
+    subtitle: "Natáčaj si vlastné kvalitné UGC videá telefónom a zverejňuj ich na TikToku a Instagrame, aby si propagoval/a aplikáciu (na začiatok AI aplikáciu na učenie). 1 video denne, platené za každé schválené video plus bonus za zhliadnutia.",
     perVideo: "za video", bonus: "bonus za pozretia", bonusDetail: "{{rpm}} za {{views}} pozretí",
-    monthly: "až {{amount}} mesačne", monthlyHint: "2 videá denne, bez bonusu",
     cta: "Prihlásiť sa", how: "Ako to funguje",
     steps: [
       ["Prihlás sa za 3 minúty", "Povedz nám niečo o sebe a natoč krátke predstavovacie video (tzv. „yap“)."],
       ["Podpíš zmluvu online", "Zmluva nezávislého tvorcu, podpísaná jedným kliknutím."],
-      ["Zverejňuj 2 videá denne", "Každé ráno dostaneš 2 briefy: referenčné video, hook a jednoduché pokyny."],
+      ["Natoč a zverejni 1 video denne", "Vlastné kvalitné UGC video natáčaš na telefón. Každé ráno dostaneš: zadanie, referenčné video a hook."],
       ["Výplata každý týždeň", "Za video + bonus za pozretia, vyplácané každý týždeň cez Ruul."],
     ],
     examples: "Ukážky videí, ktoré budeš točiť", faq: "Časté otázky",

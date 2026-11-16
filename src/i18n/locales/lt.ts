@@ -3,15 +3,14 @@ const lt: PublicDict = {
   common: { loading: "Įkeliama…", save: "Išsaugoti", cancel: "Atšaukti", logout: "Atsijungti", error: "Kažkas nepavyko", language: "Kalba" },
   landing: {
     badge: "Apmokama kūrėjų programa",
-    title: "Uždirbk filmuodamas vaizdo įrašus. Tapk {{brand}} kūrėju.",
-    subtitle: "Kelk 2 trumpus vaizdo įrašus per dieną apie programėles, kurias dievina studentai. Uždirbk {{price}} už įrašą ir papildomą premiją už peržiūras.",
+    title: "Darbas: UGC turinio kūrėjas (-a) mobiliajai programėlei",
+    subtitle: "Filmuok savo kokybiškus UGC vaizdo įrašus telefonu ir skelbk juos TikTok bei Instagram, kad reklamuotum programėlę (pradžiai – dirbtinio intelekto mokymosi programėlę). 1 vaizdo įrašas per dieną, mokama už kiekvieną patvirtintą vaizdo įrašą plius priedas už peržiūras.",
     perVideo: "už įrašą", bonus: "peržiūrų premija", bonusDetail: "{{rpm}} už {{views}} peržiūrų",
-    monthly: "iki {{amount}} per mėnesį", monthlyHint: "2 įrašai per dieną, be premijos",
     cta: "Teikti paraišką", how: "Kaip tai veikia",
     steps: [
       ["Pateik paraišką per 3 minutes", "Papasakok apie save ir nufilmuok trumpą prisistatymo vaizdo įrašą („yap“)."],
       ["Pasirašyk sutartį internetu", "Savarankiško kūrėjo sutartis, pasirašoma vienu paspaudimu."],
-      ["Kelk 2 įrašus per dieną", "Kiekvieną rytą gausi 2 užduotis: pavyzdinį įrašą, hook ir paprastas instrukcijas."],
+      ["Nufilmuok ir paskelbk 1 vaizdo įrašą per dieną", "Savo telefonu pats nufilmuoji kokybišką UGC vaizdo įrašą. Kiekvieną rytą gauni: brifą, pavyzdinį vaizdo įrašą ir hook'ą."],
       ["Išmokos kas savaitę", "Už įrašą + peržiūrų premija, mokama kas savaitę per Ruul."],
     ],
     examples: "Įrašų, kuriuos kursi, pavyzdžiai", faq: "DUK",

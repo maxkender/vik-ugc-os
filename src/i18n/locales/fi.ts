@@ -3,15 +3,14 @@ const fi: PublicDict = {
   common: { loading: "Ladataan…", save: "Tallenna", cancel: "Peruuta", logout: "Kirjaudu ulos", error: "Jokin meni pieleen", language: "Kieli" },
   landing: {
     badge: "Palkallinen sisällöntuottajaohjelma",
-    title: "Saa palkkaa videoiden tekemisestä. Ryhdy {{brand}}-tekijäksi.",
-    subtitle: "Julkaise 2 lyhyttä videota päivässä sovelluksista, joita opiskelijat rakastavat. Tienaa {{price}} per video ja lisäksi bonus katselukerroista.",
+    title: "Työ: UGC-sisällöntuottaja mobiilisovellukselle",
+    subtitle: "Kuvaat itse laadukkaita UGC-videoita puhelimellasi ja julkaiset ne TikTokissa ja Instagramissa sovelluksen mainostamiseksi (aluksi tekoälyopiskelusovellus). 1 video päivässä, maksu hyväksytystä videosta sekä katselukertabonus.",
     perVideo: "per video", bonus: "katselubonus", bonusDetail: "{{rpm}} / {{views}} katselukertaa",
-    monthly: "jopa {{amount}}/kk", monthlyHint: "2 videota päivässä, ilman katselubonusta",
     cta: "Hae nyt", how: "Näin se toimii",
     steps: [
       ["Hae 3 minuutissa", "Kerro itsestäsi ja kuvaa lyhyt esittelyvideo (ns. \"yap\")."],
       ["Allekirjoita sopimus verkossa", "Itsenäisen tekijän sopimus, allekirjoitettu yhdellä klikkauksella."],
-      ["Julkaise 2 videota päivässä", "Joka aamu saat 2 briefiä: mallivideon, koukun ja selkeät ohjeet."],
+      ["Kuvaa ja postaa 1 video päivässä", "Kuvaat itse laadukkaan UGC-videon puhelimellasi. Joka aamu saat: briefin, esimerkkivideon ja hookin."],
       ["Palkka joka viikko", "Per video + katselubonus, maksetaan viikoittain Ruulin kautta."],
     ],
     examples: "Esimerkkejä videoista, joita teet", faq: "Usein kysytyt kysymykset",

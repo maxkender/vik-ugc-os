@@ -3,15 +3,14 @@ const sv: PublicDict = {
   common: { loading: "Laddar…", save: "Spara", cancel: "Avbryt", logout: "Logga ut", error: "Något gick fel", language: "Språk" },
   landing: {
     badge: "Betalt creator-program",
-    title: "Få betalt för att göra videor. Bli {{brand}}-creator.",
-    subtitle: "Lägg upp 2 korta videor om dagen om appar som studenter älskar. Tjäna {{price}} per video plus en bonus på dina visningar.",
+    title: "Jobb: UGC-skapare för en mobilapp",
+    subtitle: "Filma dina egna UGC-videor av hög kvalitet med mobilen och posta dem på TikTok och Instagram för att marknadsföra en app (en AI-studieapp till att börja med). 1 video om dagen, betalt per godkänd video plus en bonus för visningar.",
     perVideo: "per video", bonus: "visningsbonus", bonusDetail: "{{rpm}} per {{views}} visningar",
-    monthly: "upp till {{amount}}/månad", monthlyHint: "2 videor om dagen, utan visningsbonus",
     cta: "Ansök nu", how: "Så funkar det",
     steps: [
       ["Ansök på 3 minuter", "Berätta om dig själv och spela in en kort introvideo (en \"yap\")."],
       ["Skriv under avtalet online", "Avtal som egenföretagande creator, signerat med ett klick."],
-      ["Lägg upp 2 videor om dagen", "Varje morgon får du 2 briefar: en referensvideo, en hook och enkla instruktioner."],
+      ["Filma och posta 1 video om dagen", "Du filmar din egen UGC-video med hög kvalitet med mobilen. Varje morgon får du: en brief, en referensvideo och en hook."],
       ["Få betalt varje vecka", "Per video + visningsbonus, utbetalt varje vecka via Ruul."],
     ],
     examples: "Exempel på det du kommer att göra", faq: "Vanliga frågor",

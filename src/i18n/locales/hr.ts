@@ -3,15 +3,14 @@ const hr: PublicDict = {
   common: { loading: "Učitavanje…", save: "Spremi", cancel: "Odustani", logout: "Odjava", error: "Nešto je pošlo po zlu", language: "Jezik" },
   landing: {
     badge: "Plaćeni program za kreatore",
-    title: "Zarađuj snimanjem videa. Postani {{brand}} kreator.",
-    subtitle: "Objavljuj 2 kratka videa dnevno o aplikacijama koje studenti obožavaju. Zaradi {{price}} po videu, plus bonus za preglede.",
+    title: "Posao: UGC kreator sadržaja za mobilnu aplikaciju",
+    subtitle: "Snimaj vlastite kvalitetne UGC videe telefonom i objavljuj ih na TikToku i Instagramu kako bi promovirao/la aplikaciju (za početak, AI aplikaciju za učenje). 1 video dnevno, plaća se po odobrenom videu plus bonus za preglede.",
     perVideo: "po videu", bonus: "bonus za preglede", bonusDetail: "{{rpm}} za {{views}} pregleda",
-    monthly: "do {{amount}}/mjesečno", monthlyHint: "2 videa dnevno, bez bonusa",
     cta: "Prijavi se", how: "Kako funkcionira",
     steps: [
       ["Prijavi se za 3 minute", "Reci nam nešto o sebi i snimi kratki video predstavljanja (tzv. „yap”)."],
       ["Potpiši ugovor online", "Ugovor za samostalnog kreatora, potpisan jednim klikom."],
-      ["Objavljuj 2 videa dnevno", "Svako jutro dobivaš 2 briefa: referentni video, hook i jednostavne upute."],
+      ["Snimi i objavi 1 video dnevno", "Sam snimaš kvalitetan UGC video svojim mobitelom. Svako jutro dobiješ: brief, referentni video i hook."],
       ["Isplata svaki tjedan", "Po videu + bonus za preglede, isplaćuje se tjedno putem Ruula."],
     ],
     examples: "Primjeri videa koje ćeš raditi", faq: "Česta pitanja",

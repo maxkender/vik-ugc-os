@@ -4,15 +4,14 @@ const pt: PublicDict = {
   common: { loading: "Carregando…", save: "Salvar", cancel: "Cancelar", logout: "Sair", error: "Algo deu errado", language: "Idioma" },
   landing: {
     badge: "Programa de criadores pago",
-    title: "Ganhe dinheiro fazendo vídeos. Seja criador(a) {{brand}}.",
-    subtitle: "Poste 2 vídeos curtos por dia sobre apps que os estudantes amam. Ganhe {{price}} por vídeo, mais um bônus pelas suas visualizações.",
+    title: "Vaga: criador(a) de conteúdo UGC para um app de celular",
+    subtitle: "Grave seus próprios vídeos UGC de qualidade com o celular e poste no TikTok e no Instagram para divulgar um app (um app de estudos com IA, para começar). 1 vídeo por dia, pago por vídeo validado, mais um bônus por visualizações.",
     perVideo: "por vídeo", bonus: "bônus de visualizações", bonusDetail: "{{rpm}} a cada {{views}} visualizações",
-    monthly: "até {{amount}}/mês", monthlyHint: "2 vídeos por dia, sem contar o bônus",
     cta: "Quero me inscrever", how: "Como funciona",
     steps: [
       ["Inscreva-se em 3 minutos", "Conte um pouco sobre você e grave um vídeo curto de apresentação (um \"yap\")."],
       ["Assine o contrato online", "Contrato de criador(a) autônomo(a), assinado com um clique."],
-      ["Poste 2 vídeos por dia", "Toda manhã você recebe 2 briefings: um vídeo de referência, um gancho e instruções simples."],
+      ["Grave e poste 1 vídeo por dia", "Você grava com o celular o seu próprio vídeo UGC de qualidade. Toda manhã você recebe: um briefing, um vídeo de referência e um hook."],
       ["Receba toda semana", "Por vídeo + bônus de visualizações, pago semanalmente pela Ruul."],
     ],
     examples: "Exemplos do que você vai criar", faq: "Perguntas frequentes",

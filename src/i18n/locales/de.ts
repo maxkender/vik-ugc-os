@@ -3,15 +3,14 @@ const de: PublicDict = {
   common: { loading: "Wird geladen…", save: "Speichern", cancel: "Abbrechen", logout: "Abmelden", error: "Etwas ist schiefgelaufen", language: "Sprache" },
   landing: {
     badge: "Bezahltes Creator-Programm",
-    title: "Werde für Videos bezahlt. Werde {{brand}} Creator.",
-    subtitle: "Poste 2 kurze Videos pro Tag über Apps, die Studierende lieben. Verdiene {{price}} pro Video plus einen Bonus auf deine Views.",
+    title: "Job: UGC Content Creator für eine mobile App",
+    subtitle: "Filme deine eigenen hochwertigen UGC-Videos mit deinem Handy und poste sie auf TikTok und Instagram, um eine App zu bewerben (zunächst eine KI-Lern-App). 1 Video pro Tag, bezahlt pro validiertem Video plus ein Views-Bonus.",
     perVideo: "pro Video", bonus: "Views-Bonus", bonusDetail: "{{rpm}} pro {{views}} Views",
-    monthly: "bis zu {{amount}}/Monat", monthlyHint: "2 Videos pro Tag, ohne Views-Bonus",
     cta: "Jetzt bewerben", how: "So funktioniert's",
     steps: [
       ["In 3 Minuten bewerben", "Erzähl uns von dir und nimm ein kurzes Vorstellungsvideo auf (ein „Yap“)."],
       ["Vertrag online unterschreiben", "Vertrag als selbstständige:r Creator, mit einem Klick unterschrieben."],
-      ["2 Videos pro Tag posten", "Jeden Morgen bekommst du 2 Briefings: ein Referenzvideo, einen Hook und einfache Anweisungen."],
+      ["Dreh und poste 1 Video pro Tag", "Du drehst dein eigenes, hochwertiges UGC-Video mit dem Handy. Jeden Morgen bekommst du: ein Briefing, ein Referenzvideo und einen Hook."],
       ["Jede Woche bezahlt werden", "Pro Video + Views-Bonus, wöchentlich über Ruul ausgezahlt."],
     ],
     examples: "Beispiele für deine Videos", faq: "Häufige Fragen",

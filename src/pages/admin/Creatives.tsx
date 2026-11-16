@@ -7,6 +7,7 @@ import { formatMoney } from "@shared/zones.ts";
 import { CREATIVE_LANGS, HOOKS, RTL_LANGS, type Hook } from "@shared/creativeCopy.ts";
 import { copyViolations, jobCopy } from "@shared/jobCopy.ts";
 import { cardCopy } from "@shared/cardCopy.ts";
+import { notesCopy } from "@shared/notesCopy.ts";
 import { Badge, Button, Card, Empty, Field, PageHeader, Select, Spinner, useToast, Chip, Section } from "@/components/ui";
 import { flag } from "@/lib/utils";
 
@@ -156,8 +157,125 @@ async function renderCard(cr: any): Promise<Blob> {
   return await new Promise<Blob>((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error("canvas"))), "image/png"));
 }
 
+/** Coupe aussi les langues sans espaces (japonais, thaï…) : un « mot » trop long est coupé caractère par caractère. */
+function wrapAny(ctx: CanvasRenderingContext2D, text: string, maxW: number): string[] {
+  const out: string[] = [];
+  for (const l of wrap(ctx, text, maxW)) {
+    if (ctx.measureText(l).width <= maxW) { out.push(l); continue; }
+    let cur = "";
+    for (const ch of Array.from(l)) { if (ctx.measureText(cur + ch).width > maxW && cur) { out.push(cur); cur = ch; } else cur += ch; }
+    if (cur) out.push(cur);
+  }
+  return out;
+}
+
+/**
+ * Style « Notes iPhone » (16/11) : fond blanc, « < Notes » et « ⋯ » orange iOS (#E8A400), date grise centrée,
+ * titre gras, sous-titre, 4 lignes avec flèches orange, appel final. Grandes polices, peu de vide.
+ * En 9:16, le texte reste entre 14 % et 80 % de la hauteur (safe zones).
+ */
+async function renderNotes(cr: any): Promise<Blob> {
+  const [W, H] = FORMATS[cr.format] ?? [1080, 1080];
+  const tall = H / W > 1.5;
+  const n = cr.card ?? {};
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d")!;
+  await document.fonts.ready;
+  await Promise.all(["700 80px Inter", "500 40px Inter", "600 40px Inter"].map((f) => document.fonts.load(f).catch(() => null)));
+  const ORANGE = "#E8A400";
+  const rtl = RTL_LANGS.has(String(cr.language ?? "").split("-")[0]);
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, W, H);
+  ctx.direction = rtl ? "rtl" : "ltr";
+  const padX = W * 0.07;
+  const inner = W - 2 * padX;
+  const top = tall ? H * 0.14 : H * 0.05;
+  const bottom = tall ? H * 0.8 : H * 0.96;
+  const headS = Math.round(W * 0.05);
+  const dateS = Math.round(W * 0.03);
+  const fit = (titleS: number) => {
+    const subS = Math.round(titleS * 0.62), lineS = Math.round(titleS * 0.6), ctaS = Math.round(titleS * 0.62);
+    ctx.font = `700 ${titleS}px Inter`;
+    const tl = wrapAny(ctx, n.title ?? "", inner);
+    ctx.font = `500 ${subS}px Inter`;
+    const sl = wrapAny(ctx, n.subtitle ?? "", inner);
+    ctx.font = `500 ${lineS}px Inter`;
+    const arrowW = lineS * 1.5;
+    const ll = (n.lines ?? []).map((l: string) => wrapAny(ctx, l, inner - arrowW));
+    ctx.font = `700 ${ctaS}px Inter`;
+    const cl = wrapAny(ctx, n.cta ?? "", inner);
+    const h = headS * 1.6 + dateS * 2.6 + tl.length * titleS * 1.18 + titleS * 0.35 + sl.length * subS * 1.3 + subS * 0.9
+      + ll.reduce((a: number, x: string[]) => a + x.length * lineS * 1.3 + lineS * 0.55, 0) + ctaS * 0.6 + cl.length * ctaS * 1.3;
+    return { subS, lineS, ctaS, arrowW, tl, sl, ll, cl, h };
+  };
+  let titleS = Math.round(W * (tall ? 0.092 : 0.075));
+  let F = fit(titleS);
+  while (F.h > bottom - top && titleS > 30) { titleS -= 2; F = fit(titleS); }
+  // Centre verticalement le bloc dans la zone utile (peu de vide au-dessus et en dessous).
+  let y = top + Math.max(0, (bottom - top - F.h) / 2) * (tall ? 1 : 0.5);
+  const xL = rtl ? W - padX : padX;
+  const xR = rtl ? padX : W - padX;
+  // En-tête : « < Notes » … « ⋯ »
+  ctx.fillStyle = ORANGE;
+  ctx.textAlign = rtl ? "right" : "left";
+  ctx.font = `600 ${headS}px Inter`;
+  const chevron = rtl ? "›" : "‹";
+  ctx.font = `400 ${Math.round(headS * 1.5)}px Inter`;
+  ctx.fillText(chevron, xL, y + headS * 1.05);
+  const chevW = ctx.measureText(chevron).width + headS * 0.35;
+  ctx.font = `500 ${headS}px Inter`;
+  ctx.fillText(n.app ?? "Notes", rtl ? xL - chevW : xL + chevW, y + headS);
+  // « ⋯ » dans un cercle fin
+  const r = headS * 0.75;
+  const cxDots = rtl ? xR + r : xR - r;
+  ctx.strokeStyle = ORANGE;
+  ctx.lineWidth = Math.max(3, W * 0.0035);
+  ctx.beginPath();
+  ctx.arc(cxDots, y + headS * 0.62, r, 0, Math.PI * 2);
+  ctx.stroke();
+  for (const dx of [-r * 0.42, 0, r * 0.42]) { ctx.beginPath(); ctx.arc(cxDots + dx, y + headS * 0.62, r * 0.11, 0, Math.PI * 2); ctx.fill(); }
+  y += headS * 1.6;
+  // Date grise centrée
+  ctx.fillStyle = "#8e8e93";
+  ctx.font = `500 ${dateS}px Inter`;
+  ctx.textAlign = "center";
+  y += dateS * 1.5;
+  ctx.fillText(n.date ?? "", W / 2, y);
+  y += dateS * 1.1;
+  ctx.textAlign = rtl ? "right" : "left";
+  // Titre
+  ctx.fillStyle = "#000000";
+  ctx.font = `700 ${titleS}px Inter`;
+  for (const l of F.tl) { y += titleS; ctx.fillText(l, xL, y); y += titleS * 0.18; }
+  y += titleS * 0.35;
+  // Sous-titre
+  ctx.fillStyle = "#1c1c1e";
+  ctx.font = `500 ${F.subS}px Inter`;
+  for (const l of F.sl) { y += F.subS; ctx.fillText(l, xL, y); y += F.subS * 0.3; }
+  y += F.subS * 0.9;
+  // Lignes avec flèches orange
+  for (const para of F.ll) {
+    ctx.font = `700 ${F.lineS}px Inter`;
+    ctx.fillStyle = ORANGE;
+    ctx.fillText(rtl ? "←" : "→", xL, y + F.lineS);
+    ctx.font = `500 ${F.lineS}px Inter`;
+    ctx.fillStyle = "#000000";
+    for (const l of para) { y += F.lineS; ctx.fillText(l, rtl ? xL - F.arrowW : xL + F.arrowW, y); y += F.lineS * 0.3; }
+    y += F.lineS * 0.55;
+  }
+  // Appel
+  y += F.ctaS * 0.6;
+  ctx.fillStyle = "#000000";
+  ctx.font = `700 ${F.ctaS}px Inter`;
+  for (const l of F.cl) { y += F.ctaS; ctx.fillText(l, xL, y); y += F.ctaS * 0.3; }
+  return await new Promise<Blob>((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error("canvas"))), "image/png"));
+}
+
 export async function renderCreative(cr: any): Promise<Blob> {
   if (cr.style === "card") return renderCard(cr);
+  if (cr.style === "notes") return renderNotes(cr);
   const [W, H] = FORMATS[cr.format] ?? [1080, 1080];
   const tall = H / W > 1.5;
   const canvas = document.createElement("canvas");
@@ -329,7 +447,7 @@ export default function Creatives() {
   const [sel, setSel] = useState<string[]>([]);
   const [formats, setFormats] = useState<string[]>(["1:1", "4:5", "9:16"]);
   const [hook, setHook] = useState<Hook>("student");
-  const [style, setStyle] = useState<"card" | "photo" | "text">("card");
+  const [style, setStyle] = useState<"card" | "notes" | "photo" | "text">("card");
   const [busy, setBusy] = useState<string | null>(null);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [f, setF] = useState({ country: "", language: "", format: "", status: "" });
@@ -374,7 +492,11 @@ export default function Creatives() {
         const copy = jobCopy(lang, hook, priceFor(code), code);
         for (const format of formats) {
           const card = cardCopy(lang, hook, code);
-          const row: Record<string, unknown> = style === "card"
+          const notes = notesCopy(lang);
+          const row: Record<string, unknown> = style === "notes"
+            ? { country: code, language: notes.lang, format, style, hook, status: "draft", headline: notes.title, subline: notes.subtitle, cta: notes.cta, bonus_line: null,
+                monthly_line: null, disclaimer: null, card: { app: notes.app, date: notes.date, title: notes.title, subtitle: notes.subtitle, lines: notes.lines, cta: notes.cta }, ad_text: card.primary }
+            : style === "card"
             ? { country: code, language: card.lang, format, style, hook, status: "draft", headline: copy.headline, subline: null, cta: copy.cta, bonus_line: null,
                 monthly_line: null, disclaimer: null, card: { label: card.label, title: card.title, lines: card.lines, cta: card.cta, footer: card.footer }, ad_text: card.primary }
             : { country: code, language: copy.lang, format, style, hook, status: "draft", headline: copy.headline, subline: copy.tag, cta: copy.cta, bonus_line: copy.pay,
@@ -485,7 +607,7 @@ export default function Creatives() {
           <div className="space-y-5">
             <Field label="Style">
               <div className="flex flex-wrap gap-2">
-                {([["card", "Carte offre d'emploi"], ["photo", "Photo UGC (visuel IA ensuite)"], ["text", "Texte simple"]] as const).map(([v, l]) => (
+                {([["card", "Carte offre d'emploi"], ["notes", "Notes iPhone"], ["photo", "Photo UGC (visuel IA ensuite)"], ["text", "Texte simple"]] as const).map(([v, l]) => (
                   <Chip key={v} active={style === v} onClick={() => setStyle(v)}>{l}</Chip>
                 ))}
               </div>

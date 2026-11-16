@@ -3,15 +3,14 @@ const tr: PublicDict = {
   common: { loading: "Yükleniyor…", save: "Kaydet", cancel: "İptal", logout: "Çıkış yap", error: "Bir şeyler ters gitti", language: "Dil" },
   landing: {
     badge: "Ücretli içerik üretici programı",
-    title: "Video çekerek para kazan. {{brand}} içerik üreticisi ol.",
-    subtitle: "Öğrencilerin sevdiği uygulamalar hakkında günde 2 kısa video paylaş. Video başına {{price}}, üstüne izlenme bonusu kazan.",
+    title: "İş: Mobil uygulama için UGC içerik üreticisi",
+    subtitle: "Telefonunla kaliteli UGC videolarını kendin çek ve bir uygulamayı (başlangıç için yapay zekâ destekli bir çalışma uygulaması) tanıtmak için TikTok ve Instagram'da paylaş. Günde 1 video; onaylanan her video için ödeme ve ek olarak izlenme bonusu.",
     perVideo: "video başına", bonus: "izlenme bonusu", bonusDetail: "{{views}} izlenme başına {{rpm}}",
-    monthly: "ayda {{amount}}'a kadar", monthlyHint: "günde 2 video, bonus hariç",
     cta: "Başvur", how: "Nasıl çalışır",
     steps: [
       ["3 dakikada başvur", "Bize kendinden bahset ve kısa bir tanıtım videosu (\"yap\") çek."],
       ["Sözleşmeyi online imzala", "Bağımsız içerik üretici sözleşmesi, tek tıkla imzalanır."],
-      ["Günde 2 video paylaş", "Her sabah 2 brief alırsın: referans video, hook ve basit talimatlar."],
+      ["Günde 1 video çek ve paylaş", "Telefonunla kendi kaliteli UGC videonu çekiyorsun. Her sabah şunları alıyorsun: bir brief, bir referans video ve bir hook."],
       ["Her hafta ödeme", "Video başına + izlenme bonusu, Ruul üzerinden haftalık ödenir."],
     ],
     examples: "Çekeceğin videolardan örnekler", faq: "Sık sorulan sorular",

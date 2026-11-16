@@ -9,7 +9,7 @@ import { Badge, Button, Card, Dialog, Field, Input, PageHeader, Select, Spinner,
 
 const SAMPLE = {
   company_name: "Vik Studios SAS", full_name: "Ana García", birthdate: "2004-03-12", country_name: "Spain", date: new Date().toISOString().slice(0, 10),
-  videos_per_day: 2, price_per_video: "$3.50", rpm: "$0.70", rpm_views: "1,000", zone_code: "B", currency: "USD",
+  videos_per_day: 1, price_per_video: "$6.00", rpm: "$0.50", rpm_views: "1,000", zone_code: "B", currency: "USD",
   country_clauses: "**Country notes (EU):** exemple de clauses pays.",
 };
 const VARIABLES = Object.keys(SAMPLE);

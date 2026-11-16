@@ -23,19 +23,17 @@ const en = {
   common: { loading: "Loading…", save: "Save", cancel: "Cancel", logout: "Log out", error: "Something went wrong", language: "Language" },
   landing: {
     badge: "Paid creator program",
-    title: "Get paid to make videos. Become a {{brand}} creator.",
-    subtitle: "Post 2 short videos a day about apps students love. Earn {{price}} per video, plus a bonus on your views.",
+    title: "Job: UGC content creator for a mobile app",
+    subtitle: "Film your own quality UGC videos with your phone and post them on TikTok and Instagram to promote an app. 1 video a day, paid per validated video plus a views bonus.",
     perVideo: "per video",
     bonus: "views bonus",
     bonusDetail: "{{rpm}} per {{views}} views",
-    monthly: "up to {{amount}}/month",
-    monthlyHint: "2 videos a day, before views bonus",
     cta: "Apply now",
     how: "How it works",
     steps: [
       ["Apply in 3 minutes", "Tell us about you and record a short intro video (a \"yap\")."],
       ["Sign your contract online", "Independent creator agreement, signed in one click."],
-      ["Film and post 2 videos a day", "You film your own quality UGC videos on your phone. Every morning: a brief, a reference video and a hook."],
+      ["Film and post 1 video a day", "You film your own quality UGC video on your phone. Every morning: a brief, a reference video and a hook."],
       ["Get paid every week", "Per video + views bonus, paid weekly through Ruul."],
     ],
     examples: "Examples of what you'll make",
@@ -75,7 +73,7 @@ const en = {
   creator: {
     nav: { today: "Today", stats: "Views", payments: "Payments", feedback: "Feedback" },
     hello: "Hi {{name}}",
-    todayTitle: "Your briefs for today", none: "No brief for today yet. New briefs arrive every morning.",
+    todayTitle: "Your brief for today", none: "No brief for today yet. New briefs arrive every morning.",
     due: "Due {{date}}", hook: "Hook", instructions: "Instructions", reference: "Reference video", openOriginal: "Open the original", assets: "Files for this video", download: "Download",
     postedLink: "Link to your posted video", submit: "Submit", submitted: "Submitted ✓",
     feedback: {

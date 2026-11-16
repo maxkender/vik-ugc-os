@@ -222,7 +222,7 @@ export default function Today() {
   const earlier = list.filter((a) => !current.includes(a));
   const z = poster.data?.zones;
   const lang = i18n.resolvedLanguage ?? "en";
-  const goal = z?.videos_per_day ?? 2;
+  const goal = z?.videos_per_day ?? 1;
   const doneToday = list.filter((a) => a.due_date === today && (a.status === "posted" || a.status === "validated")).length;
   const first = (me.fullName ?? "").split(" ")[0];
 

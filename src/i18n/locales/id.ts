@@ -3,15 +3,14 @@ const id: PublicDict = {
   common: { loading: "Memuat…", save: "Simpan", cancel: "Batal", logout: "Keluar", error: "Terjadi kesalahan", language: "Bahasa" },
   landing: {
     badge: "Program kreator berbayar",
-    title: "Dibayar untuk bikin video. Jadi kreator {{brand}}.",
-    subtitle: "Posting 2 video pendek per hari tentang aplikasi yang disukai mahasiswa. Dapatkan {{price}} per video plus bonus dari jumlah view-mu.",
+    title: "Lowongan: kreator konten UGC untuk aplikasi mobile",
+    subtitle: "Rekam sendiri video UGC berkualitas pakai ponselmu, lalu posting di TikTok dan Instagram untuk mempromosikan sebuah aplikasi (untuk awal, aplikasi belajar berbasis AI). 1 video per hari, dibayar per video yang divalidasi plus bonus views.",
     perVideo: "per video", bonus: "bonus view", bonusDetail: "{{rpm}} per {{views}} view",
-    monthly: "hingga {{amount}}/bulan", monthlyHint: "2 video per hari, belum termasuk bonus view",
     cta: "Daftar sekarang", how: "Cara kerjanya",
     steps: [
       ["Daftar dalam 3 menit", "Ceritakan tentang dirimu dan rekam video perkenalan singkat (\"yap\")."],
       ["Tanda tangani kontrak online", "Kontrak kreator independen, ditandatangani dengan satu klik."],
-      ["Posting 2 video per hari", "Setiap pagi kamu dapat 2 brief: video referensi, hook, dan instruksi sederhana."],
+      ["Rekam dan posting 1 video per hari", "Kamu merekam sendiri video UGC berkualitas pakai ponselmu. Setiap pagi kamu dapat: brief, video referensi, dan hook."],
       ["Dibayar setiap minggu", "Per video + bonus view, dibayar mingguan lewat Ruul."],
     ],
     examples: "Contoh video yang akan kamu buat", faq: "Pertanyaan umum",
