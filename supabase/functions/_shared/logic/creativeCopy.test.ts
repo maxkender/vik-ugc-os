@@ -22,4 +22,12 @@ describe("textes des créas", () => {
     expect(creativeCopy("xx", "earn", "2 $").lang).toBe("en");
     expect(creativeCopy("es-419", "earn", "2 $").lang).toBe("es");
   });
+  it("bonus aux vues et espagnol d'Amérique latine", () => {
+    const mx = creativeCopy("es", "student", "2,50 US$", { bonus: "0,50 US$", country: "MX" });
+    expect(mx.headline).toBe("¿Estudiante? Gana 2,50 US$ por video");
+    expect(mx.subline).not.toContain("vídeo");
+    expect(mx.bonus).toBe("+0,50 US$ de bono por cada 1.000 vistas");
+    expect(creativeCopy("es", "student", "3 €", { country: "ES" }).headline).toContain("vídeo");
+    expect(creativeCopy("fr", "earn", "5 $").bonus).toBeNull();
+  });
 });

@@ -149,12 +149,37 @@ export const HOOKS: Array<{ value: Hook; label: string }> = [
 ];
 
 /** Texte d'une créa pour une langue et un hook, prix inséré. Repli : langue → anglais, hook → student. */
-export function creativeCopy(lang: string | null | undefined, hook: Hook, price: string): CreativeCopy & { lang: string } {
+/** Ligne « bonus aux vues » mise en avant sur la créa ({{bonus}} = RPM de la zone, pour 1 000 vues à J+7). */
+export const BONUS_COPY: Record<string, string> = {
+  en: "+{{bonus}} bonus per 1,000 views", fr: "+{{bonus}} de bonus pour 1 000 vues", es: "+{{bonus}} de bono por cada 1.000 vistas",
+  de: "+{{bonus}} Bonus pro 1.000 Aufrufe", it: "+{{bonus}} di bonus ogni 1.000 visualizzazioni", pt: "+{{bonus}} de bónus por cada 1.000 visualizações",
+  nl: "+{{bonus}} bonus per 1.000 weergaven", pl: "+{{bonus}} premii za każde 1000 wyświetleń", ro: "+{{bonus}} bonus la fiecare 1.000 de vizualizări",
+  cs: "+{{bonus}} bonus za každých 1 000 zhlédnutí", sk: "+{{bonus}} bonus za každých 1 000 zhliadnutí", hu: "+{{bonus}} bónusz minden 1000 megtekintés után",
+  el: "+{{bonus}} μπόνους ανά 1.000 προβολές", bg: "+{{bonus}} бонус на всеки 1000 гледания", hr: "+{{bonus}} bonusa na svakih 1.000 pregleda",
+  sl: "+{{bonus}} bonusa na vsakih 1.000 ogledov", sr: "+{{bonus}} бонуса на сваких 1.000 прегледа", uk: "+{{bonus}} бонусу за кожні 1000 переглядів",
+  tr: "Her 1.000 izlenmeye +{{bonus}} bonus", ar: "‎+{{bonus}} مكافأة لكل 1000 مشاهدة", he: "‎+{{bonus}} בונוס לכל 1,000 צפיות",
+  ja: "1,000回再生ごとに+{{bonus}}のボーナス", ko: "조회수 1,000회당 +{{bonus}} 보너스", sv: "+{{bonus}} bonus per 1 000 visningar",
+  no: "+{{bonus}} bonus per 1 000 visninger", da: "+{{bonus}} bonus pr. 1.000 visninger", fi: "+{{bonus}} bonus jokaisesta 1 000 katselusta",
+  et: "+{{bonus}} boonus iga 1000 vaatamise eest", lv: "+{{bonus}} bonuss par katriem 1000 skatījumiem", lt: "+{{bonus}} premija už kas 1 000 peržiūrų",
+};
+
+/** Espagnol d'Amérique latine : « video », « celular » (l'espagnol d'Espagne dit « vídeo », « móvil »). */
+const LATAM = new Set(["MX", "CO", "AR", "PE", "CL", "EC", "VE", "GT", "BO", "DO", "HN", "PY", "SV", "NI", "CR", "PA", "UY", "PR", "CU", "US"]);
+function localize(text: string, lang: string, country?: string | null): string {
+  if (lang !== "es" || !country || !LATAM.has(country.toUpperCase())) return text;
+  return text.replace(/vídeo/g, "video").replace(/Vídeo/g, "Video").replace(/móvil/g, "celular");
+}
+
+export function creativeCopy(
+  lang: string | null | undefined, hook: Hook, price: string, opts: { bonus?: string | null; country?: string | null } = {},
+): CreativeCopy & { lang: string; bonus: string | null } {
   const l = (lang ?? "en").split("-")[0];
-  const pack = CREATIVE_COPY[l] ?? CREATIVE_COPY.en;
+  const known = CREATIVE_COPY[l] ? l : "en";
+  const pack = CREATIVE_COPY[known];
   const c = pack[hook] ?? pack.student;
-  const fill = (s: string) => s.replace(/\{\{price\}\}/g, price);
-  return { headline: fill(c.headline), subline: fill(c.subline), cta: fill(c.cta), lang: CREATIVE_COPY[l] ? l : "en" };
+  const fill = (s: string) => localize(s.replace(/\{\{price\}\}/g, price), known, opts.country);
+  const bonus = opts.bonus ? (BONUS_COPY[known] ?? BONUS_COPY.en).replace(/\{\{bonus\}\}/g, opts.bonus) : null;
+  return { headline: fill(c.headline), subline: fill(c.subline), cta: fill(c.cta), lang: known, bonus };
 }
 
 /** Langues écrites de droite à gauche (alignement du texte sur le canvas). */

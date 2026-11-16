@@ -87,18 +87,39 @@ export async function renderCreative(cr: any): Promise<Blob> {
   ctx.fillStyle = "#ffffff";
   ctx.shadowColor = "rgba(0,0,0,0.45)";
   ctx.shadowBlur = 18;
-  // titre : taille auto pour tenir dans 40 % de la hauteur
-  let size = Math.round(W * 0.105);
+  // titre : taille auto pour tenir dans 40 % de la hauteur (plus grand en 9:16 : lisible en story)
+  const tall = H / W > 1.5;
+  let size = Math.round(W * (tall ? 0.13 : 0.105));
   let lines: string[] = [];
   for (; size > 36; size -= 4) {
     ctx.font = `700 ${size}px Inter`;
     lines = wrap(ctx, cr.headline, maxW);
     if (lines.length * size * 1.12 <= H * 0.4) break;
   }
-  let y = H * 0.12 + size;
+  let y = H * (tall ? 0.2 : 0.12) + size;
   for (const l of lines) { ctx.fillText(l, tx, y); y += size * 1.12; }
+  // Bonus aux vues : pastille jaune très visible sous le titre.
+  if (cr.bonus_line) {
+    ctx.shadowBlur = 0;
+    const bs = Math.round(W * (tall ? 0.05 : 0.043));
+    ctx.font = `700 ${bs}px Inter`;
+    const bl = wrap(ctx, cr.bonus_line, maxW - bs * 1.2);
+    const bw = Math.min(maxW, Math.max(...bl.map((l) => ctx.measureText(l).width)) + bs * 1.2);
+    const bh = bl.length * bs * 1.25 + bs * 0.7;
+    const bx = rtl ? W - pad - bw : pad, by = y - size * 0.55;
+    ctx.fillStyle = "#ffd84d";
+    ctx.beginPath();
+    ctx.roundRect(bx, by, bw, bh, bs * 0.35);
+    ctx.fill();
+    ctx.fillStyle = "#00113E";
+    let ly = by + bs * 0.35 + bs;
+    for (const l of bl) { ctx.fillText(l, rtl ? bx + bw - bs * 0.6 : bx + bs * 0.6, ly); ly += bs * 1.25; }
+    ctx.fillStyle = "#ffffff";
+    ctx.shadowBlur = 18;
+    y = by + bh + size * 0.7;
+  }
   if (cr.subline) {
-    const s = Math.round(size * 0.42);
+    const s = Math.round(size * (tall ? 0.4 : 0.42));
     ctx.font = `500 ${s}px Inter`;
     y += s * 0.4;
     for (const l of wrap(ctx, cr.subline, maxW)) { ctx.fillText(l, tx, y); y += s * 1.3; }
@@ -106,7 +127,7 @@ export async function renderCreative(cr: any): Promise<Blob> {
   ctx.shadowBlur = 0;
   // CTA
   if (cr.cta) {
-    const s = Math.round(W * 0.045);
+    const s = Math.round(W * (tall ? 0.055 : 0.045));
     ctx.font = `600 ${s}px Inter`;
     const tw = ctx.measureText(cr.cta).width;
     const bh = s * 2.1, bw = tw + s * 2.2, bx = rtl ? W - pad - bw : pad, by = H - pad - bh - s * 1.5;
@@ -170,11 +191,17 @@ export default function Creatives() {
     const z = (zones.data ?? []).find((x: any) => x.code === c?.zone_code);
     return z ? formatMoney(Number(z.price_per_video), z.currency, c?.language ?? "en") : "";
   };
+  /** Bonus aux vues de la zone (RPM pour 1 000 vues à J+7). */
+  const bonusFor = (code: string) => {
+    const c = country(code);
+    const z = (zones.data ?? []).find((x: any) => x.code === c?.zone_code);
+    return z && Number(z.rpm) > 0 ? formatMoney(Number(z.rpm), z.currency, c?.language ?? "en") : null;
+  };
   const langOf = (code: string) => String(country(code)?.language ?? "en").split("-")[0];
   const selectZone = (zone: string) => setSel([...new Set([...sel, ...openCountries.filter((c: any) => c.zone_code === zone).map((c: any) => c.code)])]);
   const langsSelected = [...new Set(sel.map(langOf))];
   const total = sel.length * formats.length;
-  const sample = sel[0] ? creativeCopy(langOf(sel[0]), hook, priceFor(sel[0])) : creativeCopy("fr", hook, "5 $");
+  const sample = sel[0] ? creativeCopy(langOf(sel[0]), hook, priceFor(sel[0]), { bonus: bonusFor(sel[0]), country: sel[0] }) : creativeCopy("fr", hook, "5 $", { bonus: "1 $" });
 
   const generate = async () => {
     if (!sel.length || !formats.length) return toast("Choisis des pays et des formats", "danger");
@@ -185,9 +212,9 @@ export default function Creatives() {
     try {
       for (const code of sel) {
         const lang = langOf(code);
-        const copy = creativeCopy(lang, hook, priceFor(code));
+        const copy = creativeCopy(lang, hook, priceFor(code), { bonus: bonusFor(code), country: code });
         for (const format of formats) {
-          const row = { country: code, language: copy.lang, format, headline: copy.headline, subline: copy.subline, cta: copy.cta, status: "draft" };
+          const row = { country: code, language: copy.lang, format, headline: copy.headline, subline: copy.subline, cta: copy.cta, bonus_line: copy.bonus, status: "draft" };
           const { data, error } = await supabase.from("recruitment_creatives").insert(row).select("*").single();
           if (error) throw error;
           await renderAndUpload(data);
@@ -289,6 +316,7 @@ export default function Creatives() {
             <div className="rounded-xl border border-[#d8e3ff] bg-tint-blue p-4 text-sm">
               <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-subtle-foreground">Aperçu · {sel[0] ? `${flag(sel[0])} ${langName(langOf(sel[0]))}` : "fr"}</p>
               <p className="mt-1.5 text-[15px] font-semibold text-foreground">{sample.headline}</p>
+              {sample.bonus && <span className="mt-1.5 inline-block rounded-md bg-[#ffd84d] px-2 py-0.5 text-xs font-bold text-[#00113E]">{sample.bonus}</span>}
               <p className="text-muted-foreground">{sample.subline}</p>
               <span className="mt-2 inline-block rounded-full bg-accent px-3 py-1 text-xs font-medium text-white">{sample.cta}</span>
             </div>

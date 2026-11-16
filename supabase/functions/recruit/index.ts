@@ -5,6 +5,7 @@
 import { appUrl, audit, caller, getSetting, HttpError, requireAdmin, requireRecruiter as requireStaff, serve, userId } from "../_shared/http.ts";
 import { queueEmail } from "../_shared/outbox.ts";
 import { createContract } from "../_shared/contracts.ts";
+import { purgeApplication, purgeTestData } from "../_shared/purge.ts";
 import { signatureStep } from "../_shared/logic/reminders.ts";
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import type { Caller } from "../_shared/http.ts";
@@ -71,6 +72,25 @@ serve(async (req, body, db) => {
         return { ok: true, status: decision };
       }
       throw new HttpError(400, "decision");
+    }
+    case "delete_candidate": {
+      // Bouton admin « Supprimer ce candidat et ses données » : définitif, journalisé.
+      requireAdmin(c, false);
+      const id = String(body.application_id ?? "");
+      if (!id) throw new HttpError(400, "application_id");
+      const preview = await purgeApplication(db, id, true);
+      if (body.dry_run === true) return { ok: true, dry_run: true, counts: preview };
+      const counts = await purgeApplication(db, id, false);
+      await audit(db, userId(c), "candidate.delete", "application", id, counts);
+      return { ok: true, counts };
+    }
+    case "purge_test_data": {
+      // Comptes de test : aperçu par défaut (dry_run), suppression seulement avec confirm: "PURGE".
+      requireAdmin(c, false);
+      const run = body.confirm === "PURGE";
+      const r = await purgeTestData(db, !run);
+      if (run) await audit(db, userId(c), "test_data.purge", "profiles", null, r.counts);
+      return { ok: true, ...r };
     }
     case "remind": {
       requireStaff(c);

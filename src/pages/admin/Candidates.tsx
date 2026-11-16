@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
-import { Check, ChevronLeft, ChevronRight, Clock, ExternalLink, Inbox, Search, UserPlus, X } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Clock, ExternalLink, Inbox, Search, Trash2, UserPlus, X } from "lucide-react";
 import { Badge, Button, Card, Chip, Empty, Input, PageHeader, Select, Spinner, Table, Tabs, Td, Textarea, Th, useToast } from "@/components/ui";
 import { callFn, supabase } from "@/lib/supabase";
 import { useCountries } from "@/lib/hooks";
@@ -34,6 +34,20 @@ export default function Candidates() {
   const toast = useToast();
   const qc = useQueryClient();
   const { profile } = useAuth();
+  /** Suppression définitive (admin) : candidature, contrat + PDF, vidéo, emails, compte posteur et ses données. */
+  const deleteCandidate = async (a: any) => {
+    try {
+      const p = await callFn("recruit", { action: "delete_candidate", application_id: a.id, dry_run: true });
+      const c = p.counts;
+      const ok = window.confirm(`Supprimer définitivement ${a.first_name} ${a.last_name} (${a.email}) ?\n\n` +
+        `· candidature, ${c.contracts} contrat(s) et ${c.contract_pdfs} PDF signé(s)\n· ${c.yap_videos} vidéo de présentation\n· ${c.emails} email(s)\n` +
+        `${c.users ? "· son compte posteur (briefs, posts, paie, conversations)\n" : ""}\nAction irréversible.`);
+      if (!ok) return;
+      await callFn("recruit", { action: "delete_candidate", application_id: a.id });
+      toast("Candidat et données supprimés", "success");
+      qc.invalidateQueries({ queryKey: ["applications"] });
+    } catch (e) { toast((e as Error).message, "danger"); }
+  };
   const { data: countries } = useCountries();
   const [params] = useSearchParams();
   const initialView = params.get("view");
@@ -176,6 +190,7 @@ export default function Candidates() {
                   <Td className="whitespace-nowrap text-right">
                     {["new", "review"].includes(a.status) && <span className="inline-flex gap-1.5"><Button size="sm" variant="secondary" onClick={() => openInReview(a)}>Revoir</Button><Button size="sm" onClick={() => decide(a, "accept")}>Accepter</Button></span>}
                     {a.status === "contract_sent" && <Button size="sm" variant="secondary" onClick={async () => { await callFn("recruit", { action: "resend_contract", application_id: a.id }); toast("Contrat renvoyé", "success"); }}>Renvoyer le contrat</Button>}
+                    {profile?.role === "admin" && <Button size="icon" variant="ghost" className="ml-1 h-8 w-8 text-[#c42a2d]" title="Supprimer ce candidat et ses données" aria-label="Supprimer ce candidat et ses données" onClick={() => deleteCandidate(a)}><Trash2 className="h-4 w-4" /></Button>}
                   </Td>
                 </tr>
               );
