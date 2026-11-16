@@ -57,13 +57,22 @@ async function syncInsights(db: SupabaseClient, cfg: MetaCfg) {
     }
   }
   if (rows.length) await db.from("meta_insights").upsert(rows, { onConflict: "level,meta_id,date" });
-  // statuts à jour
-  const { data: camps } = await db.from("meta_campaigns").select("id, meta_id").not("meta_id", "is", null);
-  for (const c of camps ?? []) {
+  // Statuts à jour (campagnes, ad sets, pubs), en lot : ACTIVE, PAUSED, IN_PROCESS, PENDING_REVIEW, DISAPPROVED…
+  // La colonne « status » garde le statut configuré (ACTIVE / PAUSED / ARCHIVED) ; effective_status dans review_status.
+  for (const [table, edge] of [["meta_campaigns", "campaigns"], ["meta_adsets", "adsets"], ["meta_ads", "ads"]] as const) {
+    const { data: rows } = await db.from(table).select("id, meta_id").not("meta_id", "is", null).not("status", "in", "(ARCHIVED,DELETED)");
+    if (!rows?.length) continue;
     try {
-      const s = await graph(cfg, c.meta_id, { params: { fields: "effective_status" } });
-      await db.from("meta_campaigns").update({ status: s.effective_status, last_synced_at: new Date().toISOString() }).eq("id", c.id);
-    } catch { /* supprimée côté Meta */ }
+      const res = await graph(cfg, `${cfg.ad_account_id}/${edge}`, { params: { fields: "id,status,effective_status", limit: "500" } });
+      const byId = new Map((res.data ?? []).map((m: any) => [m.id, m]));
+      for (const r of rows) {
+        const m: any = byId.get(r.meta_id);
+        if (!m) continue;
+        const patch: Record<string, unknown> = { status: m.status, effective_status: m.effective_status };
+        if (table === "meta_campaigns") patch.last_synced_at = new Date().toISOString();
+        await db.from(table).update(patch).eq("id", r.id);
+      }
+    } catch { /* on réessaiera à la prochaine heure */ }
   }
   return { ok: true, rows: rows.length };
 }

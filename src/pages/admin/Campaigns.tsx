@@ -8,8 +8,13 @@ import { LaunchChecklist } from "./campaigns/LaunchChecklist";
 import { Badge, Button, Card, CardTitle, Dialog, Empty, Field, IconTile, Input, PageHeader, Spinner, Table, Td, Th, useToast } from "@/components/ui";
 import { dateFr, flag } from "@/lib/utils";
 
-const statusTone = (s: string) => (s === "ACTIVE" ? "success" : s === "PAUSED" ? "warning" : "default") as any;
-const StatusBadge = ({ s }: { s: string }) => <Badge tone={statusTone(s)}><span className="h-1.5 w-1.5 rounded-full bg-current" />{s === "ACTIVE" ? "Active" : s === "PAUSED" ? "En pause" : s}</Badge>;
+const EFFECTIVE: Record<string, string> = { PENDING_REVIEW: "En revue", IN_PROCESS: "En traitement", DISAPPROVED: "Refusée", WITH_ISSUES: "Problème", CAMPAIGN_PAUSED: "Campagne en pause", ADSET_PAUSED: "Ad set en pause" };
+const statusTone = (s: string) => (s === "ACTIVE" ? "success" : s === "PAUSED" ? "warning" : s === "DISAPPROVED" || s === "WITH_ISSUES" ? "danger" : "default") as any;
+/** Statut configuré (Active / En pause) + statut effectif Meta quand il diffère (en revue, refusée…), synchronisés chaque heure. */
+const StatusBadge = ({ s, eff }: { s: string; eff?: string | null }) => {
+  const shown = s === "ACTIVE" && eff && EFFECTIVE[eff] ? eff : s;
+  return <Badge tone={statusTone(shown)}><span className="h-1.5 w-1.5 rounded-full bg-current" />{shown === "ACTIVE" ? "Active" : shown === "PAUSED" ? "En pause" : EFFECTIVE[shown] ?? shown}</Badge>;
+};
 
 export default function Campaigns() {
   const qc = useQueryClient();
@@ -213,7 +218,7 @@ export default function Campaigns() {
                   <div className="flex min-w-0 items-center gap-3">
                     <IconTile icon={<Megaphone />} tint="blue" />
                     <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2"><h3 className="truncate text-[15px] font-semibold">{c.name}</h3><StatusBadge s={c.status} /></div>
+                      <div className="flex flex-wrap items-center gap-2"><h3 className="truncate text-[15px] font-semibold">{c.name}</h3><StatusBadge s={c.status} eff={c.effective_status} /></div>
                       <p className="mt-0.5 text-xs text-subtle-foreground">Meta {c.meta_id} · créée {dateFr(c.created_at)} · {c.countries.map(flag).join(" ")} · <span className="tabular">{total} €/j</span></p>
                     </div>
                   </div>
@@ -230,7 +235,7 @@ export default function Campaigns() {
                     {(c.meta_adsets ?? []).map((a: any) => (
                       <tr key={a.id}>
                         <Td><span className="mr-1.5">{a.country ? flag(a.country) : adsetCountries(a).map(flag).join("")}</span><span className="font-medium">{a.name}</span></Td>
-                        <Td><StatusBadge s={a.status} /></Td>
+                        <Td><StatusBadge s={a.status} eff={a.effective_status} /></Td>
                         <Td className="text-muted-foreground">{a.zone_code ?? "—"}</Td>
                         <Td><BudgetEditor value={Number(a.daily_budget)} max={cap} busy={busy === `budget-${a.id}`} onApply={(v) => setBudget(a, v)} /></Td>
                         <Td>
@@ -238,7 +243,7 @@ export default function Campaigns() {
                             <div className="space-y-1">
                               {a.meta_ads.map((ad: any) => (
                                 <div key={ad.id} className="flex items-center gap-2 text-xs">
-                                  <span className="max-w-56 truncate">{ad.name}</span><StatusBadge s={ad.status} />
+                                  <span className="max-w-56 truncate">{ad.name}</span><StatusBadge s={ad.status} eff={ad.effective_status} />
                                   {ad.status === "ACTIVE"
                                     ? <button className="text-accent hover:underline" onClick={() => pause("ad", ad)}>Pause</button>
                                     : <button className="text-accent hover:underline" onClick={() => activate("ad", ad, Number(a.daily_budget))}>Activer</button>}
