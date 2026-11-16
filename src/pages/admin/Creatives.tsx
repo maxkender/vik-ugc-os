@@ -89,13 +89,33 @@ export async function renderCreative(cr: any): Promise<Blob> {
   ctx.shadowBlur = 18;
   // titre : taille auto pour tenir dans 40 % de la hauteur (plus grand en 9:16 : lisible en story)
   const tall = H / W > 1.5;
-  let size = Math.round(W * (tall ? 0.13 : 0.105));
+  let size = Math.round(W * (tall ? 0.12 : 0.105));
   let lines: string[] = [];
+  // Hauteur disponible : du haut du texte jusqu'au-dessus du bouton CTA (titre + bonus + sous-titre doivent tenir).
+  const ctaS = Math.round(W * (tall ? 0.055 : 0.045));
+  const space = (H - pad - ctaS * 2.1 - ctaS * 1.5 - ctaS) - H * (tall ? 0.2 : 0.12);
+  const blockHeight = (sz: number) => {
+    ctx.font = `700 ${sz}px Inter`;
+    const hl = wrap(ctx, cr.headline, maxW).length * sz * 1.12;
+    let bonus = 0;
+    if (cr.bonus_line) {
+      const bs = Math.round(W * (tall ? 0.05 : 0.043));
+      ctx.font = `700 ${bs}px Inter`;
+      bonus = wrap(ctx, cr.bonus_line, maxW - bs * 1.2).length * bs * 1.25 + bs * 0.7 + sz * 0.15;
+    }
+    let sub = 0;
+    if (cr.subline) {
+      const ss = Math.round(sz * (tall ? 0.4 : 0.42));
+      ctx.font = `500 ${ss}px Inter`;
+      sub = wrap(ctx, cr.subline, maxW).length * ss * 1.3 + ss * 0.4;
+    }
+    return hl + bonus + sub;
+  };
   for (; size > 36; size -= 4) {
-    ctx.font = `700 ${size}px Inter`;
-    lines = wrap(ctx, cr.headline, maxW);
-    if (lines.length * size * 1.12 <= H * 0.4) break;
+    if (blockHeight(size) <= space) break;
   }
+  ctx.font = `700 ${size}px Inter`;
+  lines = wrap(ctx, cr.headline, maxW);
   let y = H * (tall ? 0.2 : 0.12) + size;
   for (const l of lines) { ctx.fillText(l, tx, y); y += size * 1.12; }
   // Bonus aux vues : pastille jaune très visible sous le titre.
