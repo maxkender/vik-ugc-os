@@ -12,6 +12,7 @@ const CreatorLayout = lazy(() => import("./pages/creator/CreatorLayout"));
 const CreatorToday = lazy(() => import("./pages/creator/Today"));
 const CreatorStats = lazy(() => import("./pages/creator/Stats"));
 const CreatorPayments = lazy(() => import("./pages/creator/Payments"));
+const CreatorFeedback = lazy(() => import("./pages/creator/Feedback"));
 const Library = lazy(() => import("./pages/admin/Library"));
 const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
 const Creators = lazy(() => import("./pages/admin/Creators"));
@@ -71,6 +72,7 @@ export function App() {
           <Route index element={<CreatorToday />} />
           <Route path="stats" element={<CreatorStats />} />
           <Route path="payments" element={<CreatorPayments />} />
+          <Route path="feedback" element={<CreatorFeedback />} />
           <Route path="account" element={<CreatorAccount />} />
         </Route>
 

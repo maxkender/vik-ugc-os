@@ -160,6 +160,7 @@ Posters are content creators paid by Vik Studios to film and publish short UGC v
 ## Views D+2 / D+7
 - Views are measured automatically 2 days (D+2) and 7 days (D+7) after publication. They appear in the "Views" tab.
 - D+7 views are the ones used for the bonus.
+- Feedback: the team reviews each posted video (validated / to fix / rejected) with a comment, points to work on and timestamps. "recent_feedback" in the context lists the creator's latest feedback: use it to explain what to fix. To resubmit a video marked "to fix", the creator posts the corrected video and pastes the new link in the "Feedback" tab ("I fixed it"). Only validated videos are paid.
 
 ## Pay
 - Base: each validated video is paid the zone's price per video.
@@ -253,7 +254,11 @@ export interface AssistantContext {
   payouts: { week_start: string; total: number; currency: string; status: string; videos: number | null }[];
   next_payout_estimate: { week_start: string; validated_videos: number; base_estimate: number; currency: string } | null;
   onboarding_step: string | null;
+  /** Derniers retours de l'équipe sur ses vidéos (verdict, commentaire, points, moments). */
+  recent_feedback: { date: string; brief: string; verdict: string; comment: string | null; points: string[]; moments: string[] }[];
 }
+
+export interface CtxReview { poster_id: string; created_at: string; verdict: string; comment: string | null; checks: string[] | null; timestamps: { t: string; note?: string }[] | null; brief_title?: string | null }
 
 /** Lundi (UTC) de la semaine de `day` (YYYY-MM-DD). */
 export function weekStartOf(day: string): string {
@@ -283,6 +288,7 @@ export function buildAssistantContext(input: {
   assignments: CtxAssignment[];
   payouts: CtxPayout[];
   onboarding: CtxOnboarding[];
+  reviews?: CtxReview[];
 }): AssistantContext {
   const { posterId, today } = input;
   const profile = input.profile && input.profile.id === posterId ? input.profile : null;
@@ -339,6 +345,13 @@ export function buildAssistantContext(input: {
     payouts,
     next_payout_estimate: next,
     onboarding_step: lastStep,
+    // Seuls ses propres retours (filtrés par poster_id), les 5 plus récents.
+    recent_feedback: (input.reviews ?? []).filter((r) => r.poster_id === posterId)
+      .sort((x, y) => y.created_at.localeCompare(x.created_at)).slice(0, 5)
+      .map((r) => ({
+        date: r.created_at.slice(0, 10), brief: r.brief_title ?? "", verdict: r.verdict, comment: r.comment ?? null,
+        points: r.checks ?? [], moments: (r.timestamps ?? []).map((t) => `${t.t}${t.note ? ` ${t.note}` : ""}`),
+      })),
   };
 }
 

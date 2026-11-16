@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { AtSign, BarChart3, CalendarCheck, LogOut, Wallet } from "lucide-react";
+import { AtSign, BarChart3, CalendarCheck, LogOut, MessageSquare, Wallet } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
@@ -23,10 +24,19 @@ export default function CreatorLayout() {
     if (profile?.locale && !stored) i18n.changeLanguage(uiLangForCountry(profile.locale));
   }, [profile?.locale]);
 
-  const tabs = [
+  // Retours non lus : pastille sur l'onglet « Retours ».
+  const unreadQ = useQuery({
+    queryKey: ["unread-reviews", profile?.id],
+    enabled: !!profile?.id,
+    queryFn: async () => (await supabase.from("post_reviews").select("id", { count: "exact", head: true }).eq("poster_id", profile!.id).is("seen_at", null)).count ?? 0,
+    refetchInterval: 60_000,
+  });
+  const unread = unreadQ.data ?? 0;
+  const tabs: { to: string; end?: boolean; label: string; icon: any; badge?: number }[] = [
     { to: "/creator", end: true, label: t("creator.nav.today"), icon: CalendarCheck },
     { to: "/creator/account", label: t("account.nav"), icon: AtSign },
     { to: "/creator/stats", label: t("creator.nav.stats"), icon: BarChart3 },
+    { to: "/creator/feedback", label: t("creator.nav.feedback"), icon: MessageSquare, badge: unread },
     { to: "/creator/payments", label: t("creator.nav.payments"), icon: Wallet },
   ];
 
@@ -53,6 +63,7 @@ export default function CreatorLayout() {
               className={({ isActive }) => cn("relative inline-flex items-center gap-2 px-3 pb-3 pt-1 text-sm font-medium transition-colors",
                 isActive ? "text-foreground after:absolute after:inset-x-3 after:-bottom-px after:h-0.5 after:rounded-full after:bg-accent" : "text-subtle-foreground hover:text-foreground")}>
               <tab.icon className="h-4 w-4" strokeWidth={1.75} /> {tab.label}
+              {!!tab.badge && <span className="tabular rounded-full bg-[#fe504f] px-1.5 text-[10px] font-bold text-white">{tab.badge}</span>}
             </NavLink>
           ))}
         </nav>
@@ -65,14 +76,15 @@ export default function CreatorLayout() {
 
       {/* Barre d'onglets mobile */}
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md sm:hidden">
-        <div className="mx-auto grid max-w-md grid-cols-4">
+        <div className="mx-auto grid max-w-md grid-cols-5">
           {tabs.map((tab) => (
             <NavLink key={tab.to} to={tab.to} end={tab.end}
               className={({ isActive }) => cn("flex flex-col items-center gap-1 py-2.5 text-[11px] font-medium transition-colors", isActive ? "text-accent" : "text-subtle-foreground")}>
               {({ isActive }) => (
                 <>
                   <span className={cn("inline-flex h-7 w-12 items-center justify-center rounded-full transition-colors", isActive && "bg-accent-soft")}>
-                    <tab.icon className="h-[19px] w-[19px]" strokeWidth={isActive ? 2 : 1.75} />
+                    <span className="relative"><tab.icon className="h-[19px] w-[19px]" strokeWidth={isActive ? 2 : 1.75} />
+                      {!!tab.badge && <span className="tabular absolute -right-2 -top-1.5 min-w-4 rounded-full bg-[#fe504f] px-1 text-center text-[10px] font-bold leading-4 text-white">{tab.badge}</span>}</span>
                   </span>
                   {tab.label}
                 </>

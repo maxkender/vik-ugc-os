@@ -1,11 +1,16 @@
 // briefs — création / assignation des briefs et répartition sur la file du jour.
 //   create { title, instructions?, hook?, app_id?, video_id?, language?, target_countries?, poster_ids?, pool_id?, quantity?, due_date?, origin? }
 //   dispatch { date? }                        cron (chaque matin) / admin
-//   review { assignment_id, status: validated|rejected, reason? }   staff
+//   review { assignment_id, verdict: validated|changes_requested|rejected, comment?, checks?, timestamps? }   staff (admin / contrôleur)
+//          → statut de l'assignation, ligne post_reviews, email « post_feedback » dans la langue du posteur.
+//          (compatibilité : status + reason)
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { audit, caller, getSetting, HttpError, requireAdmin, requireStaff, serve, userId } from "../_shared/http.ts";
 import { dispatchBriefs } from "../_shared/logic/dispatch.ts";
 import { isoDay } from "../_shared/logic/dates.ts";
+import { appUrl } from "../_shared/http.ts";
+import { queueEmail } from "../_shared/outbox.ts";
+import { feedbackEmailVars, parseTimestamp, REVIEW_CHECKS, type Verdict } from "../_shared/logic/review.ts";
 
 async function dispatch(db: SupabaseClient, day: string) {
   const cfg = await getSetting(db, "briefs");
@@ -69,14 +74,38 @@ serve(async (req, body, db) => {
     }
     case "review": {
       requireStaff(c);
-      const status = String(body.status);
-      if (!["validated", "rejected", "posted"].includes(status)) throw new HttpError(400, "status");
+      const verdict = String(body.verdict ?? body.status) as Verdict;
+      if (!["validated", "changes_requested", "rejected"].includes(verdict)) throw new HttpError(400, "verdict");
+      const comment = String(body.comment ?? body.reason ?? "").trim().slice(0, 2000);
+      if (verdict !== "validated" && !comment) throw new HttpError(422, "Un commentaire est obligatoire pour « À corriger » et « Refusé »");
+      const checks = (Array.isArray(body.checks) ? body.checks : []).filter((x: string) => (REVIEW_CHECKS as readonly string[]).includes(x));
+      const timestamps = (Array.isArray(body.timestamps) ? body.timestamps : [])
+        .map((t: any) => ({ t: String(t?.t ?? "").trim().slice(0, 8), note: String(t?.note ?? "").trim().slice(0, 300) }))
+        .filter((t: any) => parseTimestamp(t.t) !== null).slice(0, 20);
+      const { data: a } = await db.from("brief_assignments").select("id, poster_id, posted_url, briefs(title)").eq("id", body.assignment_id).single();
+      if (!a) throw new HttpError(404, "assignment not found");
       const { error } = await db.from("brief_assignments").update({
-        status, validated_at: status === "validated" ? new Date().toISOString() : null,
-        rejection_reason: status === "rejected" ? String(body.reason ?? "") : null,
-      }).eq("id", body.assignment_id);
+        status: verdict, validated_at: verdict === "validated" ? new Date().toISOString() : null,
+        rejection_reason: verdict === "validated" ? null : comment,
+      }).eq("id", a.id);
       if (error) throw error;
-      return { ok: true };
+      const { data: rv } = await db.from("post_reviews").insert({
+        assignment_id: a.id, poster_id: a.poster_id, reviewer_id: userId(c), verdict, comment: comment || null, checks, timestamps, posted_url: a.posted_url,
+      }).select("id").single();
+      // Notification email (et in-app via post_reviews non lus) : toujours, sauf « validé » sans commentaire.
+      if (verdict !== "validated" || comment) {
+        const { data: p } = await db.from("profiles").select("email, full_name, locale, posters(language)").eq("id", a.poster_id).maybeSingle();
+        if (p?.email) {
+          const language = (p as any).posters?.language ?? p.locale ?? "en";
+          await queueEmail(db, {
+            template: "post_feedback", to: p.email, language,
+            vars: feedbackEmailVars({ firstName: String(p.full_name ?? "").split(" ")[0], briefTitle: (a as any).briefs?.title ?? "", verdict, comment, checks, timestamps, language }),
+            buttonUrl: appUrl("/creator/feedback"), relatedType: "post_review", relatedId: rv?.id ?? null,
+          });
+        }
+      }
+      await audit(db, userId(c), `post.${verdict}`, "brief_assignment", a.id, { checks });
+      return { ok: true, review_id: rv?.id };
     }
     default:
       throw new HttpError(400, "unknown action");

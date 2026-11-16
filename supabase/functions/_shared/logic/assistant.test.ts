@@ -136,3 +136,16 @@ describe("assistant : divers", () => {
     expect(assistantText("not_configured", "en")).toMatch(/not configured/);
   });
 });
+
+describe("assistant : retours de l'équipe", () => {
+  it("le contexte contient les 5 derniers retours du posteur, jamais ceux d'un autre", () => {
+    const ctx = buildAssistantContext({
+      posterId: "p1", today: "2026-11-16", profile: null, poster: null, zone: null, assignments: [], payouts: [], onboarding: [],
+      reviews: [
+        { poster_id: "p1", created_at: "2026-11-16T09:00:00Z", verdict: "changes_requested", comment: "Hook trop lent", checks: ["hook"], timestamps: [{ t: "0:04", note: "coupe" }], brief_title: "POV" },
+        { poster_id: "p2", created_at: "2026-11-16T10:00:00Z", verdict: "rejected", comment: "autre", checks: [], timestamps: [] },
+      ],
+    });
+    expect(ctx.recent_feedback).toEqual([{ date: "2026-11-16", brief: "POV", verdict: "changes_requested", comment: "Hook trop lent", points: ["hook"], moments: ["0:04 coupe"] }]);
+  });
+});

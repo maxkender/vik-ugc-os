@@ -87,9 +87,12 @@ async function loadContext(db: SupabaseClient, posterId: string) {
     : null;
   const byId = new Map<string, any>();
   for (const a of [...(assignments ?? []), ...(todays ?? [])]) byId.set(a.id, a);
+  const { data: reviews } = await db.from("post_reviews").select("poster_id, created_at, verdict, comment, checks, timestamps, brief_assignments(briefs(title))")
+    .eq("poster_id", posterId).order("created_at", { ascending: false }).limit(5);
   return buildAssistantContext({
     posterId, today, profile, poster, zone,
     assignments: [...byId.values()], payouts: payouts ?? [], onboarding: onboarding ?? [],
+    reviews: (reviews ?? []).map((r: any) => ({ ...r, brief_title: r.brief_assignments?.briefs?.title ?? null })),
   });
 }
 

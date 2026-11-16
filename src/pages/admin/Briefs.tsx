@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Clapperboard, ExternalLink, Eye, Globe2, Inbox, Pencil, Plus, Shuffle, Users, X } from "lucide-react";
+import { Check, Clapperboard, ExternalLink, Eye, Globe2, Inbox, Pencil, Plus, Shuffle, Users } from "lucide-react";
 import { Badge, Button, Card, Drawer, Empty, MetricPill, PageHeader, Spinner, Tabs, useToast } from "@/components/ui";
 import { callFn, supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
@@ -8,6 +8,8 @@ import { cn, compact, dateFr, flag } from "@/lib/utils";
 import { AssignBriefDialog } from "./library/AssignBriefDialog";
 import { thumbOf } from "./library/media";
 import { BriefAssetsPicker } from "./assets/BriefAssets";
+import { ReviewPanel } from "./review/ReviewPanel";
+import { FeedbackStats } from "./review/FeedbackStats";
 import { VideoPlayer } from "./library/VideoPlayer";
 import type { Video } from "./library/types";
 import { createContext, useContext } from "react";
@@ -15,8 +17,8 @@ import { createContext, useContext } from "react";
 /** Clic sur une miniature de brief : ouvre le lecteur sur la vidéo de référence. */
 const PlayCtx = createContext<(v: Video) => void>(() => {});
 
-const ST_TONE: Record<string, any> = { todo: "default", posted: "accent", validated: "success", rejected: "danger" };
-const ST_LABEL: Record<string, string> = { todo: "À faire", posted: "Posté", validated: "Validé", rejected: "Refusé" };
+const ST_TONE: Record<string, any> = { todo: "default", posted: "accent", validated: "success", rejected: "danger", changes_requested: "warning" };
+const ST_LABEL: Record<string, string> = { todo: "À faire", posted: "Posté", validated: "Validé", rejected: "Refusé", changes_requested: "À corriger" };
 
 function Thumb({ v, className }: { v: any; className?: string }) {
   const src = v ? thumbOf(v) : null;
@@ -33,7 +35,8 @@ function Thumb({ v, className }: { v: any; className?: string }) {
 export default function Briefs() {
   const toast = useToast();
   const qc = useQueryClient();
-  const [tab, setTab] = useState<"queue" | "briefs">("queue");
+  const [tab, setTab] = useState<"queue" | "briefs" | "feedback">("queue");
+  const [reviewing, setReviewing] = useState<any | null>(null);
   const [creating, setCreating] = useState(false);
   const [open, setOpen] = useState<any | null>(null);
   const [busy, setBusy] = useState(false);
@@ -47,7 +50,7 @@ export default function Briefs() {
   });
   const { data: queue, isLoading: loadingQueue } = useQuery({
     queryKey: ["briefs", "queue"],
-    queryFn: async () => (await supabase.from("brief_assignments").select("*, briefs(title, hook, videos(*)), posters(display_name, country)").eq("status", "posted").order("posted_at").limit(200)).data ?? [],
+    queryFn: async () => (await supabase.from("brief_assignments").select("*, briefs(title, hook, instructions, videos(*)), posters(display_name, country)").eq("status", "posted").order("posted_at").limit(200)).data ?? [],
   });
   const refresh = () => qc.invalidateQueries({ queryKey: ["briefs"] });
   // Rien à valider mais des briefs existent : on ouvre directement la liste.
@@ -87,6 +90,7 @@ export default function Briefs() {
         <Tabs value={tab} onChange={setTab} items={[
           { value: "queue", label: <span className="flex items-center gap-1.5">À valider {queue?.length ? <span className="tabular rounded-full bg-accent px-1.5 text-[11px] font-semibold text-white">{queue.length}</span> : null}</span> },
           { value: "briefs", label: <span className="flex items-center gap-1.5">Tous les briefs <span className="tabular text-subtle-foreground">{briefs?.length ?? 0}</span></span> },
+          { value: "feedback", label: "Retours et stats" },
         ]} />
       </div>
 
@@ -103,8 +107,8 @@ export default function Briefs() {
                 </div>
                 <div className="mt-2"><ViewsEditor a={a} onSaved={refresh} /></div>
                 <div className="mt-auto flex gap-2 pt-3">
-                  <Button size="sm" variant="success" onClick={() => review(a.id, "validated")}><Check className="h-3.5 w-3.5" /> Valider</Button>
-                  <Button size="sm" variant="secondary" onClick={() => review(a.id, "rejected")}><X className="h-3.5 w-3.5" /> Refuser</Button>
+                  <Button size="sm" onClick={() => setReviewing(a)}><Pencil className="h-3.5 w-3.5" /> Revoir</Button>
+                  <Button size="sm" variant="success" onClick={() => review(a.id, "validated")}><Check className="h-3.5 w-3.5" /> Valider direct</Button>
                 </div>
               </div>
             </Card>
@@ -156,7 +160,9 @@ export default function Briefs() {
         </Card>
       ) : <Empty title="Aucun brief" icon={<Inbox className="h-5 w-5" />} action={<Button onClick={() => setCreating(true)}><Plus className="h-4 w-4" /> Nouveau brief</Button>}>Crée un brief depuis la Bibliothèque (« Assigner en brief » sur une vidéo) ou un brief manuel.</Empty>)}
 
-      <BriefDrawer brief={open} onClose={() => setOpen(null)} onReview={review} />
+      {tab === "feedback" && <FeedbackStats />}
+      <BriefDrawer brief={open} onClose={() => setOpen(null)} onReview={review} onOpenReview={(a) => setReviewing({ ...a, briefs: { title: open?.title, hook: open?.hook, instructions: open?.instructions, videos: open?.videos } })} />
+      <ReviewPanel assignment={reviewing} onClose={() => setReviewing(null)} onDone={() => { setReviewing(null); refresh(); }} />
       <AssignBriefDialog video={null} open={creating} onClose={() => { setCreating(false); refresh(); }} origin="manual" />
       <VideoPlayer list={playing ? [playing] : []} index={playing ? 0 : null} onIndex={(i) => i === null && setPlaying(null)} />
     </div>
@@ -201,7 +207,7 @@ function ViewsEditor({ a, onSaved }: { a: any; onSaved: () => void }) {
   );
 }
 
-function BriefDrawer({ brief, onClose, onReview }: { brief: any; onClose: () => void; onReview: (id: string, s: "validated" | "rejected") => void }) {
+function BriefDrawer({ brief, onClose, onReview, onOpenReview }: { brief: any; onClose: () => void; onReview: (id: string, s: "validated" | "rejected") => void; onOpenReview: (a: any) => void }) {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: ["briefs", "detail", brief?.id],
@@ -240,7 +246,7 @@ function BriefDrawer({ brief, onClose, onReview }: { brief: any; onClose: () => 
                   </div>
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <ViewsEditor a={a} onSaved={() => qc.invalidateQueries({ queryKey: ["briefs"] })} />
-                    {a.status === "posted" && <span className="flex gap-1.5"><Button size="sm" variant="success" onClick={() => onReview(a.id, "validated")}><Check className="h-3 w-3" /> Valider</Button><Button size="sm" variant="secondary" onClick={() => onReview(a.id, "rejected")}><X className="h-3 w-3" /> Refuser</Button></span>}
+                    {a.posted_url && <span className="flex gap-1.5"><Button size="sm" onClick={() => onOpenReview(a)}><Pencil className="h-3 w-3" /> Revoir / retour</Button>{a.status === "posted" && <Button size="sm" variant="success" onClick={() => onReview(a.id, "validated")}><Check className="h-3 w-3" /> Valider</Button>}</span>}
                   </div>
                 </li>
               ))}

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { CheckCircle2, Clock, Download, ExternalLink, Lightbulb, Link2, Play, Quote, Send, Sparkles, XCircle } from "lucide-react";
+import { Link } from "react-router-dom";
+import { CheckCircle2, Clock, Download, ExternalLink, Pencil, Lightbulb, Link2, Play, Quote, Send, Sparkles, XCircle } from "lucide-react";
 import { publicUrl, supabase } from "@/lib/supabase";
 import { Button, Spinner, useToast } from "@/components/ui";
 import { formatMoney } from "@shared/zones.ts";
@@ -13,7 +14,7 @@ import { READ_ONLY_HINT, todayIso, useCreatorIdentity, useMyPoster } from "./sha
 interface RefVideo { id: string; url: string | null; thumbnail_path: string | null; thumbnail_src: string | null; video_path: string | null; video_src?: string | null; external_id?: string | null; caption: string | null; platform: string }
 interface BriefFile { id: string; name: string; kind: string; path: string; mime: string | null; size_bytes: number | null }
 interface Assignment {
-  id: string; due_date: string; status: "todo" | "posted" | "validated" | "rejected"; posted_url: string | null; rejection_reason: string | null;
+  id: string; due_date: string; status: "todo" | "posted" | "validated" | "rejected" | "changes_requested"; posted_url: string | null; rejection_reason: string | null;
   briefs: { title: string; hook: string | null; instructions: string | null; reference_video_id: string | null; videos: RefVideo | null; brief_assets?: { assets: BriefFile | null }[] } | null;
 }
 
@@ -22,6 +23,7 @@ const STATUS = {
   posted: { cls: "bg-tint-blue text-[#0040d6]", icon: Send },
   validated: { cls: "bg-tint-green text-[#0b7a3c]", icon: CheckCircle2 },
   rejected: { cls: "bg-tint-red text-[#c42a2d]", icon: XCircle },
+  changes_requested: { cls: "bg-tint-yellow text-[#8a5a00]", icon: Pencil },
 } as const;
 
 function StatusPill({ status }: { status: Assignment["status"] }) {
@@ -142,6 +144,13 @@ function BriefCard({ a, index }: { a: Assignment; index: number }) {
           </div>
         )}
 
+        {a.status === "changes_requested" && (
+          <div className="rounded-xl bg-tint-yellow px-4 py-3 text-sm text-[#8a5a00]">
+            <p className="flex items-center gap-1.5 font-semibold"><Pencil className="h-4 w-4" /> {t("creator.feedback.verdict.changes_requested")}</p>
+            {a.rejection_reason && <p className="mt-1 whitespace-pre-wrap text-[#5c3d00]">{a.rejection_reason}</p>}
+            <p className="mt-1.5 text-xs">{t("creator.feedback.fixedHint")} <Link to="/creator/feedback" className="font-medium underline">{t("creator.nav.feedback")}</Link></p>
+          </div>
+        )}
         {a.status === "validated" ? (
           a.posted_url && (
             <a href={a.posted_url} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-xl bg-tint-green px-4 py-3 text-sm font-medium text-[#0b7a3c]">
