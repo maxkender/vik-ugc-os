@@ -1,4 +1,26 @@
-# PROGRESS : état au 16/11/2026 (lancement Meta)
+# PROGRESS : état au 16/11/2026 (V5)
+
+## V5 : grille du 16/11, 62 pays, carte offre d'emploi, retours aux créateurs
+
+- **Tarifs** : fixe 10 / 6 / 3 $, RPM 1 / 0,5 / 0,2 $ pour 1 000 vues à J+7, plafond du bonus 300 / 150 / 60 $ par vidéo. Appliqués dans la paie (tests), le contrat (modèle + résumé en 6 langues), l'assistant et la landing.
+- **Pays** : 62 ouverts (21 A / 17 B / 24 C), langue principale par pays. Portugal et Pérou fermés (gardés en base).
+- **Langues publiques** : 9 nouvelles (is, hy, ka, kk, hi, id, ms, th, vi) ; portugais passé en brésilien.
+- **Créas** :
+  - nouveau style « carte offre d'emploi » (fond jaune, sans montant) en 39 langues ;
+  - préposition / cas corrects par pays (au Mexique, у Србији…) ;
+  - texte de pub ✅ ;
+  - choix du style : carte / photo UGC / texte ;
+  - bouton « Rendre les brouillons affichés ».
+- **Pilote MX + CO** : 24 créas en brouillon (12 cartes + 12 photos à 3 $). Elles sont à rendre puis valider dans Créas : les comptes de test sont supprimés, aucune session admin n'est disponible côté build.
+- **Retours aux créateurs** :
+  - revue côte à côte ;
+  - verdict Validé / À corriger / Refusé, points, timestamps, modèles ;
+  - email au posteur dans sa langue ;
+  - onglet Retours et « J'ai corrigé » ;
+  - l'assistant connaît les derniers retours ;
+  - statistiques par posteur.
+- **En attente** : sens de « 14 / 10 / 7 $ par semaine » (non implémenté), adresse postale légale, app Meta en Live.
+
 
 ## Lancement Meta (16/11)
 
