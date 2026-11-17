@@ -138,7 +138,7 @@ export function launchChecklist(i: ChecklistInput): ChecklistItem[] {
           : `à relire : ${i.translations.filter((t) => !t.done).map((t) => `${t.country} ${t.lang.toUpperCase()} (${t.reviewer})`).join(", ")}` }
       : { key: "translations", label: "Traductions relues", ok: i.translationsReviewed, critical: false, manual: true, detail: "case à cocher après relecture native" },
     { key: "creatives", label: "Créas validées", ok: i.approvedCreatives > 0 && i.creativesValidated, critical: true, manual: true, detail: `${i.approvedCreatives} créa(s) approuvée(s)${i.creativesValidated ? "" : " · validation finale à cocher"}` },
-    { key: "budget", label: "Budget global plafonné", ok: i.globalCap > 0 && i.committedBudget <= i.globalCap, critical: true, detail: `${i.committedBudget} € engagés / plafond ${i.globalCap} €/jour` },
+    { key: "budget", label: "Budget global plafonné", ok: i.globalCap > 0 && i.committedBudget <= i.globalCap, critical: true, detail: `${i.committedBudget} € actifs / plafond ${i.globalCap} €/jour` },
   ];
 }
 export const blockingItems = (items: ChecklistItem[]) => items.filter((x) => x.critical && !x.ok);

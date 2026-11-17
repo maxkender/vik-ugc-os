@@ -84,9 +84,8 @@ export default function Campaigns() {
   };
   const pause = (level: string, row: any) => act(`pause-${row.id}`, () => callFn("meta", { action: "pause", level, id: row.id }), "Mis en pause");
 
+  // Seuls les ad sets actifs comptent dans le plafond global (décision de Max du 17/11).
   const committed = useMemo(() => (camps.data ?? []).flatMap((c: any) => c.meta_adsets ?? [])
-    .filter((a: any) => ["ACTIVE", "PAUSED"].includes(a.status)).reduce((sum: number, a: any) => sum + Number(a.daily_budget), 0), [camps.data]);
-  const activeBudget = useMemo(() => (camps.data ?? []).flatMap((c: any) => c.meta_adsets ?? [])
     .filter((a: any) => a.status === "ACTIVE").reduce((sum: number, a: any) => sum + Number(a.daily_budget), 0), [camps.data]);
   const setBudget = (a: any, amount: number) => {
     if (!(amount > 0)) return toast("Budget invalide", "danger");
@@ -193,14 +192,14 @@ export default function Campaigns() {
           <div className="flex items-center gap-3">
             <IconTile icon={<Wallet />} tint={committed > globalCap * 0.9 ? "red" : "blue"} />
             <div>
-              <p className="text-[13px] font-medium text-muted-foreground">Budgets engagés / jour</p>
+              <p className="text-[13px] font-medium text-muted-foreground">Budgets actifs / jour</p>
               <p className="tabular text-[22px] font-semibold leading-tight">{committed} € <span className="text-sm font-normal text-subtle-foreground">/ {globalCap} €</span></p>
             </div>
           </div>
           <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-[#f1f3f7]">
             <div className="h-full rounded-full" style={{ width: `${Math.max(2, Math.min(100, (committed / Math.max(globalCap, 1)) * 100))}%`, background: committed > globalCap * 0.9 ? "#fe504f" : "#004dff" }} />
           </div>
-          <p className="mt-2 text-xs text-subtle-foreground">Actifs + en pause · dont actifs : {activeBudget} €</p>
+          <p className="mt-2 text-xs text-subtle-foreground">Ad sets actifs uniquement (les ad sets en pause ne comptent pas)</p>
           {batch.length > 0 && (
             <div className="mt-3 rounded-xl border border-[#dbe5ff] bg-[#f6f9ff] p-3" data-testid="launch-batch">
               <p className="text-[13px] font-semibold text-foreground">Lot de lancement : {batch.map((x) => `${flag(x)} ${x}`).join("  ")}</p>

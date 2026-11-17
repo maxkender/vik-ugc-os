@@ -79,9 +79,9 @@ async function syncInsights(db: SupabaseClient, cfg: MetaCfg) {
   return { ok: true, rows: rows.length };
 }
 
-/** Somme des budgets/jour des ad sets ACTIVE ou PAUSED (ce qui pourrait dépenser si tout était activé). */
+/** Somme des budgets/jour des ad sets ACTIVE (décision de Max du 17/11 : seuls les actifs comptent dans le plafond global). */
 async function committedBudget(db: SupabaseClient): Promise<number> {
-  const { data } = await db.from("meta_adsets").select("daily_budget, status").in("status", ["ACTIVE", "PAUSED"]);
+  const { data } = await db.from("meta_adsets").select("daily_budget, status").eq("status", "ACTIVE");
   return Math.round((data ?? []).reduce((sum, r) => sum + Number(r.daily_budget ?? 0), 0) * 100) / 100;
 }
 
@@ -297,7 +297,7 @@ serve(async (req, body, db) => {
       const { data: row } = await db.from("meta_adsets").select("*").eq("id", body.adset_id).single();
       if (!row) throw new HttpError(404, "adset not found");
       const used = await committedBudget(db);
-      const next = used - Number(row.daily_budget) + amount;
+      const next = row.status === "ACTIVE" ? used - Number(row.daily_budget) + amount : used;
       if (next > cfg.global_daily_cap) throw new HttpError(400, `Plafond global dépassé : ${next} > ${cfg.global_daily_cap} €/jour`);
       await graph(cfg, row.meta_id, { method: "POST", params: { daily_budget: String(toMinor(amount)) } });
       await db.from("meta_adsets").update({ daily_budget: amount }).eq("id", row.id);
@@ -351,6 +351,11 @@ serve(async (req, body, db) => {
         throw new HttpError(409, `Checklist de lancement incomplète : ${blocking.map((b) => b.label).join(", ")}`);
       }
       if (blocking.length) await audit(db, userId(c), "meta.activate.forced", table, row.id, { blocking: blocking.map((b) => b.key) });
+      // Plafond global (actifs seulement) : on ajoute ce qui deviendrait actif.
+      if (level !== "ad" && row.status !== "ACTIVE") {
+        const after = (await committedBudget(db)) + budget;
+        if (after > cfg.global_daily_cap) throw new HttpError(400, `Plafond global dépassé : ${after} > ${cfg.global_daily_cap} €/jour (ad sets actifs)`);
+      }
       const ok = activationAllowed({ isAdmin: c.role === "admin", dailyBudget: budget, cap: level === "campaign" ? cfg.global_daily_cap : cfg.max_daily_budget });
       if (!ok.ok) throw new HttpError(403, `activation refusée : ${ok.reason} (budget ${budget} / plafond ${level === "campaign" ? cfg.global_daily_cap : cfg.max_daily_budget})`);
       await graph(cfg, row.meta_id, { method: "POST", params: { status: "ACTIVE" } });
