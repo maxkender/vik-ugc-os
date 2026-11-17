@@ -2,6 +2,7 @@
 //   decide { application_id, decision: accept|reject|review|new, notes? }   staff (recruteur : ses pays)
 //   resend_contract { application_id }                                     staff
 //   cron                                                                  cron : relances J+1/J+3/J+6, expiration J+7, refus différés
+import { videoStep } from "../_shared/logic/videoLater.ts";
 import { appUrl, audit, caller, getSetting, HttpError, requireAdmin, requireRecruiter as requireStaff, serve, userId } from "../_shared/http.ts";
 import { queueEmail } from "../_shared/outbox.ts";
 import { createContract } from "../_shared/contracts.ts";
@@ -137,9 +138,48 @@ serve(async (req, body, db) => {
         await db.from("applications").update({ rejection_email_sent_at: now.toISOString() }).eq("id", a.id);
         out.rejections++;
       }
+      Object.assign(out, await videoCron(db, now));
       return { ok: true, ...out };
+    }
+    case "video_remind": {
+      // Relance manuelle (admin) d'une candidature sans vidéo : renvoie le lien personnel.
+      requireStaff(c);
+      const { data: a } = await db.from("applications").select("id, first_name, email, locale, status, video_token, video_due_at").eq("id", body.application_id).single();
+      if (!a || a.status !== "video_pending" || !a.video_token) throw new HttpError(409, "not_video_pending");
+      await queueEmail(db, { template: "video_reminder_1", to: a.email, language: a.locale, vars: { first_name: a.first_name, due_date: fmtDue(a.video_due_at, a.locale) },
+        buttonUrl: appUrl(`/apply/video/${a.video_token}`), relatedType: "application", relatedId: a.id });
+      await audit(db, userId(c), "application.video_remind", "application", a.id, null);
+      return { ok: true };
     }
     default:
       throw new HttpError(400, "unknown action");
   }
 });
+
+function fmtDue(iso: string, locale: string): string {
+  try { return new Intl.DateTimeFormat(locale || "en", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" }).format(new Date(iso)); }
+  catch { return iso.slice(0, 16).replace("T", " "); }
+}
+
+/** Candidatures sans vidéo : relance J+1 (« plus que 2 jours »), J+2 (« dernier jour »), expiration J+3 + email poli. */
+async function videoCron(db: SupabaseClient, now: Date) {
+  const out = { video_reminders: 0, video_expired: 0 };
+  const { data: pend } = await db.from("applications").select("id, first_name, email, locale, country, video_token, video_due_at, video_pending_since, video_reminders, created_at")
+    .eq("status", "video_pending").limit(500);
+  for (const a of pend ?? []) {
+    const step = videoStep(a.video_pending_since ?? a.created_at, a.video_reminders ?? 0, now);
+    if (!step) continue;
+    if (step === "expire") {
+      await db.from("applications").update({ status: "expired", video_token: null }).eq("id", a.id).eq("status", "video_pending");
+      await queueEmail(db, { template: "video_expired", to: a.email, language: a.locale, vars: { first_name: a.first_name },
+        buttonUrl: appUrl(`/apply/${String(a.country ?? "").toLowerCase()}`), relatedType: "application", relatedId: a.id });
+      out.video_expired++;
+      continue;
+    }
+    await queueEmail(db, { template: step === "remind_1" ? "video_reminder_1" : "video_reminder_2", to: a.email, language: a.locale,
+      vars: { first_name: a.first_name, due_date: fmtDue(a.video_due_at, a.locale) }, buttonUrl: appUrl(`/apply/video/${a.video_token}`), relatedType: "application", relatedId: a.id });
+    await db.from("applications").update({ video_reminders: step === "remind_1" ? 1 : 2 }).eq("id", a.id);
+    out.video_reminders++;
+  }
+  return out;
+}

@@ -7,6 +7,7 @@ import { Spinner } from "./components/ui";
 const Login = lazy(() => import("./pages/Login"));
 const Landing = lazy(() => import("./pages/public/Landing"));
 const Apply = lazy(() => import("./pages/public/Apply"));
+const VideoLater = lazy(() => import("./pages/public/VideoLater"));
 const Sign = lazy(() => import("./pages/public/Sign"));
 const CreatorLayout = lazy(() => import("./pages/creator/CreatorLayout"));
 const CreatorToday = lazy(() => import("./pages/creator/Today"));
@@ -64,6 +65,7 @@ export function App() {
         <Route path="/join" element={<Landing />} />
         <Route path="/join/:country" element={<Landing />} />
         <Route path="/apply" element={<Apply />} />
+        <Route path="/apply/video/:token" element={<VideoLater />} />
         <Route path="/apply/:country" element={<Apply />} />
         <Route path="/sign/:token" element={<Sign />} />
         <Route path="/privacy" element={<Legal />} />

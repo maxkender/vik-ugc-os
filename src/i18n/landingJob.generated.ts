@@ -37,7 +37,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Link accepteret ✓",
     "yapUploadFailed": "Uploaden virkede ikke. Intet problem: Indsæt et link til din video herunder (YouTube uopført, Google Drive, iCloud…).",
     "yapTypeError": "Denne fil er ikke en video. Vælg en video (MP4, MOV), eller indsæt et link herunder.",
-    "yapSizeError": "Denne video er over 200 MB. Indsæt i stedet et link til den herunder."
+    "yapSizeError": "Denne video er over 200 MB. Indsæt i stedet et link til den herunder.",
+    "videoLater": "Jeg har ikke min video lige nu, jeg sender den senere",
+    "videoLaterHint": "Du får en e-mail med et personligt link: Du har 3 dage til at tilføje din video.",
+    "doneVideoLater": "Ansøgningen er modtaget! Tjek din e-mail: Du har 3 dage til at tilføje din præsentationsvideo via linket, vi har sendt dig.",
+    "videoPageTitle": "Tilføj din præsentationsvideo",
+    "videoPageIntro": "{{name}}, tilføj din præsentationsvideo (30–90 sekunder, hvor du taler til kameraet) senest {{date}}. Derefter bliver din ansøgning gennemgået.",
+    "videoPageSubmit": "Send min video",
+    "videoPageSent": "Tak! Vi har modtaget din video. Din ansøgning bliver nu gennemgået: Vi skriver til dig på e-mail.",
+    "videoPageExpired": "Dette link er udløbet (der er gået 3 dage). Du kan søge igen, det tager 3 minutter.",
+    "videoPageInvalid": "Dette link er ikke gyldigt. Brug linket fra vores e-mail, eller søg igen.",
+    "restart": "Søg igen"
   },
   "ar": {
     "heroTitle": "وظيفة: صانع/ة محتوى UGC لتطبيق جوال",
@@ -74,7 +84,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "تم قبول الرابط ✓",
     "yapUploadFailed": "فشل الرفع. لا تقلق: الصق أدناه رابطًا لفيديو الخاص بك (YouTube غير مدرج، Google Drive، iCloud…).",
     "yapTypeError": "هذا الملف ليس فيديو. اختر فيديو (MP4، MOV) أو الصق رابطًا أدناه.",
-    "yapSizeError": "حجم هذا الفيديو يتجاوز 200 ميغابايت. الصق بدلًا من ذلك رابطًا له أدناه."
+    "yapSizeError": "حجم هذا الفيديو يتجاوز 200 ميغابايت. الصق بدلًا من ذلك رابطًا له أدناه.",
+    "videoLater": "ما عندي الفيديو الآن، رح أرسله لاحقًا",
+    "videoLaterHint": "رح توصلك رسالة بريد إلكتروني فيها رابط شخصي: وعندك 3 أيام لإضافة الفيديو.",
+    "doneVideoLater": "وصلنا طلبك! شوف بريدك الإلكتروني: عندك 3 أيام لإضافة فيديو التعريف بنفسك من خلال الرابط اللي أرسلناه لك.",
+    "videoPageTitle": "أضف فيديو التعريف بنفسك",
+    "videoPageIntro": "{{name}}، أضف فيديو التعريف بنفسك (من 30 إلى 90 ثانية، وأنت تتكلم أمام الكاميرا) قبل {{date}}. بعدها يدخل طلبك مرحلة المراجعة.",
+    "videoPageSubmit": "أرسل الفيديو",
+    "videoPageSent": "شكرًا لك! وصلنا الفيديو. طلبك الآن قيد المراجعة، وراح نراسلك على بريدك الإلكتروني.",
+    "videoPageExpired": "انتهت صلاحية هذا الرابط (مرّت الأيام الثلاثة). تقدر تقدّم طلبك من جديد، وياخذ منك 3 دقائق فقط.",
+    "videoPageInvalid": "هذا الرابط غير صالح. استخدم الرابط الموجود في رسالتنا الإلكترونية، أو قدّم طلبك من جديد.",
+    "restart": "قدّم طلبك من جديد"
   },
   "bg": {
     "heroTitle": "Работа: UGC създател на съдържание за мобилно приложение",
@@ -111,7 +131,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Линкът е приет ✓",
     "yapUploadFailed": "Качването не се получи. Няма проблем: постави по-долу линк към видеото си (YouTube като скрито, Google Drive, iCloud…).",
     "yapTypeError": "Този файл не е видео. Избери видео (MP4, MOV) или постави линк по-долу.",
-    "yapSizeError": "Това видео е над 200 MB. Вместо това постави по-долу линк към него."
+    "yapSizeError": "Това видео е над 200 MB. Вместо това постави по-долу линк към него.",
+    "videoLater": "Нямам видеото си в момента, ще го изпратя по-късно",
+    "videoLaterHint": "Ще получиш имейл с личен линк: ще имаш 3 дни, за да добавиш видеото си.",
+    "doneVideoLater": "Кандидатурата ти е получена! Провери имейла си: имаш 3 дни да добавиш представителното си видео чрез линка, който ти изпратихме.",
+    "videoPageTitle": "Добави представителното си видео",
+    "videoPageIntro": "{{name}}, добави представителното си видео (30–90 секунди, говориш пред камерата) до {{date}}. След това кандидатурата ти ще бъде разгледана.",
+    "videoPageSubmit": "Изпрати видеото ми",
+    "videoPageSent": "Благодарим ти! Видеото ти е получено. Кандидатурата ти вече се разглежда: ще ти пишем по имейл.",
+    "videoPageExpired": "Този линк е изтекъл (изминаха 3 дни). Можеш да кандидатстваш отново, отнема 3 минути.",
+    "videoPageInvalid": "Този линк не е валиден. Използвай линка от нашия имейл или кандидатствай отново.",
+    "restart": "Кандидатствай отново"
   },
   "cs": {
     "heroTitle": "Práce: tvůrce/tvůrkyně UGC obsahu pro mobilní aplikaci",
@@ -148,7 +178,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Odkaz přijat ✓",
     "yapUploadFailed": "Nahrání se nepovedlo. Žádný problém: vlož níže odkaz na své video (neveřejné video na YouTube, Google Drive, iCloud…).",
     "yapTypeError": "Tenhle soubor není video. Vyber video (MP4, MOV) nebo níže vlož odkaz.",
-    "yapSizeError": "Tohle video má přes 200 MB. Vlož místo něj níže odkaz na video."
+    "yapSizeError": "Tohle video má přes 200 MB. Vlož místo něj níže odkaz na video.",
+    "videoLater": "Teď své video nemám, pošlu ho později",
+    "videoLaterHint": "Dostaneš e-mail s osobním odkazem: na přidání videa budeš mít 3 dny.",
+    "doneVideoLater": "Přihláška přijata! Mrkni do e-mailu: pomocí odkazu, který jsme ti poslali, máš 3 dny na přidání úvodního videa.",
+    "videoPageTitle": "Přidej své úvodní video",
+    "videoPageIntro": "{{name}}, přidej své úvodní video (30–90 sekund, mluvíš do kamery) do {{date}}. Potom půjde tvoje přihláška ke kontrole.",
+    "videoPageSubmit": "Odeslat video",
+    "videoPageSent": "Díky! Video je u nás. Tvoji přihlášku teď posuzujeme: ozveme se ti e-mailem.",
+    "videoPageExpired": "Platnost tohoto odkazu vypršela (uplynuly 3 dny). Můžeš se přihlásit znovu, zabere to 3 minuty.",
+    "videoPageInvalid": "Tento odkaz není platný. Použij odkaz z našeho e-mailu, nebo se přihlas znovu.",
+    "restart": "Přihlásit se znovu"
   },
   "el": {
     "heroTitle": "Δουλειά: δημιουργός περιεχομένου UGC για μια εφαρμογή κινητού",
@@ -185,7 +225,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Ο σύνδεσμος έγινε δεκτός ✓",
     "yapUploadFailed": "Η μεταφόρτωση δεν λειτούργησε. Κανένα πρόβλημα: επικόλλησε παρακάτω έναν σύνδεσμο προς το βίντεό σου (YouTube μη καταχωρισμένο, Google Drive, iCloud…).",
     "yapTypeError": "Αυτό το αρχείο δεν είναι βίντεο. Διάλεξε ένα βίντεο (MP4, MOV) ή επικόλλησε έναν σύνδεσμο παρακάτω.",
-    "yapSizeError": "Αυτό το βίντεο ξεπερνά τα 200 MB. Επικόλλησε καλύτερα έναν σύνδεσμο προς το βίντεο παρακάτω."
+    "yapSizeError": "Αυτό το βίντεο ξεπερνά τα 200 MB. Επικόλλησε καλύτερα έναν σύνδεσμο προς το βίντεο παρακάτω.",
+    "videoLater": "Δεν έχω το βίντεό μου αυτή τη στιγμή, θα το στείλω αργότερα",
+    "videoLaterHint": "Θα λάβεις ένα email με έναν προσωπικό σύνδεσμο: θα έχεις 3 ημέρες για να προσθέσεις το βίντεό σου.",
+    "doneVideoLater": "Η αίτησή σου παραλήφθηκε! Έλεγξε τα email σου: έχεις 3 ημέρες για να προσθέσεις το βίντεο παρουσίασής σου με τον σύνδεσμο που σου στείλαμε.",
+    "videoPageTitle": "Πρόσθεσε το βίντεο παρουσίασής σου",
+    "videoPageIntro": "{{name}}, πρόσθεσε το βίντεο παρουσίασής σου (30–90 δευτερόλεπτα, μιλώντας στην κάμερα) πριν από τις {{date}}. Μετά η αίτησή σου περνά σε αξιολόγηση.",
+    "videoPageSubmit": "Στείλε το βίντεό μου",
+    "videoPageSent": "Ευχαριστούμε! Το βίντεό σου παραλήφθηκε. Η αίτησή σου βρίσκεται τώρα υπό αξιολόγηση: θα σου στείλουμε email.",
+    "videoPageExpired": "Αυτός ο σύνδεσμος έχει λήξει (πέρασαν οι 3 ημέρες). Μπορείς να κάνεις ξανά αίτηση, διαρκεί 3 λεπτά.",
+    "videoPageInvalid": "Αυτός ο σύνδεσμος δεν είναι έγκυρος. Χρησιμοποίησε τον σύνδεσμο από το email μας ή κάνε ξανά αίτηση.",
+    "restart": "Κάνε ξανά αίτηση"
   },
   "de": {
     "heroTitle": "Job: UGC Content Creator für eine mobile App",
@@ -222,7 +272,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Link akzeptiert ✓",
     "yapUploadFailed": "Der Upload hat nicht geklappt. Kein Problem: Füge unten einen Link zu deinem Video ein (YouTube nicht gelistet, Google Drive, iCloud…).",
     "yapTypeError": "Diese Datei ist kein Video. Wähle ein Video (MP4, MOV) oder füge unten einen Link ein.",
-    "yapSizeError": "Dieses Video ist größer als 200 MB. Füge stattdessen unten einen Link zu deinem Video ein."
+    "yapSizeError": "Dieses Video ist größer als 200 MB. Füge stattdessen unten einen Link zu deinem Video ein.",
+    "videoLater": "Ich habe mein Video gerade nicht zur Hand, ich schicke es später",
+    "videoLaterHint": "Du bekommst eine E-Mail mit einem persönlichen Link: Damit hast du 3 Tage Zeit, dein Video hinzuzufügen.",
+    "doneVideoLater": "Bewerbung erhalten! Schau in dein E-Mail-Postfach: Mit dem Link, den wir dir geschickt haben, hast du 3 Tage Zeit, dein Vorstellungsvideo hinzuzufügen.",
+    "videoPageTitle": "Füge dein Vorstellungsvideo hinzu",
+    "videoPageIntro": "{{name}}, füge dein Vorstellungsvideo (30–90 Sekunden, direkt in die Kamera gesprochen) bis zum {{date}} hinzu. Danach wird deine Bewerbung geprüft.",
+    "videoPageSubmit": "Mein Video senden",
+    "videoPageSent": "Danke! Dein Video ist angekommen. Deine Bewerbung wird jetzt geprüft: Wir melden uns per E-Mail bei dir.",
+    "videoPageExpired": "Dieser Link ist abgelaufen (die 3 Tage sind vorbei). Du kannst dich einfach noch einmal bewerben, das dauert 3 Minuten.",
+    "videoPageInvalid": "Dieser Link ist nicht gültig. Nutze den Link aus unserer E-Mail oder bewirb dich noch einmal.",
+    "restart": "Erneut bewerben"
   },
   "it": {
     "heroTitle": "Lavoro: creator di contenuti UGC per un'app mobile",
@@ -259,7 +319,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Link accettato ✓",
     "yapUploadFailed": "Il caricamento non è andato a buon fine. Nessun problema: incolla qui sotto un link al tuo video (YouTube non in elenco, Google Drive, iCloud…).",
     "yapTypeError": "Questo file non è un video. Scegli un video (MP4, MOV) o incolla un link qui sotto.",
-    "yapSizeError": "Questo video supera i 200 MB. Incolla invece un link al video qui sotto."
+    "yapSizeError": "Questo video supera i 200 MB. Incolla invece un link al video qui sotto.",
+    "videoLater": "Non ho il video adesso, lo invierò più tardi",
+    "videoLaterHint": "Riceverai un'email con un link personale: avrai 3 giorni per aggiungere il tuo video.",
+    "doneVideoLater": "Candidatura ricevuta! Controlla la tua email: hai 3 giorni per aggiungere il tuo video di presentazione con il link che ti abbiamo inviato.",
+    "videoPageTitle": "Aggiungi il tuo video di presentazione",
+    "videoPageIntro": "{{name}}, aggiungi il tuo video di presentazione (da 30 a 90 secondi, parlando alla camera) entro il {{date}}. Dopodiché la tua candidatura passerà alla revisione.",
+    "videoPageSubmit": "Invia il mio video",
+    "videoPageSent": "Grazie! Abbiamo ricevuto il tuo video. La tua candidatura è ora in fase di revisione: ti scriveremo via email.",
+    "videoPageExpired": "Questo link è scaduto (sono passati i 3 giorni). Puoi candidarti di nuovo, ci vogliono solo 3 minuti.",
+    "videoPageInvalid": "Questo link non è valido. Usa il link che trovi nella nostra email, oppure candidati di nuovo.",
+    "restart": "Candidati di nuovo"
   },
   "hr": {
     "heroTitle": "Posao: UGC kreator sadržaja za mobilnu aplikaciju",
@@ -296,7 +366,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Link je prihvaćen ✓",
     "yapUploadFailed": "Prijenos nije uspio. Bez brige: zalijepi dolje link na svoj video (YouTube nenavedeni, Google Drive, iCloud…).",
     "yapTypeError": "Ova datoteka nije video. Odaberi video (MP4, MOV) ili zalijepi link dolje.",
-    "yapSizeError": "Ovaj video je veći od 200 MB. Umjesto toga dolje zalijepi link na njega."
+    "yapSizeError": "Ovaj video je veći od 200 MB. Umjesto toga dolje zalijepi link na njega.",
+    "videoLater": "Trenutačno nemam svoj video, poslat ću ga kasnije",
+    "videoLaterHint": "Dobit ćeš e-mail s osobnom poveznicom: imat ćeš 3 dana da dodaš svoj video.",
+    "doneVideoLater": "Prijava je primljena! Provjeri e-mail: imaš 3 dana da dodaš svoj video za predstavljanje putem poveznice koju smo ti poslali.",
+    "videoPageTitle": "Dodaj svoj video za predstavljanje",
+    "videoPageIntro": "{{name}}, dodaj svoj video za predstavljanje (30–90 sekundi, govoriš u kameru) do {{date}}. Nakon toga tvoja prijava ide na pregled.",
+    "videoPageSubmit": "Pošalji moj video",
+    "videoPageSent": "Hvala ti! Tvoj video je stigao. Tvoja prijava sada se pregledava: javit ćemo ti se e-mailom.",
+    "videoPageExpired": "Ova je poveznica istekla (prošla su 3 dana). Možeš se ponovno prijaviti, traje 3 minute.",
+    "videoPageInvalid": "Ova poveznica nije valjana. Upotrijebi poveznicu iz našeg e-maila ili se ponovno prijavi.",
+    "restart": "Prijavi se ponovno"
   },
   "fi": {
     "heroTitle": "Työ: UGC-sisällöntuottaja mobiilisovellukselle",
@@ -333,7 +413,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Linkki hyväksytty ✓",
     "yapUploadFailed": "Lataus ei onnistunut. Ei hätää: liitä alle linkki videoosi (YouTube-piilotettu, Google Drive, iCloud…).",
     "yapTypeError": "Tämä tiedosto ei ole video. Valitse video (MP4, MOV) tai liitä linkki alle.",
-    "yapSizeError": "Tämä video on yli 200 Mt. Liitä sen sijaan linkki videoosi alle."
+    "yapSizeError": "Tämä video on yli 200 Mt. Liitä sen sijaan linkki videoosi alle.",
+    "videoLater": "Minulla ei ole videota nyt valmiina, lähetän sen myöhemmin",
+    "videoLaterHint": "Saat sähköpostiin henkilökohtaisen linkin: sinulla on 3 päivää aikaa lisätä videosi.",
+    "doneVideoLater": "Hakemus vastaanotettu! Katso sähköpostisi: sinulla on 3 päivää aikaa lisätä esittelyvideosi lähettämämme linkin kautta.",
+    "videoPageTitle": "Lisää esittelyvideosi",
+    "videoPageIntro": "{{name}}, lisää esittelyvideosi (30–90 sekuntia, puhut suoraan kameralle) ennen {{date}}. Sen jälkeen hakemuksesi siirtyy arvioitavaksi.",
+    "videoPageSubmit": "Lähetä videoni",
+    "videoPageSent": "Kiitos! Videosi on perillä. Hakemustasi arvioidaan nyt: otamme sinuun yhteyttä sähköpostitse.",
+    "videoPageExpired": "Tämä linkki on vanhentunut (3 päivää on kulunut). Voit hakea uudelleen, siihen menee 3 minuuttia.",
+    "videoPageInvalid": "Tämä linkki ei ole kelvollinen. Käytä sähköpostissamme olevaa linkkiä tai hae uudelleen.",
+    "restart": "Hae uudelleen"
   },
   "hu": {
     "heroTitle": "Munka: UGC-tartalomgyártó egy mobilappnak",
@@ -370,7 +460,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Link elfogadva ✓",
     "yapUploadFailed": "A feltöltés nem sikerült. Semmi gond: illessz be lent egy linket a videódhoz (YouTube nem listázott, Google Drive, iCloud…).",
     "yapTypeError": "Ez a fájl nem videó. Válassz egy videót (MP4, MOV), vagy illessz be lent egy linket.",
-    "yapSizeError": "Ez a videó nagyobb, mint 200 MB. Illessz be inkább lent egy linket hozzá."
+    "yapSizeError": "Ez a videó nagyobb, mint 200 MB. Illessz be inkább lent egy linket hozzá.",
+    "videoLater": "Most nincs kéznél a videóm, később elküldöm",
+    "videoLaterHint": "Kapsz egy e-mailt egy személyes linkkel: 3 napod lesz arra, hogy feltöltsd a videódat.",
+    "doneVideoLater": "Megkaptuk a jelentkezésedet! Nézd meg az e-mailjeidet: 3 napod van arra, hogy a kapott linken keresztül feltöltsd a bemutatkozó videódat.",
+    "videoPageTitle": "Töltsd fel a bemutatkozó videódat",
+    "videoPageIntro": "{{name}}, töltsd fel a bemutatkozó videódat (30–90 másodperc, kamerába beszélve) eddig: {{date}}. Ezután a jelentkezésed elbírálásra kerül.",
+    "videoPageSubmit": "Videóm elküldése",
+    "videoPageSent": "Köszönjük! Megkaptuk a videódat. A jelentkezésedet most bíráljuk el, e-mailben értesítünk.",
+    "videoPageExpired": "Ez a link lejárt (letelt a 3 nap). Jelentkezhetsz újra, 3 percet vesz igénybe.",
+    "videoPageInvalid": "Ez a link nem érvényes. Használd az e-mailünkben kapott linket, vagy jelentkezz újra.",
+    "restart": "Jelentkezés újra"
   },
   "et": {
     "heroTitle": "Töö: UGC-sisuloojaks mobiilirakendusele",
@@ -407,7 +507,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Link on vastu võetud ✓",
     "yapUploadFailed": "Üleslaadimine ei õnnestunud. Pole hullu: kleebi allpool link oma videole (YouTube'i määratlemata video, Google Drive, iCloud…).",
     "yapTypeError": "See fail ei ole video. Vali video (MP4, MOV) või kleebi allpool link.",
-    "yapSizeError": "See video on suurem kui 200 MB. Kleebi hoopis allpool link oma videole."
+    "yapSizeError": "See video on suurem kui 200 MB. Kleebi hoopis allpool link oma videole.",
+    "videoLater": "Mul pole praegu oma videot käepärast, saadan selle hiljem",
+    "videoLaterHint": "Saad e-kirja isikliku lingiga: sul on 3 päeva aega oma video lisamiseks.",
+    "doneVideoLater": "Avaldus on kätte saadud! Vaata oma e-posti: sul on 3 päeva aega, et lisada oma tutvustusvideo meie saadetud lingi kaudu.",
+    "videoPageTitle": "Lisa oma tutvustusvideo",
+    "videoPageIntro": "{{name}}, lisa oma tutvustusvideo (30–90 sekundit, räägid otse kaamerasse) enne {{date}}. Seejärel läheb sinu avaldus läbivaatamisele.",
+    "videoPageSubmit": "Saada mu video",
+    "videoPageSent": "Aitäh! Sinu video on kätte saadud. Sinu avaldust vaadatakse nüüd üle: anname sulle e-kirjaga teada.",
+    "videoPageExpired": "See link on aegunud (3 päeva on möödas). Võid uuesti avalduse esitada, see võtab 3 minutit.",
+    "videoPageInvalid": "See link ei kehti. Kasuta lingi meie e-kirjast või esita avaldus uuesti.",
+    "restart": "Esita avaldus uuesti"
   },
   "he": {
     "heroTitle": "משרה: יוצר/ת תוכן UGC לאפליקציה סלולרית",
@@ -444,7 +554,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "הקישור התקבל ✓",
     "yapUploadFailed": "ההעלאה לא הצליחה. אין בעיה: הדבק/י למטה קישור לסרטון שלך (YouTube לא רשום, Google Drive, iCloud…).",
     "yapTypeError": "הקובץ הזה הוא לא סרטון. בחר/י סרטון (MP4, MOV) או הדבק/י קישור למטה.",
-    "yapSizeError": "הסרטון הזה גדול מ-200 MB. הדבק/י במקומו קישור אליו למטה."
+    "yapSizeError": "הסרטון הזה גדול מ-200 MB. הדבק/י במקומו קישור אליו למטה.",
+    "videoLater": "אין לי את הסרטון עכשיו, אשלח אותו מאוחר יותר",
+    "videoLaterHint": "תקבלו אימייל עם קישור אישי: יהיו לך 3 ימים להוסיף את הסרטון שלך.",
+    "doneVideoLater": "הבקשה התקבלה! תבדקו את האימייל: יש לך 3 ימים להוסיף את סרטון ההיכרות שלך דרך הקישור ששלחנו לך.",
+    "videoPageTitle": "הוסף/י את סרטון ההיכרות שלך",
+    "videoPageIntro": "{{name}}, הוסף/י את סרטון ההיכרות שלך (30–90 שניות, מדבר/ת אל המצלמה) עד {{date}}. אחר כך הבקשה שלך תעבור לבדיקה.",
+    "videoPageSubmit": "שליחת הסרטון שלי",
+    "videoPageSent": "תודה! הסרטון שלך התקבל. הבקשה שלך נמצאת עכשיו בבדיקה: נחזור אליך באימייל.",
+    "videoPageExpired": "הקישור הזה פג תוקף (עברו 3 ימים). אפשר להגיש בקשה מחדש, זה לוקח 3 דקות.",
+    "videoPageInvalid": "הקישור הזה אינו תקין. השתמש/י בקישור מהאימייל שלנו, או הגש/י בקשה מחדש.",
+    "restart": "להגשת בקשה מחדש"
   },
   "nl": {
     "heroTitle": "Job: UGC-contentmaker voor een mobiele app",
@@ -481,7 +601,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Link geaccepteerd ✓",
     "yapUploadFailed": "De upload is niet gelukt. Geen zorgen: plak hieronder een link naar je video (YouTube niet-vermeld, Google Drive, iCloud…).",
     "yapTypeError": "Dit bestand is geen video. Kies een video (MP4, MOV) of plak hieronder een link.",
-    "yapSizeError": "Deze video is groter dan 200 MB. Plak hieronder in plaats daarvan een link naar je video."
+    "yapSizeError": "Deze video is groter dan 200 MB. Plak hieronder in plaats daarvan een link naar je video.",
+    "videoLater": "Ik heb mijn video nu niet bij de hand, ik stuur hem later",
+    "videoLaterHint": "Je krijgt een e-mail met een persoonlijke link: je hebt 3 dagen om je video toe te voegen.",
+    "doneVideoLater": "Aanmelding ontvangen! Check je e-mail: je hebt 3 dagen om je introductievideo toe te voegen via de link die we je hebben gestuurd.",
+    "videoPageTitle": "Voeg je introductievideo toe",
+    "videoPageIntro": "{{name}}, voeg je introductievideo toe (30–90 seconden, pratend in de camera) vóór {{date}}. Daarna wordt je aanmelding beoordeeld.",
+    "videoPageSubmit": "Verstuur mijn video",
+    "videoPageSent": "Bedankt! Je video is binnen. Je aanmelding wordt nu beoordeeld: we sturen je een e-mail.",
+    "videoPageExpired": "Deze link is verlopen (de 3 dagen zijn voorbij). Je kunt je opnieuw aanmelden, dat duurt maar 3 minuten.",
+    "videoPageInvalid": "Deze link is niet geldig. Gebruik de link uit onze e-mail of meld je opnieuw aan.",
+    "restart": "Opnieuw aanmelden"
   },
   "no": {
     "heroTitle": "Jobb: UGC-skaper for en mobilapp",
@@ -518,7 +648,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Lenken er godkjent ✓",
     "yapUploadFailed": "Opplastingen fungerte ikke. Ikke noe problem: lim inn en lenke til videoen din nedenfor (YouTube uoppført, Google Drive, iCloud …).",
     "yapTypeError": "Denne filen er ikke en video. Velg en video (MP4, MOV) eller lim inn en lenke nedenfor.",
-    "yapSizeError": "Denne videoen er over 200 MB. Lim heller inn en lenke til den nedenfor."
+    "yapSizeError": "Denne videoen er over 200 MB. Lim heller inn en lenke til den nedenfor.",
+    "videoLater": "Jeg har ikke videoen min akkurat nå, jeg sender den senere",
+    "videoLaterHint": "Du får en e-post med en personlig lenke: du har 3 dager på deg til å legge til videoen din.",
+    "doneVideoLater": "Søknaden er mottatt! Sjekk e-posten din: du har 3 dager på deg til å legge til introduksjonsvideoen din med lenken vi har sendt deg.",
+    "videoPageTitle": "Legg til introduksjonsvideoen din",
+    "videoPageIntro": "{{name}}, legg til introduksjonsvideoen din (30–90 sekunder, der du snakker til kameraet) innen {{date}}. Deretter går søknaden din til vurdering.",
+    "videoPageSubmit": "Send videoen min",
+    "videoPageSent": "Takk! Videoen din er mottatt. Søknaden din blir nå vurdert: vi sender deg en e-post.",
+    "videoPageExpired": "Denne lenken har utløpt (det har gått 3 dager). Du kan søke på nytt, det tar 3 minutter.",
+    "videoPageInvalid": "Denne lenken er ikke gyldig. Bruk lenken fra e-posten vår, eller søk på nytt.",
+    "restart": "Søk på nytt"
   },
   "ja": {
     "heroTitle": "求人:モバイルアプリのUGCコンテンツクリエイター",
@@ -555,7 +695,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "リンクを確認したよ ✓",
     "yapUploadFailed": "アップロードがうまくいかなかったよ。大丈夫、下に動画のリンクを貼ってね(YouTubeの限定公開、Google Drive、iCloudなど)。",
     "yapTypeError": "このファイルは動画じゃないみたい。動画(MP4、MOV)を選ぶか、下にリンクを貼ってね。",
-    "yapSizeError": "この動画は200MBを超えてるよ。代わりに下へ動画のリンクを貼ってね。"
+    "yapSizeError": "この動画は200MBを超えてるよ。代わりに下へ動画のリンクを貼ってね。",
+    "videoLater": "今は動画がないので、後で送ります",
+    "videoLaterHint": "専用リンクをメールでお送りします。リンクから3日以内に動画を追加してね。",
+    "doneVideoLater": "応募を受け付けました!メールを確認してね。送ったリンクから、3日以内に自己紹介動画を追加してください。",
+    "videoPageTitle": "自己紹介動画を追加しよう",
+    "videoPageIntro": "{{name}}さん、{{date}}までに自己紹介動画(30〜90秒、カメラに向かって話す動画)を追加してね。追加後に、応募の審査が始まります。",
+    "videoPageSubmit": "動画を送る",
+    "videoPageSent": "ありがとう!動画を受け取りました。これから応募の審査を行います。結果はメールでお知らせするね。",
+    "videoPageExpired": "このリンクは有効期限が切れています(3日が過ぎました)。もう一度応募できるよ。3分で終わります。",
+    "videoPageInvalid": "このリンクは無効です。メールに記載のリンクを使うか、もう一度応募してね。",
+    "restart": "もう一度応募する"
   },
   "ko": {
     "heroTitle": "직무: 모바일 앱 UGC 콘텐츠 크리에이터",
@@ -592,7 +742,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "링크가 확인됐어 ✓",
     "yapUploadFailed": "업로드가 제대로 되지 않았어. 괜찮아, 아래에 영상 링크를 붙여넣어 줘 (YouTube 일부 공개, Google Drive, iCloud 등).",
     "yapTypeError": "이 파일은 영상이 아니야. 영상(MP4, MOV)을 선택하거나 아래에 링크를 붙여넣어 줘.",
-    "yapSizeError": "이 영상은 200MB를 넘어. 대신 아래에 영상 링크를 붙여넣어 줘."
+    "yapSizeError": "이 영상은 200MB를 넘어. 대신 아래에 영상 링크를 붙여넣어 줘.",
+    "videoLater": "지금은 영상이 없어요. 나중에 보낼게요",
+    "videoLaterHint": "개인 링크가 담긴 이메일을 보내드려요. 링크로 3일 안에 영상을 추가하면 돼요.",
+    "doneVideoLater": "지원서가 접수됐어요! 이메일을 확인해 보세요. 보내드린 링크로 3일 안에 소개 영상을 추가해 주세요.",
+    "videoPageTitle": "소개 영상 추가하기",
+    "videoPageIntro": "{{name}}님, {{date}}까지 소개 영상(30~90초, 카메라를 보며 말하는 영상)을 추가해 주세요. 그러면 지원서 심사가 시작돼요.",
+    "videoPageSubmit": "내 영상 보내기",
+    "videoPageSent": "고마워요! 영상이 잘 도착했어요. 지금 지원서를 심사하고 있고, 결과는 이메일로 알려드릴게요.",
+    "videoPageExpired": "이 링크는 만료됐어요(3일이 지났어요). 다시 지원할 수 있고, 3분이면 충분해요.",
+    "videoPageInvalid": "유효하지 않은 링크예요. 이메일에 있는 링크를 사용하거나 다시 지원해 주세요.",
+    "restart": "다시 지원하기"
   },
   "lv": {
     "heroTitle": "Darbs: UGC satura veidotājs/-a mobilajai lietotnei",
@@ -629,7 +789,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Saite pieņemta ✓",
     "yapUploadFailed": "Augšupielāde neizdevās. Nekas vārgs: ielīmē zemāk saiti uz savu video (YouTube nelistēts, Google Drive, iCloud…).",
     "yapTypeError": "Šis fails nav video. Izvēlies video (MP4, MOV) vai ielīmē saiti zemāk.",
-    "yapSizeError": "Šis video ir lielāks par 200 MB. Tā vietā zemāk ielīmē saiti uz to."
+    "yapSizeError": "Šis video ir lielāks par 200 MB. Tā vietā zemāk ielīmē saiti uz to.",
+    "videoLater": "Man tagad nav sava video, nosūtīšu to vēlāk",
+    "videoLaterHint": "Tu saņemsi e-pastu ar personīgu saiti: tev būs 3 dienas, lai pievienotu savu video.",
+    "doneVideoLater": "Pieteikums saņemts! Pārbaudi savu e-pastu: tev ir 3 dienas, lai ar mūsu atsūtīto saiti pievienotu savu iepazīšanās video.",
+    "videoPageTitle": "Pievieno savu iepazīšanās video",
+    "videoPageIntro": "{{name}}, pievieno savu iepazīšanās video (30–90 sekundes, runā tieši kamerā) līdz {{date}}. Pēc tam tavs pieteikums tiks nodots izskatīšanai.",
+    "videoPageSubmit": "Nosūtīt manu video",
+    "videoPageSent": "Paldies! Tavs video ir saņemts. Tavs pieteikums tagad tiek izskatīts: mēs tev rakstīsim e-pastā.",
+    "videoPageExpired": "Šīs saites derīguma termiņš ir beidzies (pagājušas 3 dienas). Tu vari pieteikties vēlreiz, tas aizņem 3 minūtes.",
+    "videoPageInvalid": "Šī saite nav derīga. Izmanto saiti no mūsu e-pasta vai pieteic��es vēlreiz.",
+    "restart": "Pieteikties vēlreiz"
   },
   "lt": {
     "heroTitle": "Darbas: UGC turinio kūrėjas (-a) mobiliajai programėlei",
@@ -666,7 +836,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Nuoroda priimta ✓",
     "yapUploadFailed": "Įkelti nepavyko. Nieko tokio: žemiau įklijuok nuorodą į savo vaizdo įrašą (YouTube nenurodytas viešai, Google Drive, iCloud…).",
     "yapTypeError": "Šis failas nėra vaizdo įrašas. Pasirink vaizdo įrašą (MP4, MOV) arba žemiau įklijuok nuorodą.",
-    "yapSizeError": "Šis vaizdo įrašas viršija 200 MB. Vietoj to žemiau įklijuok nuorodą į jį."
+    "yapSizeError": "Šis vaizdo įrašas viršija 200 MB. Vietoj to žemiau įklijuok nuorodą į jį.",
+    "videoLater": "Šiuo metu neturiu savo vaizdo įrašo, atsiųsiu vėliau",
+    "videoLaterHint": "Gausi el. laišką su asmenine nuoroda: turėsi 3 dienas savo vaizdo įrašui pridėti.",
+    "doneVideoLater": "Paraišką gavome! Patikrink savo el. paštą: turi 3 dienas, kad pridėtum prisistatymo vaizdo įrašą naudodama(s) mūsų atsiųstą nuorodą.",
+    "videoPageTitle": "Pridėk savo prisistatymo vaizdo įrašą",
+    "videoPageIntro": "{{name}}, pridėk savo prisistatymo vaizdo įrašą (30–90 sekundžių, kalbant į kamerą) iki {{date}}. Tada tavo paraiška bus perduota peržiūrai.",
+    "videoPageSubmit": "Siųsti mano vaizdo įrašą",
+    "videoPageSent": "Ačiū! Tavo vaizdo įrašas gautas. Dabar tavo paraiška peržiūrima: parašysime tau el. paštu.",
+    "videoPageExpired": "Šios nuorodos galiojimas pasibaigė (praėjo 3 dienos). Gali pateikti paraišką iš naujo, tai užtrunka 3 minutes.",
+    "videoPageInvalid": "Ši nuoroda negalioja. Naudok nuorodą iš mūsų el. laiško arba pateik paraišką iš naujo.",
+    "restart": "Pateikti paraišką iš naujo"
   },
   "pt": {
     "heroTitle": "Vaga: criador(a) de conteúdo UGC para um app de celular",
@@ -703,7 +883,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Link aceito ✓",
     "yapUploadFailed": "O envio não funcionou. Sem problemas: cole abaixo um link do seu vídeo (YouTube não listado, Google Drive, iCloud…).",
     "yapTypeError": "Esse arquivo não é um vídeo. Escolha um vídeo (MP4, MOV) ou cole um link abaixo.",
-    "yapSizeError": "Esse vídeo tem mais de 200 MB. Cole abaixo um link dele."
+    "yapSizeError": "Esse vídeo tem mais de 200 MB. Cole abaixo um link dele.",
+    "videoLater": "Não estou com meu vídeo agora, vou enviar depois",
+    "videoLaterHint": "Você vai receber um e-mail com um link pessoal: você terá 3 dias para adicionar seu vídeo.",
+    "doneVideoLater": "Candidatura recebida! Confira seu e-mail: você tem 3 dias para adicionar seu vídeo de apresentação pelo link que enviamos.",
+    "videoPageTitle": "Adicione seu vídeo de apresentação",
+    "videoPageIntro": "{{name}}, adicione seu vídeo de apresentação (de 30 a 90 segundos, falando para a câmera) até {{date}}. Depois disso, sua candidatura entra em análise.",
+    "videoPageSubmit": "Enviar meu vídeo",
+    "videoPageSent": "Obrigado! Recebemos seu vídeo. Sua candidatura agora está em análise: vamos te avisar por e-mail.",
+    "videoPageExpired": "Este link expirou (os 3 dias já passaram). Você pode se candidatar de novo, leva só 3 minutos.",
+    "videoPageInvalid": "Este link não é válido. Use o link do nosso e-mail ou se candidate de novo.",
+    "restart": "Candidatar-me de novo"
   },
   "pl": {
     "heroTitle": "Praca: twórca/twórczyni treści UGC dla aplikacji mobilnej",
@@ -740,7 +930,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Link zaakceptowany ✓",
     "yapUploadFailed": "Nie udało się przesłać pliku. Spokojnie: wklej poniżej link do swojego filmu (YouTube jako niepubliczny, Google Drive, iCloud…).",
     "yapTypeError": "Ten plik nie jest filmem. Wybierz film (MP4, MOV) lub wklej link poniżej.",
-    "yapSizeError": "Ten film waży ponad 200 MB. Zamiast tego wklej poniżej link do niego."
+    "yapSizeError": "Ten film waży ponad 200 MB. Zamiast tego wklej poniżej link do niego.",
+    "videoLater": "Nie mam teraz swojego wideo, wyślę je później",
+    "videoLaterHint": "Dostaniesz e-mail z osobistym linkiem: będziesz mieć 3 dni na dodanie wideo.",
+    "doneVideoLater": "Zgłoszenie przyjęte! Sprawdź skrzynkę e-mail: masz 3 dni na dodanie swojego wideo prezentacyjnego za pomocą linku, który Ci wysłaliśmy.",
+    "videoPageTitle": "Dodaj swoje wideo prezentacyjne",
+    "videoPageIntro": "{{name}}, dodaj swoje wideo prezentacyjne (30–90 sekund, mówisz do kamery) przed {{date}}. Potem Twoje zgłoszenie trafi do oceny.",
+    "videoPageSubmit": "Wyślij moje wideo",
+    "videoPageSent": "Dziękujemy! Twoje wideo dotarło. Twoje zgłoszenie jest teraz w trakcie oceny: odezwiemy się do Ciebie e-mailem.",
+    "videoPageExpired": "Ten link wygasł (minęły 3 dni). Możesz zgłosić się ponownie, zajmie to 3 minuty.",
+    "videoPageInvalid": "Ten link jest nieprawidłowy. Skorzystaj z linku z naszego e-maila albo zgłoś się ponownie.",
+    "restart": "Zgłoś się ponownie"
   },
   "sk": {
     "heroTitle": "Práca: tvorca/tvorkyňa UGC obsahu pre mobilnú aplikáciu",
@@ -777,7 +977,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Odkaz bol prijatý ✓",
     "yapUploadFailed": "Nahrávanie sa nepodarilo. Žiadny problém: vlož nižšie odkaz na svoje video (YouTube nezaradené, Google Drive, iCloud…).",
     "yapTypeError": "Tento súbor nie je video. Vyber video (MP4, MOV) alebo vlož odkaz nižšie.",
-    "yapSizeError": "Toto video má viac ako 200 MB. Vlož radšej nižšie odkaz na svoje video."
+    "yapSizeError": "Toto video má viac ako 200 MB. Vlož radšej nižšie odkaz na svoje video.",
+    "videoLater": "Video teraz nemám, pošlem ho neskôr",
+    "videoLaterHint": "Dostaneš e-mail s osobným odkazom: na pridanie videa budeš mať 3 dni.",
+    "doneVideoLater": "Prihláška bola prijatá! Pozri si e-maily: na pridanie úvodného videa cez odkaz, ktorý sme ti poslali, máš 3 dni.",
+    "videoPageTitle": "Pridaj svoje úvodné video",
+    "videoPageIntro": "{{name}}, pridaj svoje úvodné video (30 – 90 sekúnd, rozprávaš do kamery) do {{date}}. Potom sa tvoja prihláška dostane na posúdenie.",
+    "videoPageSubmit": "Odoslať video",
+    "videoPageSent": "Ďakujeme! Tvoje video sme dostali. Tvoja prihláška sa teraz posudzuje: ozveme sa ti e-mailom.",
+    "videoPageExpired": "Platnosť tohto odkazu vypršala (uplynuli 3 dni). Môžeš sa prihlásiť znova, trvá to 3 minúty.",
+    "videoPageInvalid": "Tento odkaz nie je platný. Použi odkaz z nášho e-mailu alebo sa prihlás znova.",
+    "restart": "Prihlásiť sa znova"
   },
   "sr": {
     "heroTitle": "Posao: UGC kreator sadržaja za mobilnu aplikaciju",
@@ -814,7 +1024,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Link je prihvaćen ✓",
     "yapUploadFailed": "Otpremanje nije uspelo. Nema problema: nalepi dole link ka svom videu (nenavedeni YouTube, Google Drive, iCloud…).",
     "yapTypeError": "Ovaj fajl nije video. Izaberi video (MP4, MOV) ili nalepi link dole.",
-    "yapSizeError": "Ovaj video je veći od 200 MB. Umesto toga dole nalepi link ka njemu."
+    "yapSizeError": "Ovaj video je veći od 200 MB. Umesto toga dole nalepi link ka njemu.",
+    "videoLater": "Trenutno nemam video, poslaću ga kasnije",
+    "videoLaterHint": "Dobićeš mejl sa ličnim linkom: imaćeš 3 dana da dodaš svoj video.",
+    "doneVideoLater": "Prijava je primljena! Proveri mejl: imaš 3 dana da dodaš svoj uvodni video preko linka koji smo ti poslali.",
+    "videoPageTitle": "Dodaj svoj uvodni video",
+    "videoPageIntro": "{{name}}, dodaj svoj uvodni video (30–90 sekundi, dok pričaš u kameru) pre {{date}}. Nakon toga tvoja prijava ide na pregled.",
+    "videoPageSubmit": "Pošalji moj video",
+    "videoPageSent": "Hvala! Tvoj video je stigao. Tvoja prijava je sada na pregledu: javićemo ti se mejlom.",
+    "videoPageExpired": "Ovaj link je istekao (prošla su 3 dana). Možeš ponovo da se prijaviš, treba ti samo 3 minuta.",
+    "videoPageInvalid": "Ovaj link nije važeći. Koristi link iz našeg mejla ili se prijavi ponovo.",
+    "restart": "Prijavi se ponovo"
   },
   "ro": {
     "heroTitle": "Job: creator de conținut UGC pentru o aplicație mobilă",
@@ -851,7 +1071,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Link acceptat ✓",
     "yapUploadFailed": "Încărcarea nu a funcționat. Nicio problemă: lipește mai jos un link către videoclipul tău (YouTube nelistat, Google Drive, iCloud…).",
     "yapTypeError": "Acest fișier nu este un videoclip. Alege un videoclip (MP4, MOV) sau lipește un link mai jos.",
-    "yapSizeError": "Acest videoclip depășește 200 MB. Lipește mai jos, în schimb, un link către el."
+    "yapSizeError": "Acest videoclip depășește 200 MB. Lipește mai jos, în schimb, un link către el.",
+    "videoLater": "Nu am videoclipul acum, îl trimit mai târziu",
+    "videoLaterHint": "Vei primi un email cu un link personal: vei avea 3 zile să îți adaugi videoclipul.",
+    "doneVideoLater": "Aplicația a fost primită! Verifică-ți emailurile: ai 3 zile să îți adaugi videoclipul de prezentare cu ajutorul linkului pe care ți l-am trimis.",
+    "videoPageTitle": "Adaugă videoclipul tău de prezentare",
+    "videoPageIntro": "{{name}}, adaugă videoclipul tău de prezentare (30–90 de secunde, vorbind direct la cameră) înainte de {{date}}. După aceea, aplicația ta intră în evaluare.",
+    "videoPageSubmit": "Trimite videoclipul meu",
+    "videoPageSent": "Mulțumim! Videoclipul tău a fost primit. Aplicația ta este acum în curs de evaluare: îți scriem pe email.",
+    "videoPageExpired": "Acest link a expirat (au trecut cele 3 zile). Poți aplica din nou, durează 3 minute.",
+    "videoPageInvalid": "Acest link nu este valid. Folosește linkul din emailul nostru sau aplică din nou.",
+    "restart": "Aplică din nou"
   },
   "sl": {
     "heroTitle": "Delo: ustvarjalec/ustvarjalka UGC vsebin za mobilno aplikacijo",
@@ -888,7 +1118,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Povezava sprejeta ✓",
     "yapUploadFailed": "Nalaganje ni uspelo. Brez skrbi: spodaj prilepi povezavo do svojega videa (nenavedeni video na YouTubu, Google Drive, iCloud …).",
     "yapTypeError": "Ta datoteka ni video. Izberi video (MP4, MOV) ali spodaj prilepi povezavo.",
-    "yapSizeError": "Ta video presega 200 MB. Namesto tega spodaj prilepi povezavo do njega."
+    "yapSizeError": "Ta video presega 200 MB. Namesto tega spodaj prilepi povezavo do njega.",
+    "videoLater": "Videa trenutno nimam pri roki, poslal/a ga bom pozneje",
+    "videoLaterHint": "Prejel/a boš e-poštno sporočilo z osebno povezavo: imel/a boš 3 dni časa, da dodaš svoj video.",
+    "doneVideoLater": "Prijava je prejeta! Preveri e-pošto: imaš 3 dni časa, da s povezavo, ki smo ti jo poslali, dodaš svoj predstavitveni video.",
+    "videoPageTitle": "Dodaj svoj predstavitveni video",
+    "videoPageIntro": "{{name}}, dodaj svoj predstavitveni video (30–90 sekund, pogovor v kamero) do {{date}}. Nato bo tvoja prijava šla v pregled.",
+    "videoPageSubmit": "Pošlji moj video",
+    "videoPageSent": "Hvala! Tvoj video je prispel. Tvojo prijavo zdaj pregledujemo: sporočili ti bomo po e-pošti.",
+    "videoPageExpired": "Ta povezava je potekla (3 dni so minili). Prijaviš se lahko znova, vzame ti le 3 minute.",
+    "videoPageInvalid": "Ta povezava ni veljavna. Uporabi povezavo iz našega e-poštnega sporočila ali se prijavi znova.",
+    "restart": "Prijavi se znova"
   },
   "sv": {
     "heroTitle": "Jobb: UGC-skapare för en mobilapp",
@@ -925,7 +1165,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Länken är godkänd ✓",
     "yapUploadFailed": "Uppladdningen fungerade inte. Ingen fara: klistra in en länk till din video nedan (YouTube olistad, Google Drive, iCloud…).",
     "yapTypeError": "Den här filen är inte en video. Välj en video (MP4, MOV) eller klistra in en länk nedan.",
-    "yapSizeError": "Den här videon är över 200 MB. Klistra in en länk till den nedan istället."
+    "yapSizeError": "Den här videon är över 200 MB. Klistra in en länk till den nedan istället.",
+    "videoLater": "Jag har inte min video just nu, jag skickar den senare",
+    "videoLaterHint": "Du får ett mejl med en personlig länk: du har 3 dagar på dig att lägga till din video.",
+    "doneVideoLater": "Vi har tagit emot din ansökan! Kolla din mejl: du har 3 dagar på dig att lägga till din presentationsvideo via länken vi skickade till dig.",
+    "videoPageTitle": "Lägg till din presentationsvideo",
+    "videoPageIntro": "{{name}}, lägg till din presentationsvideo (30–90 sekunder, där du pratar rakt in i kameran) före {{date}}. Sedan går din ansökan vidare till granskning.",
+    "videoPageSubmit": "Skicka min video",
+    "videoPageSent": "Tack! Vi har tagit emot din video. Din ansökan granskas nu: vi mejlar dig.",
+    "videoPageExpired": "Den här länken har gått ut (3 dagar har gått). Du kan ansöka igen, det tar 3 minuter.",
+    "videoPageInvalid": "Den här länken är inte giltig. Använd länken från vårt mejl eller ansök igen.",
+    "restart": "Ansök igen"
   },
   "uk": {
     "heroTitle": "Робота: UGC-креатор для мобільного застосунку",
@@ -962,7 +1212,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Посилання прийнято ✓",
     "yapUploadFailed": "Завантаження не вдалося. Не хвилюйся: встав нижче посилання на своє відео (YouTube з доступом за посиланням, Google Drive, iCloud…).",
     "yapTypeError": "Цей файл не є відео. Обери відео (MP4, MOV) або встав посилання нижче.",
-    "yapSizeError": "Це відео більше за 200 МБ. Краще встав нижче посилання на нього."
+    "yapSizeError": "Це відео більше за 200 МБ. Краще встав нижче посилання на нього.",
+    "videoLater": "Зараз у мене немає відео, надішлю його пізніше",
+    "videoLaterHint": "Ти отримаєш лист із персональним посиланням: у тебе буде 3 дні, щоб додати своє відео.",
+    "doneVideoLater": "Заявку отримано! Перевір пошту: у тебе є 3 дні, щоб додати відео-візитівку за посиланням, яке ми тобі надіслали.",
+    "videoPageTitle": "Додай своє відео-візитівку",
+    "videoPageIntro": "{{name}}, додай своє відео-візитівку (30–90 секунд, говориш на камеру) до {{date}}. Після цього твою заявку буде передано на розгляд.",
+    "videoPageSubmit": "Надіслати моє відео",
+    "videoPageSent": "Дякуємо! Твоє відео отримано. Зараз твою заявку розглядають: ми напишемо тобі на пошту.",
+    "videoPageExpired": "Термін дії цього посилання закінчився (минуло 3 дні). Ти можеш подати заявку ще раз, це займе 3 хвилини.",
+    "videoPageInvalid": "Це посилання недійсне. Скористайся посиланням із нашого листа або подай заявку ще раз.",
+    "restart": "Подати заявку ще раз"
   },
   "is": {
     "heroTitle": "Starf: UGC efnisskapari fyrir snjallforrit",
@@ -999,7 +1259,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Hlekkur samþykktur ✓",
     "yapUploadFailed": "Upphleðslan tókst ekki. Engar áhyggjur: límdu hér fyrir neðan inn hlekk á myndbandið þitt (óskráð YouTube-myndband, Google Drive, iCloud…).",
     "yapTypeError": "Þessi skrá er ekki myndband. Veldu myndband (MP4, MOV) eða límdu inn hlekk hér fyrir neðan.",
-    "yapSizeError": "Þetta myndband er stærra en 200 MB. Límdu frekar inn hlekk á það hér fyrir neðan."
+    "yapSizeError": "Þetta myndband er stærra en 200 MB. Límdu frekar inn hlekk á það hér fyrir neðan.",
+    "videoLater": "Ég er ekki með myndbandið mitt núna, ég sendi það seinna",
+    "videoLaterHint": "Þú færð tölvupóst með persónulegum hlekk: þú hefur 3 daga til að bæta myndbandinu þínu við.",
+    "doneVideoLater": "Umsókn móttekin! Kíktu á tölvupóstinn þinn: þú hefur 3 daga til að bæta kynningarmyndbandinu þínu við með hlekknum sem við sendum þér.",
+    "videoPageTitle": "Bættu við kynningarmyndbandinu þínu",
+    "videoPageIntro": "{{name}}, bættu við kynningarmyndbandinu þínu (30–90 sekúndur, þar sem þú talar beint í myndavélina) fyrir {{date}}. Eftir það fer umsóknin þín í yfirferð.",
+    "videoPageSubmit": "Senda myndbandið mitt",
+    "videoPageSent": "Takk fyrir! Myndbandið þitt er komið. Umsóknin þín er nú í yfirferð: við sendum þér tölvupóst.",
+    "videoPageExpired": "Þessi hlekkur er útrunninn (3 dagar eru liðnir). Þú getur sótt um aftur, það tekur 3 mínútur.",
+    "videoPageInvalid": "Þessi hlekkur er ekki gildur. Notaðu hlekkinn úr tölvupóstinum okkar eða sæktu um aftur.",
+    "restart": "Sækja um aftur"
   },
   "tr": {
     "heroTitle": "İş: Mobil uygulama için UGC içerik üreticisi",
@@ -1036,7 +1306,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Link kabul edildi ✓",
     "yapUploadFailed": "Yükleme işe yaramadı. Sorun değil: aşağıya videonun linkini yapıştır (YouTube liste dışı, Google Drive, iCloud…).",
     "yapTypeError": "Bu dosya bir video değil. Bir video seç (MP4, MOV) ya da aşağıya bir link yapıştır.",
-    "yapSizeError": "Bu video 200 MB'ı aşıyor. Bunun yerine aşağıya videonun linkini yapıştır."
+    "yapSizeError": "Bu video 200 MB'ı aşıyor. Bunun yerine aşağıya videonun linkini yapıştır.",
+    "videoLater": "Videom şu an elimde yok, daha sonra göndereceğim",
+    "videoLaterHint": "Sana kişisel bir bağlantı içeren bir e-posta göndereceğiz: videonu eklemek için 3 günün olacak.",
+    "doneVideoLater": "Başvurun alındı! E-postalarına bak: sana gönderdiğimiz bağlantıyla tanıtım videonu eklemek için 3 günün var.",
+    "videoPageTitle": "Tanıtım videonu ekle",
+    "videoPageIntro": "{{name}}, tanıtım videonu (30–90 saniye, kameraya bakarak konuşarak) {{date}} tarihine kadar ekle. Ardından başvurun incelemeye alınacak.",
+    "videoPageSubmit": "Videomu gönder",
+    "videoPageSent": "Teşekkürler! Videon bize ulaştı. Başvurun şu an inceleniyor: sana e-posta ile döneceğiz.",
+    "videoPageExpired": "Bu bağlantının süresi doldu (3 gün geçti). Yeniden başvurabilirsin, sadece 3 dakika sürer.",
+    "videoPageInvalid": "Bu bağlantı geçerli değil. E-postamızdaki bağlantıyı kullan ya da yeniden başvur.",
+    "restart": "Yeniden başvur"
   },
   "hy": {
     "heroTitle": "Աշխատանք՝ UGC կոնտենտ ստեղծող բջջային հավելվածի համար",
@@ -1073,7 +1353,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Հղումը ընդունված է ✓",
     "yapUploadFailed": "Վերբեռնումը չստացվեց։ Խնդիր չկա․ ներքևում տեղադրիր հղում քո տեսանյութին (YouTube-ի չցուցակագրված, Google Drive, iCloud…)։",
     "yapTypeError": "Այս ֆայլը տեսանյութ չէ։ Ընտրիր տեսանյութ (MP4, MOV) կամ ներքևում տեղադրիր հղում։",
-    "yapSizeError": "Այս տեսանյութը գերազանցում է 200 ՄԲ-ը։ Փոխարենը ներքևում տեղադրիր հղում դեպի այն։"
+    "yapSizeError": "Այս տեսանյութը գերազանցում է 200 ՄԲ-ը։ Փոխարենը ներքևում տեղադրիր հղում դեպի այն։",
+    "videoLater": "Հիմա տեսանյութս չունեմ, հետո կուղարկեմ",
+    "videoLaterHint": "Կստանաս էլ. նամակ անձնական հղումով․ քո տեսանյութը ավելացնելու համար կունենաս 3 օր։",
+    "doneVideoLater": "Դիմումդ ընդունված է։ Ստուգիր էլ. փոստդ․ մենք քեզ ուղարկած հղումով ներածական տեսանյութդ ավելացնելու համար ունես 3 օր։",
+    "videoPageTitle": "Ավելացրու քո ներածական տեսանյութը",
+    "videoPageIntro": "{{name}}, ավելացրու քո ներածական տեսանյութը (30–90 վայրկյան, խոսիր անմիջապես տեսախցիկին) մինչև {{date}}։ Դրանից հետո քո դիմումը կանցնի քննության։",
+    "videoPageSubmit": "Ուղարկել իմ տեսանյութը",
+    "videoPageSent": "Շնորհակալություն։ Քո տեսանյութը ստացվել է։ Քո դիմումը հիմա քննարկվում է․ մենք էլ. փոստով կգրենք քեզ։",
+    "videoPageExpired": "Այս հղումի ժամկետը սպառվել է (անցել է 3 օր)։ Կարող ես նորից դիմել, դա տևում է ընդամենը 3 րոպե։",
+    "videoPageInvalid": "Այս հղումը վավեր չէ։ Օգտագործիր մեր էլ. նամակի հղումը կամ նորից դիմիր։",
+    "restart": "Դիմել նորից"
   },
   "ka": {
     "heroTitle": "ვაკანსია: UGC კონტენტის შემქმნელი მობილური აპისთვის",
@@ -1110,7 +1400,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "ბმული მიღებულია ✓",
     "yapUploadFailed": "ატვირთვა ვერ მოხერხდა. არაუშავს: ჩასვი ქვემოთ შენი ვიდეოს ბმული (YouTube-ის არალისტინგური, Google Drive, iCloud…).",
     "yapTypeError": "ეს ფაილი ვიდეო არ არის. აირჩიე ვიდეო (MP4, MOV) ან ჩასვი ბმული ქვემოთ.",
-    "yapSizeError": "ეს ვიდეო 200 მბ-ზე დიდია. სანაცვლოდ ჩასვი მისი ბმული ქვემოთ."
+    "yapSizeError": "ეს ვიდეო 200 მბ-ზე დიდია. სანაცვლოდ ჩასვი მისი ბმული ქვემოთ.",
+    "videoLater": "ახლა ვიდეო ხელთ არ მაქვს, მოგვიანებით გამოგიგზავნით",
+    "videoLaterHint": "ელფოსტაზე პირადი ბმული მოგივა: ვიდეოს დასამატებლად 3 დღე გექნება.",
+    "doneVideoLater": "განაცხადი მიღებულია! შეამოწმე ელფოსტა: გამოგზავნილი ბმულით შენი გაცნობითი ვიდეოს დასამატებლად 3 დღე გაქვს.",
+    "videoPageTitle": "დაამატე შენი გაცნობითი ვიდეო",
+    "videoPageIntro": "{{name}}, დაამატე შენი გაცნობითი ვიდეო (30–90 წამი, კამერას პირდაპირ მიმართავ) {{date}}-მდე. ამის შემდეგ შენი განაცხადი განხილვაზე გადავა.",
+    "videoPageSubmit": "ვიდეოს გაგზავნა",
+    "videoPageSent": "გმადლობთ! შენი ვიდეო მივიღეთ. შენი განაცხადი ახლა განიხილება: ელფოსტით მოგწერთ.",
+    "videoPageExpired": "ამ ბმულის ვადა გაუვიდა (3 დღე გავიდა). შეგიძლია თავიდან შეავსო განაცხადი, სულ 3 წუთს მოითხოვს.",
+    "videoPageInvalid": "ეს ბმული ვალიდური არ არის. გამოიყენე ჩვენი წერილის ბმული ან თავიდან შეავსე განაცხადი.",
+    "restart": "განაცხადის თავიდან შევსება"
   },
   "ms": {
     "heroTitle": "Kerja: Pencipta kandungan UGC untuk aplikasi mudah alih",
@@ -1147,7 +1447,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Pautan diterima ✓",
     "yapUploadFailed": "Muat naik tidak berjaya. Tak apa: tampal pautan ke video anda di bawah (YouTube tidak tersenarai, Google Drive, iCloud…).",
     "yapTypeError": "Fail ini bukan video. Pilih video (MP4, MOV) atau tampal pautan di bawah.",
-    "yapSizeError": "Video ini melebihi 200 MB. Sebaliknya, tampal pautan ke video itu di bawah."
+    "yapSizeError": "Video ini melebihi 200 MB. Sebaliknya, tampal pautan ke video itu di bawah.",
+    "videoLater": "Saya tak ada video saya sekarang, saya akan hantar nanti",
+    "videoLaterHint": "Kamu akan terima e-mel dengan pautan peribadi: kamu ada 3 hari untuk menambah video kamu.",
+    "doneVideoLater": "Permohonan diterima! Semak e-mel kamu: kamu ada 3 hari untuk menambah video perkenalan kamu melalui pautan yang kami hantar.",
+    "videoPageTitle": "Tambah video perkenalan kamu",
+    "videoPageIntro": "{{name}}, tambah video perkenalan kamu (30–90 saat, bercakap menghadap kamera) sebelum {{date}}. Selepas itu, permohonan kamu akan masuk ke peringkat semakan.",
+    "videoPageSubmit": "Hantar video saya",
+    "videoPageSent": "Terima kasih! Video kamu sudah diterima. Permohonan kamu sedang disemak sekarang: kami akan e-mel kamu.",
+    "videoPageExpired": "Pautan ini telah tamat tempoh (3 hari sudah berlalu). Kamu boleh memohon semula, ia hanya ambil masa 3 minit.",
+    "videoPageInvalid": "Pautan ini tidak sah. Gunakan pautan daripada e-mel kami, atau mohon semula.",
+    "restart": "Mohon semula"
   },
   "id": {
     "heroTitle": "Lowongan: kreator konten UGC untuk aplikasi mobile",
@@ -1184,7 +1494,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Link diterima ✓",
     "yapUploadFailed": "Uploadnya gagal. Tenang, tempel saja link ke videomu di bawah (YouTube unlisted, Google Drive, iCloud…).",
     "yapTypeError": "File ini bukan video. Pilih video (MP4, MOV) atau tempel link di bawah.",
-    "yapSizeError": "Video ini lebih dari 200 MB. Tempel link ke videomu di bawah saja ya."
+    "yapSizeError": "Video ini lebih dari 200 MB. Tempel link ke videomu di bawah saja ya.",
+    "videoLater": "Aku belum punya videonya sekarang, nanti aku kirim belakangan",
+    "videoLaterHint": "Kamu akan menerima email berisi tautan pribadi: kamu punya waktu 3 hari untuk menambahkan videomu.",
+    "doneVideoLater": "Lamaran diterima! Cek emailmu: kamu punya waktu 3 hari untuk menambahkan video perkenalanmu lewat tautan yang sudah kami kirim.",
+    "videoPageTitle": "Tambahkan video perkenalanmu",
+    "videoPageIntro": "{{name}}, tambahkan video perkenalanmu (30–90 detik, bicara langsung ke kamera) sebelum {{date}}. Setelah itu, lamaranmu akan masuk tahap peninjauan.",
+    "videoPageSubmit": "Kirim videoku",
+    "videoPageSent": "Terima kasih! Videomu sudah kami terima. Lamaranmu sekarang sedang ditinjau: kami akan mengabarimu lewat email.",
+    "videoPageExpired": "Tautan ini sudah kedaluwarsa (3 hari sudah lewat). Kamu bisa melamar lagi, hanya butuh 3 menit.",
+    "videoPageInvalid": "Tautan ini tidak valid. Gunakan tautan dari email kami, atau melamar lagi.",
+    "restart": "Lamar lagi"
   },
   "vi": {
     "heroTitle": "Việc làm: Nhà sáng tạo nội dung UGC cho một ứng dụng di động",
@@ -1221,7 +1541,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Link hợp lệ ✓",
     "yapUploadFailed": "Tải lên không thành công. Không sao đâu: bạn dán link video vào bên dưới nhé (YouTube không công khai, Google Drive, iCloud…).",
     "yapTypeError": "Tệp này không phải video. Hãy chọn một video (MP4, MOV) hoặc dán link vào bên dưới nhé.",
-    "yapSizeError": "Video này nặng hơn 200 MB. Bạn dán link video vào bên dưới nhé."
+    "yapSizeError": "Video này nặng hơn 200 MB. Bạn dán link video vào bên dưới nhé.",
+    "videoLater": "Hiện tại mình chưa có video, mình sẽ gửi sau",
+    "videoLaterHint": "Bạn sẽ nhận được một email kèm liên kết riêng: bạn có 3 ngày để thêm video của mình.",
+    "doneVideoLater": "Đã nhận đơn đăng ký! Hãy kiểm tra email nhé: bạn có 3 ngày để thêm video giới thiệu bằng liên kết chúng mình đã gửi.",
+    "videoPageTitle": "Thêm video giới thiệu của bạn",
+    "videoPageIntro": "{{name}}, hãy thêm video giới thiệu của bạn (30–90 giây, nói trực tiếp với camera) trước {{date}}. Sau đó đơn đăng ký của bạn sẽ được đưa vào xem xét.",
+    "videoPageSubmit": "Gửi video của mình",
+    "videoPageSent": "Cảm ơn bạn! Video của bạn đã được gửi. Đơn đăng ký của bạn hiện đang được xem xét: chúng mình sẽ gửi email cho bạn.",
+    "videoPageExpired": "Liên kết này đã hết hạn (đã qua 3 ngày). Bạn có thể đăng ký lại, chỉ mất 3 phút thôi.",
+    "videoPageInvalid": "Liên kết này không hợp lệ. Hãy dùng liên kết trong email của chúng mình, hoặc đăng ký lại nhé.",
+    "restart": "Đăng ký lại"
   },
   "th": {
     "heroTitle": "งาน: ครีเอเตอร์คอนเทนต์ UGC สำหรับแอปมือถือ",
@@ -1258,7 +1588,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "ลิงก์ใช้ได้ ✓",
     "yapUploadFailed": "อัปโหลดไม่สำเร็จ ไม่เป็นไรนะ วางลิงก์วิดีโอของคุณด้านล่างแทนได้เลย (YouTube แบบไม่ระบุรายการ, Google Drive, iCloud…)",
     "yapTypeError": "ไฟล์นี้ไม่ใช่วิดีโอ เลือกไฟล์วิดีโอ (MP4, MOV) หรือวางลิงก์ด้านล่างได้เลย",
-    "yapSizeError": "วิดีโอนี้ใหญ่เกิน 200 MB วางลิงก์วิดีโอของคุณด้านล่างแทนนะ"
+    "yapSizeError": "วิดีโอนี้ใหญ่เกิน 200 MB วางลิงก์วิดีโอของคุณด้านล่างแทนนะ",
+    "videoLater": "ตอนนี้ฉันยังไม่มีวิดีโอ เดี๋ยวส่งให้ทีหลัง",
+    "videoLaterHint": "คุณจะได้รับอีเมลที่มีลิงก์ส่วนตัว และมีเวลา 3 วันในการเพิ่มวิดีโอของคุณ",
+    "doneVideoLater": "เราได้รับใบสมัครของคุณแล้ว! เช็กอีเมลได้เลย คุณมีเวลา 3 วันในการเพิ่มวิดีโอแนะนำตัวผ่านลิงก์ที่เราส่งให้",
+    "videoPageTitle": "เพิ่มวิดีโอแนะนำตัวของคุณ",
+    "videoPageIntro": "{{name}} เพิ่มวิดีโอแนะนำตัวของคุณ (ความยาว 30–90 วินาที พูดคุยกับกล้อง) ภายในวันที่ {{date}} จากนั้นใบสมัครของคุณจะเข้าสู่ขั้นตอนการพิจารณา",
+    "videoPageSubmit": "ส่งวิดีโอของฉัน",
+    "videoPageSent": "ขอบคุณนะ! เราได้รับวิดีโอของคุณแล้ว ตอนนี้ใบสมัครของคุณอยู่ระหว่างการพิจารณา เราจะส่งอีเมลไปหาคุณ",
+    "videoPageExpired": "ลิงก์นี้หมดอายุแล้ว (ครบ 3 วันแล้ว) คุณสามารถสมัครใหม่ได้ ใช้เวลาแค่ 3 นาที",
+    "videoPageInvalid": "ลิงก์นี้ไม่ถูกต้อง ใช้ลิงก์จากอีเมลของเรา หรือสมัครใหม่อีกครั้งก็ได้",
+    "restart": "สมัครใหม่อีกครั้ง"
   },
   "kk": {
     "heroTitle": "Жұмыс: мобильді қосымшаға арналған UGC контент жасаушы",
@@ -1295,7 +1635,17 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "Сілтеме қабылданды ✓",
     "yapUploadFailed": "Жүктеу сәтсіз аяқталды. Уайымдама: төменге видеоңа сілтеме қой (YouTube-тағы тізімде көрсетілмеген видео, Google Drive, iCloud…).",
     "yapTypeError": "Бұл файл видео емес. Видео таңда (MP4, MOV) немесе төменге сілтеме қой.",
-    "yapSizeError": "Бұл видео 200 МБ-тан асады. Оның орнына төменге видеоңа сілтеме қой."
+    "yapSizeError": "Бұл видео 200 МБ-тан асады. Оның орнына төменге видеоңа сілтеме қой.",
+    "videoLater": "Қазір бейнем жоқ, кейінірек жіберемін",
+    "videoLaterHint": "Саған жеке сілтемесі бар хат келеді: бейнеңді қосуға 3 күнің болады.",
+    "doneVideoLater": "Өтінімің қабылданды! Электрондық поштаңды тексер: біз жіберген сілтеме арқылы таныстыру бейнеңді қосуға 3 күнің бар.",
+    "videoPageTitle": "Таныстыру бейнеңді қос",
+    "videoPageIntro": "{{name}}, таныстыру бейнеңді (30–90 секунд, камераға қарап сөйлеп) {{date}} дейін қос. Содан кейін өтінімің қарауға жіберіледі.",
+    "videoPageSubmit": "Бейнемді жіберу",
+    "videoPageSent": "Рақмет! Бейнең қабылданды. Қазір өтінімің қаралып жатыр: саған электрондық пошта арқылы хабарлаймыз.",
+    "videoPageExpired": "Бұл сілтеменің мерзімі аяқталды (3 күн өтті). Өтінімді қайтадан бере аласың, ол 3 минут алады.",
+    "videoPageInvalid": "Бұл сілтеме жарамсыз. Біздің хаттағы сілтемені пайдалан немесе өтінімді қайта бер.",
+    "restart": "Өтінімді қайта беру"
   },
   "hi": {
     "heroTitle": "नौकरी: मोबाइल ऐप के लिए UGC कंटेंट क्रिएटर",
@@ -1332,6 +1682,16 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "yapLinkOk": "लिंक मंज़ूर हो गया ✓",
     "yapUploadFailed": "अपलोड नहीं हो पाया। कोई बात नहीं: नीचे अपने वीडियो का लिंक पेस्ट कर दो (YouTube अनलिस्टेड, Google Drive, iCloud…)।",
     "yapTypeError": "यह फ़ाइल वीडियो नहीं है। कोई वीडियो चुनो (MP4, MOV) या नीचे लिंक पेस्ट करो।",
-    "yapSizeError": "यह वीडियो 200 MB से बड़ा है। इसकी जगह नीचे इसका लिंक पेस्ट कर दो।"
+    "yapSizeError": "यह वीडियो 200 MB से बड़ा है। इसकी जगह नीचे इसका लिंक पेस्ट कर दो।",
+    "videoLater": "अभी मेरे पास मेरा वीडियो नहीं है, मैं बाद में भेज दूँगा/दूँगी",
+    "videoLaterHint": "तुम्हें एक पर्सनल लिंक वाला ईमेल मिलेगा: अपना वीडियो जोड़ने के लिए तुम्हारे पास 3 दिन होंगे।",
+    "doneVideoLater": "आवेदन मिल गया! अपने ईमेल देखो: हमने जो लिंक भेजा है, उससे अपना इंट्रो वीडियो जोड़ने के लिए तुम्हारे पास 3 दिन हैं।",
+    "videoPageTitle": "अपना इंट्रो वीडियो जोड़ो",
+    "videoPageIntro": "{{name}}, {{date}} से पहले अपना इंट्रो वीडियो जोड़ो (30–90 सेकंड, कैमरे की ओर देखकर बात करते हुए)। इसके बाद तुम्हारा आवेदन रिव्यू में चला जाएगा।",
+    "videoPageSubmit": "मेरा वीडियो भेजो",
+    "videoPageSent": "शुक्रिया! तुम्हारा वीडियो मिल गया। अब तुम्हारे आवेदन की समीक्षा हो रही है: हम तुम्हें ईमेल करेंगे।",
+    "videoPageExpired": "यह लिंक एक्सपायर हो चुका है (3 दिन बीत गए हैं)। तुम दोबारा आवेदन कर सकते/सकती हो, इसमें सिर्फ़ 3 मिनट लगते हैं।",
+    "videoPageInvalid": "यह लिंक मान्य नहीं है। हमारे ईमेल वाला लिंक इस्तेमाल करो, या दोबारा आवेदन करो।",
+    "restart": "दोबारा आवेदन करें"
   }
 };

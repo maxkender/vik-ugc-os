@@ -11,6 +11,7 @@ import { ageOn } from "@shared/zones.ts";
 import { ago, cn, compact, dateFr, flag } from "@/lib/utils";
 
 const COLUMNS = [
+  { key: "video_pending", label: "Vidéo en attente", dot: "bg-[#c98a00]" },
   { key: "new", label: "Nouveau", dot: "bg-accent" },
   { key: "review", label: "À revoir", dot: "bg-[#ffbb43]" },
   { key: "accepted", label: "Accepté", dot: "bg-[#1fafff]" },
@@ -18,8 +19,16 @@ const COLUMNS = [
   { key: "signed", label: "Signé", dot: "bg-success" },
   { key: "active", label: "Actif", dot: "bg-success" },
   { key: "rejected", label: "Refusé", dot: "bg-vik-red" },
+  { key: "expired", label: "Expiré (sans vidéo)", dot: "bg-[#9aa1ad]" },
 ] as const;
-const TONE: Record<string, any> = { new: "accent", review: "warning", accepted: "cyan", contract_sent: "violet", signed: "success", active: "success", rejected: "danger" };
+/** Compte à rebours d'une candidature sans vidéo (J+3). */
+const videoLeft = (a: any) => {
+  const ms = new Date(a.video_due_at).getTime() - Date.now();
+  if (!(ms > 0)) return "échéance passée";
+  const h = Math.floor(ms / 3_600_000);
+  return h >= 24 ? `${Math.floor(h / 24)} j ${h % 24} h restants` : `${h} h restantes`;
+};
+const TONE: Record<string, any> = { video_pending: "warning", expired: "default", new: "accent", review: "warning", accepted: "cyan", contract_sent: "violet", signed: "success", active: "success", rejected: "danger" };
 const statusLabel = (s: string) => COLUMNS.find((c) => c.key === s)?.label ?? s;
 
 const AVATAR_TINTS = ["bg-tint-blue text-accent", "bg-tint-violet text-vik-violet", "bg-tint-cyan text-[#0a95e0]", "bg-tint-green text-success", "bg-tint-yellow text-[#b97800]", "bg-tint-red text-vik-red"];
@@ -162,6 +171,7 @@ export default function Candidates() {
                         </div>
                         <div className="mt-2.5 flex items-center justify-between text-[11px] text-subtle-foreground">
                           <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {ago(a.created_at)}</span>
+                          {a.status === "video_pending" && a.video_due_at && <span className="font-medium text-[#8a5a00]">⏳ {videoLeft(a)} · {a.video_reminders ?? 0} relance(s)</span>}
                           {a.status === "contract_sent" && a.contracts?.[0] && <span>{a.contracts.some((c: any) => c.status === "expired") ? "expiré" : `${a.contracts[0].reminders} relance(s)`}</span>}
                           {a.tiktok_followers ? <span className="tabular">{compact(a.tiktok_followers)} abonnés</span> : null}
                         </div>
@@ -187,11 +197,12 @@ export default function Candidates() {
                   <Td className="whitespace-nowrap">{flag(a.country)} {countryName(a.country)} <Badge tone="outline" className="ml-1">{zoneOf(a.country) || "?"}</Badge></Td>
                   <Td num>{ageOn(a.birthdate)}</Td>
                   <Td className="text-[13px]">{a.tiktok_url ? <a className="text-accent hover:underline" href={a.tiktok_url} target="_blank" rel="noreferrer">{compact(a.tiktok_followers)} abonnés</a> : <span className="text-subtle-foreground">—</span>}</Td>
-                  <Td><Badge tone={TONE[a.status]}>{statusLabel(a.status)}</Badge></Td>
+                  <Td><Badge tone={TONE[a.status]}>{statusLabel(a.status)}</Badge>{a.status === "video_pending" && a.video_due_at && <div className="mt-1 text-[11px] text-[#8a5a00]">⏳ {videoLeft(a)}</div>}</Td>
                   <Td className="tabular whitespace-nowrap text-[13px] text-muted-foreground">{dateFr(a.created_at)}</Td>
                   <Td className="whitespace-nowrap text-right">
                     {["new", "review"].includes(a.status) && <span className="inline-flex gap-1.5"><Button size="sm" variant="secondary" onClick={() => openInReview(a)}>Revoir</Button><Button size="sm" onClick={() => decide(a, "accept")}>Accepter</Button></span>}
                     {a.status === "contract_sent" && <Button size="sm" variant="secondary" onClick={async () => { await callFn("recruit", { action: "resend_contract", application_id: a.id }); toast("Contrat renvoyé", "success"); }}>Renvoyer le contrat</Button>}
+                    {a.status === "video_pending" && <Button size="sm" variant="secondary" onClick={async () => { try { await callFn("recruit", { action: "video_remind", application_id: a.id }); toast("Relance envoyée (lien pour ajouter la vidéo)", "success"); } catch (e) { toast((e as Error).message, "danger"); } }}>Relancer</Button>}
                     {profile?.role === "admin" && <Button size="icon" variant="ghost" className="ml-1 h-8 w-8 text-[#c42a2d]" title="Supprimer ce candidat et ses données" aria-label="Supprimer ce candidat et ses données" onClick={() => deleteCandidate(a)}><Trash2 className="h-4 w-4" /></Button>}
                   </Td>
                 </tr>

@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
  * Un envoi par événement et par page affichée ; les échecs sont ignorés (ne bloque jamais la candidature).
  */
 const sent = new Set<string>();
-export function trackFunnel(event: "view_join" | "start_apply" | "submit_apply", country: string | null | undefined, lang: string | null | undefined) {
+export function trackFunnel(event: "view_join" | "start_apply" | "submit_apply" | "submit_no_video", country: string | null | undefined, lang: string | null | undefined) {
   const key = `${event}:${country ?? ""}:${location.pathname}`;
   if (event !== "submit_apply" && sent.has(key)) return;
   sent.add(key);

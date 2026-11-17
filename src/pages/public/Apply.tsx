@@ -55,6 +55,9 @@ export default function Apply() {
   const [errors, setErrors] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
+  // « Je l'enverrai plus tard » (17/11) : vidéo facultative, 3 jours pour l'ajouter via le lien de l'email.
+  const [videoLater, setVideoLater] = useState(false);
+  const [doneLater, setDoneLater] = useState(false);
 
   // Funnel first-party (sans cookie) : arrivée sur le formulaire d'un pays ouvert.
   useEffect(() => {
@@ -103,7 +106,7 @@ export default function Apply() {
     e.preventDefault();
     const errs: string[] = [];
     if (f.birthdate && ageOn(f.birthdate) < 18) errs.push("underage");
-    if (!yapPath && !linkOk) errs.push("yap_video");
+    if (!yapPath && !linkOk && !videoLater) errs.push("yap_video");
     if (f.has_iphone !== "yes") return; // iPhone requis (16/11) : bloqué en amont
     if (errs.length) return setErrors(errs);
     setBusy(true);
@@ -118,12 +121,17 @@ export default function Apply() {
         tiktok_followers: f.tiktok_followers ? Number(f.tiktok_followers) : null,
         instagram_followers: f.instagram_followers ? Number(f.instagram_followers) : null,
         languages: f.languages.split(",").map((s) => s.trim()).filter(Boolean),
+        video_later: videoLater && !yapPath && !linkOk,
         yap_video_path: yapPath, yap_video_url: yapPath ? null : yapUrl.trim() || null, locale: i18n.resolvedLanguage ?? "en", utm,
         tracking: attribution(eventId),
       });
+      // Lead envoyé dès la soumission, même sans vidéo (optimisation Meta).
       track("Lead", { content_name: "ugc_creator_application", country: f.country }, eventId);
+      const later = videoLater && !yapPath && !linkOk;
+      setDoneLater(later);
       setDone(true);
       trackFunnel("submit_apply", f.country, i18n.resolvedLanguage);
+      if (later) trackFunnel("submit_no_video", f.country, i18n.resolvedLanguage);
       window.scrollTo(0, 0);
     } catch (err) {
       setErrors(String((err as Error).message).split(",").map((s) => s.trim()));
@@ -154,7 +162,7 @@ export default function Apply() {
         {done ? (
           <div className="rounded-3xl border bg-white px-6 py-14 text-center shadow-xs">
             <span className="mx-auto inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-tint-green text-success"><CheckCircle2 className="h-7 w-7" /></span>
-            <p className="mx-auto mt-5 max-w-md text-lg font-semibold text-foreground">{t("apply.success")}</p>
+            <p className="mx-auto mt-5 max-w-md text-lg font-semibold text-foreground">{doneLater ? lj.doneVideoLater : t("apply.success")}</p>
           </div>
         ) : isLoading ? (
           <div className="flex justify-center py-20"><Spinner /></div>
@@ -222,7 +230,13 @@ export default function Apply() {
                 </div>
               )}
               {uploadError && <p className="text-sm text-danger" role="alert">{uploadError}</p>}
-              {!yapPath && (
+              {!yapPath && !linkOk && (
+                <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-dashed border-border-strong bg-white p-3" data-testid="video-later">
+                  <input type="checkbox" className="mt-0.5 h-4 w-4 shrink-0 accent-[#004dff]" checked={videoLater} onChange={(e) => setVideoLater(e.target.checked)} />
+                  <span><span className="block text-sm font-medium text-foreground">{lj.videoLater}</span><span className="mt-0.5 block text-xs text-muted-foreground">{lj.videoLaterHint}</span></span>
+                </label>
+              )}
+              {!yapPath && !videoLater && (
                 <div className="rounded-xl border border-border-strong bg-white p-3" data-testid="yap-link">
                   {!showLink ? (
                     <button type="button" className="text-sm font-medium text-accent hover:underline" onClick={() => setShowLink(true)}>{lj.yapLinkToggle} →</button>
@@ -247,7 +261,7 @@ export default function Apply() {
             </div>
             {messages.length > 0 && <div className="rounded-xl bg-tint-red px-4 py-3 text-sm text-[#a52326]">{messages.map((m) => <p key={m}>{m}</p>)}</div>}
             <JobWarning lang={i18n.resolvedLanguage ?? "en"} />
-            <Button type="submit" size="lg" className="h-12 w-full text-[15px]" loading={busy} disabled={underage || f.has_iphone !== "yes" || (!yapPath && !linkOk && progress !== null)}>{t("apply.submit")}</Button>
+            <Button type="submit" size="lg" className="h-12 w-full text-[15px]" loading={busy} disabled={underage || f.has_iphone !== "yes" || (!yapPath && !linkOk && !videoLater && progress !== null)}>{t("apply.submit")}</Button>
             </>}
           </form>
         )}

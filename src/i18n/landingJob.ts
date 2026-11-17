@@ -18,6 +18,8 @@ export interface LandingJob {
   applyIphone: string; yes: string; no: string; iphoneBlocked: string;
   yapLinkToggle: string; yapLinkLabel: string; yapLinkHint: string; yapLinkInvalid: string; yapLinkOk: string;
   yapUploadFailed: string; yapTypeError: string; yapSizeError: string;
+  videoLater: string; videoLaterHint: string; doneVideoLater: string;
+  videoPageTitle: string; videoPageIntro: string; videoPageSubmit: string; videoPageSent: string; videoPageExpired: string; videoPageInvalid: string; restart: string;
 }
 
 export const LANDING_JOB: Record<string, LandingJob> = {
@@ -50,6 +52,16 @@ export const LANDING_JOB: Record<string, LandingJob> = {
     yapUploadFailed: "The upload didn't work. No problem: paste a link to your video below (YouTube unlisted, Google Drive, iCloud…).",
     yapTypeError: "This file isn't a video. Choose a video (MP4, MOV) or paste a link below.",
     yapSizeError: "This video is over 200 MB. Paste a link to it below instead.",
+    videoLater: "I don't have my video right now, I'll send it later",
+    videoLaterHint: "You'll get an email with a personal link: you'll have 3 days to add your video.",
+    doneVideoLater: "Application received! Check your emails: you have 3 days to add your intro video with the link we sent you.",
+    videoPageTitle: "Add your intro video",
+    videoPageIntro: "{{name}}, add your intro video (30–90 seconds, talking to the camera) before {{date}}. Then your application goes into review.",
+    videoPageSubmit: "Send my video",
+    videoPageSent: "Thank you! Your video is in. Your application is now being reviewed: we'll email you.",
+    videoPageExpired: "This link has expired (3 days have passed). You can apply again, it takes 3 minutes.",
+    videoPageInvalid: "This link isn't valid. Use the link from our email, or apply again.",
+    restart: "Apply again",
   },
   fr: {
     heroTitle: "Job : créateur·rice de contenu UGC pour une app mobile",
@@ -80,6 +92,16 @@ export const LANDING_JOB: Record<string, LandingJob> = {
     yapUploadFailed: "L'envoi n'a pas fonctionné. Pas de souci : colle ci-dessous un lien vers ta vidéo (YouTube non répertoriée, Google Drive, iCloud…).",
     yapTypeError: "Ce fichier n'est pas une vidéo. Choisis une vidéo (MP4, MOV) ou colle un lien ci-dessous.",
     yapSizeError: "Cette vidéo dépasse 200 Mo. Colle plutôt un lien vers ta vidéo ci-dessous.",
+    videoLater: "Je n'ai pas ma vidéo maintenant, je l'enverrai plus tard",
+    videoLaterHint: "Tu recevras un email avec un lien personnel : tu auras 3 jours pour ajouter ta vidéo.",
+    doneVideoLater: "Candidature reçue ! Regarde tes emails : tu as 3 jours pour ajouter ta vidéo de présentation avec le lien qu'on t'a envoyé.",
+    videoPageTitle: "Ajoute ta vidéo de présentation",
+    videoPageIntro: "{{name}}, ajoute ta vidéo de présentation (30 à 90 secondes, face caméra) avant le {{date}}. Ta candidature passera ensuite en revue.",
+    videoPageSubmit: "Envoyer ma vidéo",
+    videoPageSent: "Merci ! Ta vidéo est bien reçue. Ta candidature est maintenant en cours d'étude : on t'écrit par email.",
+    videoPageExpired: "Ce lien a expiré (les 3 jours sont passés). Tu peux recommencer ta candidature, ça prend 3 minutes.",
+    videoPageInvalid: "Ce lien n'est pas valide. Utilise le lien de notre email, ou recommence ta candidature.",
+    restart: "Recommencer ma candidature",
   },
   es: {
     heroTitle: "Trabajo: creador/a de contenido UGC para una app móvil",
@@ -110,6 +132,16 @@ export const LANDING_JOB: Record<string, LandingJob> = {
     yapUploadFailed: "La subida no funcionó. Sin problema: pega abajo un link a tu video (YouTube oculto, Google Drive, iCloud…).",
     yapTypeError: "Este archivo no es un video. Elige un video (MP4, MOV) o pega un link abajo.",
     yapSizeError: "Este video pesa más de 200 MB. Mejor pega un link a tu video abajo.",
+    videoLater: "No tengo mi video ahora, lo enviaré después",
+    videoLaterHint: "Recibirás un email con un link personal: tendrás 3 días para agregar tu video.",
+    doneVideoLater: "¡Postulación recibida! Revisa tus emails: tienes 3 días para agregar tu video de presentación con el link que te enviamos.",
+    videoPageTitle: "Agrega tu video de presentación",
+    videoPageIntro: "{{name}}, agrega tu video de presentación (30 a 90 segundos, hablando a cámara) antes del {{date}}. Luego revisaremos tu postulación.",
+    videoPageSubmit: "Enviar mi video",
+    videoPageSent: "¡Gracias! Recibimos tu video. Tu postulación ya está en revisión: te escribiremos por email.",
+    videoPageExpired: "Este link expiró (pasaron los 3 días). Puedes volver a postular, toma 3 minutos.",
+    videoPageInvalid: "Este link no es válido. Usa el link de nuestro email o vuelve a postular.",
+    restart: "Volver a postular",
   },
   ...LANDING_JOB_GENERATED,
 };
