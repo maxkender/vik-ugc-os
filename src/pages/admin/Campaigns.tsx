@@ -278,6 +278,8 @@ export default function Campaigns() {
         </div>
       )}
 
+      <RealFunnel insights={insights.data ?? []} adsets={(camps.data ?? []).flatMap((c: any) => c.meta_adsets ?? [])} />
+
       <Card className="mt-8 p-0">
         <div className="px-6 pt-5"><CardTitle title="Métriques par pays" description="7 derniers jours · CPL = dépense / candidatures venues de Meta (UTM), sinon toutes les candidatures du pays · coût / signé = dépense / créateurs signés" /></div>
         <Table className="rounded-none rounded-b-xl border-x-0 border-b-0 shadow-none">
@@ -443,5 +445,56 @@ function AddAdDialog({ adset, onClose, onCreated }: { adset: any | null; onClose
         </div>
       )}
     </Dialog>
+  );
+}
+
+/**
+ * Funnel réel, first-party (sans cookie, donc complet, contrairement au pixel qui attend le consentement) :
+ * clics Meta → vues de la page job → formulaire ouvert → candidature envoyée, par pays et par ad set (utm_content).
+ */
+function RealFunnel({ insights, adsets }: { insights: any[]; adsets: any[] }) {
+  const q = useQuery({ queryKey: ["funnel-summary"], queryFn: async () => ((await supabase.rpc("funnel_summary", { p_days: 7 })).data ?? []) as { country: string | null; utm_content: string | null; views: number; starts: number; submits: number }[], refetchInterval: 300_000 });
+  const [byAd, setByAd] = useState(false);
+  const adsetById = new Map(adsets.map((a: any) => [a.meta_id, a]));
+  const clicksBy = new Map<string, number>();
+  for (const r of insights) { const a = adsetById.get(r.meta_id); const k = byAd ? r.meta_id : a?.country ?? "?"; clicksBy.set(k, (clicksBy.get(k) ?? 0) + Number(r.clicks ?? 0)); }
+  const rows = new Map<string, { views: number; starts: number; submits: number }>();
+  for (const r of q.data ?? []) {
+    const k = byAd ? r.utm_content ?? "(sans utm)" : r.country ?? "?";
+    const x = rows.get(k) ?? { views: 0, starts: 0, submits: 0 };
+    x.views += Number(r.views); x.starts += Number(r.starts); x.submits += Number(r.submits); rows.set(k, x);
+  }
+  for (const k of clicksBy.keys()) if (!rows.has(k)) rows.set(k, { views: 0, starts: 0, submits: 0 });
+  const pct = (a: number, b: number) => (b > 0 ? `${Math.round((a / b) * 100)} %` : "–");
+  const label = (k: string) => byAd ? (adsetById.get(k)?.name?.replace(/^Recrutement créateurs UGC – /, "") ?? k) : `${k.length === 2 ? flag(k) : ""} ${k}`;
+  const list = [...rows.entries()].sort((a, b) => (clicksBy.get(b[0]) ?? 0) + b[1].views - ((clicksBy.get(a[0]) ?? 0) + a[1].views));
+  return (
+    <Card className="mt-8 p-0" data-testid="real-funnel">
+      <div className="flex flex-wrap items-start justify-between gap-3 px-6 pt-5">
+        <CardTitle title="Funnel réel (7 jours)" description="Mesuré par nous, sans cookie ni donnée perso : complet même quand le visiteur refuse les cookies (Meta ne voit alors ni la vue ni le lead)." />
+        <div className="flex gap-1">
+          <Button size="sm" variant={byAd ? "ghost" : "secondary"} onClick={() => setByAd(false)}>Par pays</Button>
+          <Button size="sm" variant={byAd ? "secondary" : "ghost"} onClick={() => setByAd(true)}>Par ad set</Button>
+        </div>
+      </div>
+      {q.isLoading ? <div className="flex justify-center py-6"><Spinner /></div> : (
+        <Table className="mt-3 rounded-none rounded-b-xl border-x-0 border-b-0 shadow-none">
+          <thead><tr><Th>{byAd ? "Ad set (utm_content)" : "Pays"}</Th><Th num>Clics Meta</Th><Th num>Vues page job</Th><Th num>Clic → vue</Th><Th num>Formulaire ouvert</Th><Th num>Candidatures</Th><Th num>Vue → candidature</Th></tr></thead>
+          <tbody>
+            {list.length === 0 ? <tr><Td colSpan={7} className="text-center text-sm text-muted-foreground">Pas encore de données (le suivi a démarré le 17/11).</Td></tr> : list.map(([k, r]) => (
+              <tr key={k}>
+                <Td>{label(k)}</Td>
+                <Td num>{clicksBy.get(k) ?? "–"}</Td>
+                <Td num>{r.views}</Td>
+                <Td num>{pct(r.views, clicksBy.get(k) ?? 0)}</Td>
+                <Td num>{r.starts}</Td>
+                <Td num>{r.submits}</Td>
+                <Td num>{pct(r.submits, r.views)}</Td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      )}
+    </Card>
   );
 }

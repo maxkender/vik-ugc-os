@@ -11,6 +11,7 @@ import { Button, Field, IconTile, Input, Select, Spinner, Textarea, type Tint } 
 import { uiLangForCountry } from "@/i18n";
 import { JobWarning } from "@/components/public/JobWarning";
 import { landingJob } from "@/i18n/landingJob";
+import { trackFunnel } from "@/lib/funnel";
 import { yapFileCheck, yapLinkProvider } from "@shared/yapVideo.ts";
 import { cn } from "@/lib/utils";
 import { ageOn } from "@shared/zones.ts";
@@ -55,6 +56,11 @@ export default function Apply() {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
 
+  // Funnel first-party (sans cookie) : arrivée sur le formulaire d'un pays ouvert.
+  useEffect(() => {
+    const c = countries?.find((x) => x.code === f.country);
+    if (c?.open) trackFunnel("start_apply", c.code, i18n.resolvedLanguage);
+  }, [countries, f.country]);
   useEffect(() => {
     const c = countries?.find((x) => x.code === f.country);
     if (c && !params.get("lang")) i18n.changeLanguage(uiLangForCountry(c.language));
@@ -117,6 +123,7 @@ export default function Apply() {
       });
       track("Lead", { content_name: "ugc_creator_application", country: f.country }, eventId);
       setDone(true);
+      trackFunnel("submit_apply", f.country, i18n.resolvedLanguage);
       window.scrollTo(0, 0);
     } catch (err) {
       setErrors(String((err as Error).message).split(",").map((s) => s.trim()));

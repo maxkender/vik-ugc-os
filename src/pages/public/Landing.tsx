@@ -3,12 +3,14 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
 import { useQuery } from "@tanstack/react-query";
 import { usePixel } from "@/lib/usePixel";
 import { companyLine } from "@/lib/company";
+import { trackFunnel } from "@/lib/funnel";
 import { landingJob, fillVars } from "@/i18n/landingJob";
 import { JobWarning } from "@/components/public/JobWarning";
 import { ConsentBanner } from "@/components/public/ConsentBanner";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, CalendarCheck, Check, ClipboardList, Globe2, Heart, MessageCircle, PenLine, Play, Plus, Share2, ShieldCheck, Smartphone, TrendingUp, Video, Wallet } from "lucide-react";
 import { publicUrl, supabase } from "@/lib/supabase";
+import PUBLIC_COUNTRIES from "@/data/publicCountries.json";
 import { Button, IconTile, Select, Spinner, type Tint } from "@/components/ui";
 import { LANGS, uiLangForCountry } from "@/i18n";
 import { formatMoney, type ZoneRow } from "@shared/zones.ts";
@@ -28,6 +30,8 @@ interface CountryWithZone {
 export function useOpenCountries() {
   return useQuery({
     queryKey: ["public-countries"],
+    // Instantané embarqué (scripts/snapshot-public-countries.mts) : rendu immédiat, remplacé par les vraies données.
+    placeholderData: PUBLIC_COUNTRIES as unknown as CountryWithZone[],
     queryFn: async () => {
       const { data } = await supabase.from("countries").select("code, name, language, open, zone_code, zones(code, price_per_video, rpm, rpm_views, currency, videos_per_day, bonus_cap, active)").order("name");
       return (data ?? []) as unknown as CountryWithZone[];
@@ -73,6 +77,8 @@ export default function Landing() {
   useEffect(() => {
     if (country && !params.get("lang")) i18n.changeLanguage(uiLangForCountry(country.language));
   }, [country?.code]);
+  // Funnel first-party (sans cookie) : une vue par page de pays ouvert.
+  useEffect(() => { if (open && code) trackFunnel("view_join", code, i18n.resolvedLanguage); }, [open, code]);
 
   const lang = i18n.resolvedLanguage ?? "en";
   const lj = landingJob(lang);
