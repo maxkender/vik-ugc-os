@@ -1,3 +1,4 @@
+import { yapEmbedUrl, yapLinkProvider } from "@shared/yapVideo.ts";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
@@ -103,6 +104,7 @@ export default function Candidates() {
     <div>
       <PageHeader title="Candidats"
         description={profile?.role === "recruiter" ? `Vos pays : ${profile.recruiter_countries.join(", ") || "aucun (demandez à l'admin)"}` : "Revue des candidatures et pipeline de recrutement des créateurs."} />
+      <UploadFailures />
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <Tabs value={view} onChange={setView} items={[
@@ -234,9 +236,16 @@ function ReviewCard({ a, pos, zone, countryName, busy, onPrev, onNext, onDecide 
       <Card className="p-3 lg:sticky lg:top-6 lg:self-start">
         <div className="aspect-[9/16] overflow-hidden rounded-lg bg-[#0b1530]">
           {url ? <video key={url} src={url} controls autoPlay playsInline className="h-full w-full object-contain" />
-            : <div className="flex h-full flex-col items-center justify-center gap-2 text-sm text-white/60">{a.yap_video_path ? <Spinner className="text-white/60" /> : "Pas de vidéo"}</div>}
+            : a.yap_video_url && yapEmbedUrl(a.yap_video_url) ? (
+              <iframe key={a.yap_video_url} src={yapEmbedUrl(a.yap_video_url)!} className="h-full w-full" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen title="Vidéo yap" />
+            ) : a.yap_video_url ? (
+              <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center text-sm text-white/70">
+                <span>Vidéo envoyée par lien ({yapLinkProvider(a.yap_video_url) ?? "lien"})</span>
+                <a href={a.yap_video_url} target="_blank" rel="noopener noreferrer"><Button size="sm" variant="secondary"><ExternalLink className="h-3.5 w-3.5" /> Ouvrir la vidéo</Button></a>
+              </div>
+            ) : <div className="flex h-full flex-col items-center justify-center gap-2 text-sm text-white/60">{a.yap_video_path ? <Spinner className="text-white/60" /> : "Pas de vidéo"}</div>}
         </div>
-        <p className="mt-3 px-1 text-xs text-subtle-foreground">Vidéo de présentation (« yap »)</p>
+        <p className="mt-3 px-1 text-xs text-subtle-foreground">Vidéo de présentation (« yap »){a.yap_video_url && <> · <a href={a.yap_video_url} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">lien d'origine ↗</a></>}</p>
       </Card>
 
       <div className="min-w-0 space-y-5">
@@ -295,5 +304,26 @@ function ReviewCard({ a, pos, zone, countryName, busy, onPrev, onNext, onDecide 
         </Card>
       </div>
     </div>
+  );
+}
+
+/** Échecs d'envoi de la vidéo de présentation (7 derniers jours) : taille, type MIME, navigateur. */
+function UploadFailures() {
+  const q = useQuery({
+    queryKey: ["upload-failures"],
+    queryFn: async () => (await supabase.from("upload_failures").select("*").gte("created_at", new Date(Date.now() - 7 * 86_400_000).toISOString()).order("created_at", { ascending: false }).limit(50)).data ?? [],
+    refetchInterval: 120_000,
+  });
+  const rows = (q.data ?? []) as any[];
+  if (!rows.length) return null;
+  const mb = (n: number | null) => (n ? `${(n / 1048576).toFixed(0)} Mo` : "?");
+  const ua = (u: string) => /iPhone|iPad/.test(u) ? "iOS" : /Android/.test(u) ? "Android" : /Mac OS/.test(u) ? "Mac" : /Windows/.test(u) ? "Windows" : "autre";
+  return (
+    <details className="mb-5 rounded-2xl border border-[#ffd2d0] bg-[#fff6f5] px-5 py-3" data-testid="upload-failures">
+      <summary className="cursor-pointer text-sm font-semibold text-[#a52326]">⚠ {rows.length} échec(s) d'envoi de vidéo sur 7 jours (le formulaire propose alors un lien)</summary>
+      <ul className="mt-2 space-y-1 text-xs text-[#7a1d1f]">
+        {rows.map((r) => <li key={r.id}>{new Date(r.created_at).toLocaleString("fr-FR")} · {r.country ?? "?"} · {mb(r.file_size)} · .{r.file_ext || "?"} · type « {r.mime || "vide"} » · {ua(r.user_agent ?? "")} · {r.error}</li>)}
+      </ul>
+    </details>
   );
 }

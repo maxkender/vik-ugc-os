@@ -16,6 +16,8 @@ export interface LandingJob {
   pricePerVideo: string;
   iphoneTitle: string; iphoneText: string; faqIphoneQ: string; faqIphoneA: string;
   applyIphone: string; yes: string; no: string; iphoneBlocked: string;
+  yapLinkToggle: string; yapLinkLabel: string; yapLinkHint: string; yapLinkInvalid: string; yapLinkOk: string;
+  yapUploadFailed: string; yapTypeError: string; yapSizeError: string;
 }
 
 export const LANDING_JOB: Record<string, LandingJob> = {
@@ -40,6 +42,14 @@ export const LANDING_JOB: Record<string, LandingJob> = {
     yes: "Yes",
     no: "No",
     iphoneBlocked: "Thanks for your interest! This job requires an iPhone (the app and the premium access we provide are iPhone only), so we can't accept your application for now.",
+    yapLinkToggle: "Video too big? Paste a link instead",
+    yapLinkLabel: "Link to your video",
+    yapLinkHint: "YouTube (even unlisted), Instagram, TikTok, Google Drive, Dropbox, WeTransfer or iCloud. Make sure the link is accessible.",
+    yapLinkInvalid: "Use a https link from YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer or iCloud.",
+    yapLinkOk: "Link accepted ✓",
+    yapUploadFailed: "The upload didn't work. No problem: paste a link to your video below (YouTube unlisted, Google Drive, iCloud…).",
+    yapTypeError: "This file isn't a video. Choose a video (MP4, MOV) or paste a link below.",
+    yapSizeError: "This video is over 200 MB. Paste a link to it below instead.",
   },
   fr: {
     heroTitle: "Job : créateur·rice de contenu UGC pour une app mobile",
@@ -62,6 +72,14 @@ export const LANDING_JOB: Record<string, LandingJob> = {
     yes: "Oui",
     no: "Non",
     iphoneBlocked: "Merci pour ton intérêt ! Ce job demande un iPhone (l'app et l'accès premium qu'on fournit sont uniquement sur iPhone) : on ne peut donc pas accepter ta candidature pour l'instant.",
+    yapLinkToggle: "Ta vidéo est trop lourde ? Colle un lien",
+    yapLinkLabel: "Lien vers ta vidéo",
+    yapLinkHint: "YouTube (même non répertoriée), Instagram, TikTok, Google Drive, Dropbox, WeTransfer ou iCloud. Vérifie que le lien est accessible.",
+    yapLinkInvalid: "Utilise un lien https YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer ou iCloud.",
+    yapLinkOk: "Lien accepté ✓",
+    yapUploadFailed: "L'envoi n'a pas fonctionné. Pas de souci : colle ci-dessous un lien vers ta vidéo (YouTube non répertoriée, Google Drive, iCloud…).",
+    yapTypeError: "Ce fichier n'est pas une vidéo. Choisis une vidéo (MP4, MOV) ou colle un lien ci-dessous.",
+    yapSizeError: "Cette vidéo dépasse 200 Mo. Colle plutôt un lien vers ta vidéo ci-dessous.",
   },
   es: {
     heroTitle: "Trabajo: creador/a de contenido UGC para una app móvil",
@@ -84,6 +102,14 @@ export const LANDING_JOB: Record<string, LandingJob> = {
     yes: "Sí",
     no: "No",
     iphoneBlocked: "¡Gracias por tu interés! Este trabajo requiere un iPhone (la app y el acceso premium que damos son solo para iPhone), así que por ahora no podemos aceptar tu postulación.",
+    yapLinkToggle: "¿Tu video pesa demasiado? Pega un link",
+    yapLinkLabel: "Link a tu video",
+    yapLinkHint: "YouTube (aunque sea oculto), Instagram, TikTok, Google Drive, Dropbox, WeTransfer o iCloud. Revisa que el link sea accesible.",
+    yapLinkInvalid: "Usa un link https de YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer o iCloud.",
+    yapLinkOk: "Link aceptado ✓",
+    yapUploadFailed: "La subida no funcionó. Sin problema: pega abajo un link a tu video (YouTube oculto, Google Drive, iCloud…).",
+    yapTypeError: "Este archivo no es un video. Elige un video (MP4, MOV) o pega un link abajo.",
+    yapSizeError: "Este video pesa más de 200 MB. Mejor pega un link a tu video abajo.",
   },
   ...LANDING_JOB_GENERATED,
 };

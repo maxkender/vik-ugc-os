@@ -29,7 +29,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Har du en iPhone?",
     "yes": "Ja",
     "no": "Nej",
-    "iphoneBlocked": "Tak for din interesse! Dette job kræver en iPhone (appen og den premium-adgang, vi stiller til rådighed, virker kun på iPhone), så vi kan desværre ikke acceptere din ansøgning lige nu."
+    "iphoneBlocked": "Tak for din interesse! Dette job kræver en iPhone (appen og den premium-adgang, vi stiller til rådighed, virker kun på iPhone), så vi kan desværre ikke acceptere din ansøgning lige nu.",
+    "yapLinkToggle": "Er din video for stor? Indsæt et link i stedet",
+    "yapLinkLabel": "Link til din video",
+    "yapLinkHint": "YouTube (også uopført), Instagram, TikTok, Google Drive, Dropbox, WeTransfer eller iCloud. Sørg for, at linket er tilgængeligt.",
+    "yapLinkInvalid": "Brug et https-link fra YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer eller iCloud.",
+    "yapLinkOk": "Link accepteret ✓",
+    "yapUploadFailed": "Uploaden virkede ikke. Intet problem: Indsæt et link til din video herunder (YouTube uopført, Google Drive, iCloud…).",
+    "yapTypeError": "Denne fil er ikke en video. Vælg en video (MP4, MOV), eller indsæt et link herunder.",
+    "yapSizeError": "Denne video er over 200 MB. Indsæt i stedet et link til den herunder."
   },
   "ar": {
     "heroTitle": "وظيفة: صانع/ة محتوى UGC لتطبيق جوال",
@@ -58,7 +66,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "هل لديك iPhone؟",
     "yes": "نعم",
     "no": "لا",
-    "iphoneBlocked": "شكراً لاهتمامك! هذه الوظيفة تتطلب iPhone (التطبيق والوصول المميز الذي نوفره يعملان على iPhone فقط)، لذلك لا يمكننا قبول طلبك في الوقت الحالي."
+    "iphoneBlocked": "شكراً لاهتمامك! هذه الوظيفة تتطلب iPhone (التطبيق والوصول المميز الذي نوفره يعملان على iPhone فقط)، لذلك لا يمكننا قبول طلبك في الوقت الحالي.",
+    "yapLinkToggle": "الفيديو كبير جدًا؟ الصق رابطًا بدلًا منه",
+    "yapLinkLabel": "رابط الفيديو الخاص بك",
+    "yapLinkHint": "YouTube (حتى لو كان غير مدرج)، Instagram، TikTok، Google Drive، Dropbox، WeTransfer أو iCloud. تأكد أن الرابط يمكن فتحه.",
+    "yapLinkInvalid": "استخدم رابط https من YouTube أو Instagram أو TikTok أو Google Drive أو Dropbox أو WeTransfer أو iCloud.",
+    "yapLinkOk": "تم قبول الرابط ✓",
+    "yapUploadFailed": "فشل الرفع. لا تقلق: الصق أدناه رابطًا لفيديو الخاص بك (YouTube غير مدرج، Google Drive، iCloud…).",
+    "yapTypeError": "هذا الملف ليس فيديو. اختر فيديو (MP4، MOV) أو الصق رابطًا أدناه.",
+    "yapSizeError": "حجم هذا الفيديو يتجاوز 200 ميغابايت. الصق بدلًا من ذلك رابطًا له أدناه."
   },
   "bg": {
     "heroTitle": "Работа: UGC създател на съдържание за мобилно приложение",
@@ -87,7 +103,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Имаш ли iPhone?",
     "yes": "Да",
     "no": "Не",
-    "iphoneBlocked": "Благодарим за интереса! Тази работа изисква iPhone (приложението и премиум достъпът, които предоставяме, работят само на iPhone), затова засега не можем да приемем кандидатурата ти."
+    "iphoneBlocked": "Благодарим за интереса! Тази работа изисква iPhone (приложението и премиум достъпът, които предоставяме, работят само на iPhone), затова засега не можем да приемем кандидатурата ти.",
+    "yapLinkToggle": "Видеото ти е твърде голямо? Постави линк",
+    "yapLinkLabel": "Линк към твоето видео",
+    "yapLinkHint": "YouTube (дори скрито), Instagram, TikTok, Google Drive, Dropbox, WeTransfer или iCloud. Увери се, че линкът е достъпен.",
+    "yapLinkInvalid": "Използвай https линк от YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer или iCloud.",
+    "yapLinkOk": "Линкът е приет ✓",
+    "yapUploadFailed": "Качването не се получи. Няма проблем: постави по-долу линк към видеото си (YouTube като скрито, Google Drive, iCloud…).",
+    "yapTypeError": "Този файл не е видео. Избери видео (MP4, MOV) или постави линк по-долу.",
+    "yapSizeError": "Това видео е над 200 MB. Вместо това постави по-долу линк към него."
   },
   "cs": {
     "heroTitle": "Práce: tvůrce/tvůrkyně UGC obsahu pro mobilní aplikaci",
@@ -116,7 +140,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Máš iPhone?",
     "yes": "Ano",
     "no": "Ne",
-    "iphoneBlocked": "Díky za tvůj zájem! Tato práce vyžaduje iPhone (aplikace a prémiový přístup, který poskytujeme, fungují pouze na iPhonu), takže tvou přihlášku zatím bohužel nemůžeme přijmout."
+    "iphoneBlocked": "Díky za tvůj zájem! Tato práce vyžaduje iPhone (aplikace a prémiový přístup, který poskytujeme, fungují pouze na iPhonu), takže tvou přihlášku zatím bohužel nemůžeme přijmout.",
+    "yapLinkToggle": "Video je moc velké? Vlož místo něj odkaz",
+    "yapLinkLabel": "Odkaz na tvoje video",
+    "yapLinkHint": "YouTube (i neveřejné), Instagram, TikTok, Google Drive, Dropbox, WeTransfer nebo iCloud. Ujisti se, že je odkaz přístupný.",
+    "yapLinkInvalid": "Použij odkaz začínající https z YouTube, Instagramu, TikToku, Google Drive, Dropboxu, WeTransferu nebo iCloudu.",
+    "yapLinkOk": "Odkaz přijat ✓",
+    "yapUploadFailed": "Nahrání se nepovedlo. Žádný problém: vlož níže odkaz na své video (neveřejné video na YouTube, Google Drive, iCloud…).",
+    "yapTypeError": "Tenhle soubor není video. Vyber video (MP4, MOV) nebo níže vlož odkaz.",
+    "yapSizeError": "Tohle video má přes 200 MB. Vlož místo něj níže odkaz na video."
   },
   "el": {
     "heroTitle": "Δουλειά: δημιουργός περιεχομένου UGC για μια εφαρμογή κινητού",
@@ -145,7 +177,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Έχεις iPhone;",
     "yes": "Ναι",
     "no": "Όχι",
-    "iphoneBlocked": "Ευχαριστούμε για το ενδιαφέρον σου! Αυτή η δουλειά απαιτεί iPhone (η εφαρμογή και η premium πρόσβαση που παρέχουμε λειτουργούν μόνο σε iPhone), οπότε προς το παρόν δεν μπορούμε να δεχτούμε την αίτησή σου."
+    "iphoneBlocked": "Ευχαριστούμε για το ενδιαφέρον σου! Αυτή η δουλειά απαιτεί iPhone (η εφαρμογή και η premium πρόσβαση που παρέχουμε λειτουργούν μόνο σε iPhone), οπότε προς το παρόν δεν μπορούμε να δεχτούμε την αίτησή σου.",
+    "yapLinkToggle": "Το βίντεο είναι πολύ μεγάλο; Επικόλλησε έναν σύνδεσμο",
+    "yapLinkLabel": "Σύνδεσμος προς το βίντεό σου",
+    "yapLinkHint": "YouTube (ακόμα και μη καταχωρισμένο), Instagram, TikTok, Google Drive, Dropbox, WeTransfer ή iCloud. Βεβαιώσου ότι ο σύνδεσμος είναι προσβάσιμος.",
+    "yapLinkInvalid": "Χρησιμοποίησε έναν σύνδεσμο https από YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer ή iCloud.",
+    "yapLinkOk": "Ο σύνδεσμος έγινε δεκτός ✓",
+    "yapUploadFailed": "Η μεταφόρτωση δεν λειτούργησε. Κανένα πρόβλημα: επικόλλησε παρακάτω έναν σύνδεσμο προς το βίντεό σου (YouTube μη καταχωρισμένο, Google Drive, iCloud…).",
+    "yapTypeError": "Αυτό το αρχείο δεν είναι βίντεο. Διάλεξε ένα βίντεο (MP4, MOV) ή επικόλλησε έναν σύνδεσμο παρακάτω.",
+    "yapSizeError": "Αυτό το βίντεο ξεπερνά τα 200 MB. Επικόλλησε καλύτερα έναν σύνδεσμο προς το βίντεο παρακάτω."
   },
   "de": {
     "heroTitle": "Job: UGC Content Creator für eine mobile App",
@@ -174,7 +214,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Hast du ein iPhone?",
     "yes": "Ja",
     "no": "Nein",
-    "iphoneBlocked": "Danke für dein Interesse! Für diesen Job brauchst du ein iPhone (die App und der Premium-Zugang, den wir zur Verfügung stellen, funktionieren nur auf dem iPhone). Deshalb können wir deine Bewerbung vorerst leider nicht annehmen."
+    "iphoneBlocked": "Danke für dein Interesse! Für diesen Job brauchst du ein iPhone (die App und der Premium-Zugang, den wir zur Verfügung stellen, funktionieren nur auf dem iPhone). Deshalb können wir deine Bewerbung vorerst leider nicht annehmen.",
+    "yapLinkToggle": "Video zu groß? Füge stattdessen einen Link ein",
+    "yapLinkLabel": "Link zu deinem Video",
+    "yapLinkHint": "YouTube (auch nicht gelistet), Instagram, TikTok, Google Drive, Dropbox, WeTransfer oder iCloud. Achte darauf, dass der Link zugänglich ist.",
+    "yapLinkInvalid": "Verwende einen https-Link von YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer oder iCloud.",
+    "yapLinkOk": "Link akzeptiert ✓",
+    "yapUploadFailed": "Der Upload hat nicht geklappt. Kein Problem: Füge unten einen Link zu deinem Video ein (YouTube nicht gelistet, Google Drive, iCloud…).",
+    "yapTypeError": "Diese Datei ist kein Video. Wähle ein Video (MP4, MOV) oder füge unten einen Link ein.",
+    "yapSizeError": "Dieses Video ist größer als 200 MB. Füge stattdessen unten einen Link zu deinem Video ein."
   },
   "it": {
     "heroTitle": "Lavoro: creator di contenuti UGC per un'app mobile",
@@ -203,7 +251,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Hai un iPhone?",
     "yes": "Sì",
     "no": "No",
-    "iphoneBlocked": "Grazie per il tuo interesse! Questo lavoro richiede un iPhone (l'app e l'accesso premium che forniamo funzionano solo su iPhone), quindi per ora non possiamo accettare la tua candidatura."
+    "iphoneBlocked": "Grazie per il tuo interesse! Questo lavoro richiede un iPhone (l'app e l'accesso premium che forniamo funzionano solo su iPhone), quindi per ora non possiamo accettare la tua candidatura.",
+    "yapLinkToggle": "Il video è troppo pesante? Incolla un link",
+    "yapLinkLabel": "Link al tuo video",
+    "yapLinkHint": "YouTube (anche non in elenco), Instagram, TikTok, Google Drive, Dropbox, WeTransfer o iCloud. Controlla che il link sia accessibile.",
+    "yapLinkInvalid": "Usa un link https di YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer o iCloud.",
+    "yapLinkOk": "Link accettato ✓",
+    "yapUploadFailed": "Il caricamento non è andato a buon fine. Nessun problema: incolla qui sotto un link al tuo video (YouTube non in elenco, Google Drive, iCloud…).",
+    "yapTypeError": "Questo file non è un video. Scegli un video (MP4, MOV) o incolla un link qui sotto.",
+    "yapSizeError": "Questo video supera i 200 MB. Incolla invece un link al video qui sotto."
   },
   "hr": {
     "heroTitle": "Posao: UGC kreator sadržaja za mobilnu aplikaciju",
@@ -232,7 +288,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Imaš li iPhone?",
     "yes": "Da",
     "no": "Ne",
-    "iphoneBlocked": "Hvala na interesu! Za ovaj je posao potreban iPhone (aplikacija i premium pristup koje osiguravamo rade samo na iPhoneu), pa za sada ne možemo prihvatiti tvoju prijavu."
+    "iphoneBlocked": "Hvala na interesu! Za ovaj je posao potreban iPhone (aplikacija i premium pristup koje osiguravamo rade samo na iPhoneu), pa za sada ne možemo prihvatiti tvoju prijavu.",
+    "yapLinkToggle": "Video je prevelik? Zalijepi link umjesto toga",
+    "yapLinkLabel": "Link na tvoj video",
+    "yapLinkHint": "YouTube (čak i nenavedeni), Instagram, TikTok, Google Drive, Dropbox, WeTransfer ili iCloud. Provjeri je li link dostupan.",
+    "yapLinkInvalid": "Upotrijebi https link s YouTubea, Instagrama, TikToka, Google Drivea, Dropboxa, WeTransfera ili iClouda.",
+    "yapLinkOk": "Link je prihvaćen ✓",
+    "yapUploadFailed": "Prijenos nije uspio. Bez brige: zalijepi dolje link na svoj video (YouTube nenavedeni, Google Drive, iCloud…).",
+    "yapTypeError": "Ova datoteka nije video. Odaberi video (MP4, MOV) ili zalijepi link dolje.",
+    "yapSizeError": "Ovaj video je veći od 200 MB. Umjesto toga dolje zalijepi link na njega."
   },
   "fi": {
     "heroTitle": "Työ: UGC-sisällöntuottaja mobiilisovellukselle",
@@ -261,7 +325,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Onko sinulla iPhone?",
     "yes": "Kyllä",
     "no": "Ei",
-    "iphoneBlocked": "Kiitos kiinnostuksestasi! Tähän työhön tarvitaan iPhone (app ja tarjoamamme premium-käyttöoikeus toimivat vain iPhonella), joten emme valitettavasti voi hyväksyä hakemustasi toistaiseksi."
+    "iphoneBlocked": "Kiitos kiinnostuksestasi! Tähän työhön tarvitaan iPhone (app ja tarjoamamme premium-käyttöoikeus toimivat vain iPhonella), joten emme valitettavasti voi hyväksyä hakemustasi toistaiseksi.",
+    "yapLinkToggle": "Video liian iso? Liitä sen sijaan linkki",
+    "yapLinkLabel": "Linkki videoosi",
+    "yapLinkHint": "YouTube (myös piilotettu), Instagram, TikTok, Google Drive, Dropbox, WeTransfer tai iCloud. Varmista, että linkki toimii.",
+    "yapLinkInvalid": "Käytä https-linkkiä, joka johtaa YouTubeen, Instagramiin, TikTokiin, Google Driveen, Dropboxiin, WeTransferiin tai iCloudiin.",
+    "yapLinkOk": "Linkki hyväksytty ✓",
+    "yapUploadFailed": "Lataus ei onnistunut. Ei hätää: liitä alle linkki videoosi (YouTube-piilotettu, Google Drive, iCloud…).",
+    "yapTypeError": "Tämä tiedosto ei ole video. Valitse video (MP4, MOV) tai liitä linkki alle.",
+    "yapSizeError": "Tämä video on yli 200 Mt. Liitä sen sijaan linkki videoosi alle."
   },
   "hu": {
     "heroTitle": "Munka: UGC-tartalomgyártó egy mobilappnak",
@@ -290,7 +362,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Van iPhone-od?",
     "yes": "Igen",
     "no": "Nem",
-    "iphoneBlocked": "Köszönjük az érdeklődésedet! Ehhez a munkához iPhone szükséges (az app és az általunk biztosított prémium hozzáférés csak iPhone-on működik), ezért a jelentkezésedet egyelőre nem tudjuk elfogadni."
+    "iphoneBlocked": "Köszönjük az érdeklődésedet! Ehhez a munkához iPhone szükséges (az app és az általunk biztosított prémium hozzáférés csak iPhone-on működik), ezért a jelentkezésedet egyelőre nem tudjuk elfogadni.",
+    "yapLinkToggle": "Túl nagy a videó? Illessz be inkább egy linket",
+    "yapLinkLabel": "A videód linkje",
+    "yapLinkHint": "YouTube (akár nem listázott), Instagram, TikTok, Google Drive, Dropbox, WeTransfer vagy iCloud. Ellenőrizd, hogy a link elérhető legyen.",
+    "yapLinkInvalid": "Használj https linket a következők egyikéről: YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer vagy iCloud.",
+    "yapLinkOk": "Link elfogadva ✓",
+    "yapUploadFailed": "A feltöltés nem sikerült. Semmi gond: illessz be lent egy linket a videódhoz (YouTube nem listázott, Google Drive, iCloud…).",
+    "yapTypeError": "Ez a fájl nem videó. Válassz egy videót (MP4, MOV), vagy illessz be lent egy linket.",
+    "yapSizeError": "Ez a videó nagyobb, mint 200 MB. Illessz be inkább lent egy linket hozzá."
   },
   "et": {
     "heroTitle": "Töö: UGC-sisuloojaks mobiilirakendusele",
@@ -319,7 +399,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Kas sul on iPhone?",
     "yes": "Jah",
     "no": "Ei",
-    "iphoneBlocked": "Aitäh huvi eest! See töö eeldab iPhone'i (rakendus ja premium-ligipääs, mille me anname, töötavad ainult iPhone'is), seega me ei saa su avaldust praegu vastu võtta."
+    "iphoneBlocked": "Aitäh huvi eest! See töö eeldab iPhone'i (rakendus ja premium-ligipääs, mille me anname, töötavad ainult iPhone'is), seega me ei saa su avaldust praegu vastu võtta.",
+    "yapLinkToggle": "Video on liiga suur? Kleebi hoopis link",
+    "yapLinkLabel": "Link sinu videole",
+    "yapLinkHint": "YouTube (ka määratlemata), Instagram, TikTok, Google Drive, Dropbox, WeTransfer või iCloud. Veendu, et link oleks ligipääsetav.",
+    "yapLinkInvalid": "Kasuta https-linki YouTube'ist, Instagramist, TikTokist, Google Drive'ist, Dropboxist, WeTransferist või iCloudist.",
+    "yapLinkOk": "Link on vastu võetud ✓",
+    "yapUploadFailed": "Üleslaadimine ei õnnestunud. Pole hullu: kleebi allpool link oma videole (YouTube'i määratlemata video, Google Drive, iCloud…).",
+    "yapTypeError": "See fail ei ole video. Vali video (MP4, MOV) või kleebi allpool link.",
+    "yapSizeError": "See video on suurem kui 200 MB. Kleebi hoopis allpool link oma videole."
   },
   "he": {
     "heroTitle": "משרה: יוצר/ת תוכן UGC לאפליקציה סלולרית",
@@ -348,7 +436,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "יש לך iPhone?",
     "yes": "כן",
     "no": "לא",
-    "iphoneBlocked": "תודה על ההתעניינות! העבודה הזו דורשת iPhone (האפליקציה והגישה הפרימיום שאנחנו מספקים עובדות רק על iPhone), ולכן אנחנו לא יכולים לקבל את המועמדות שלך כרגע."
+    "iphoneBlocked": "תודה על ההתעניינות! העבודה הזו דורשת iPhone (האפליקציה והגישה הפרימיום שאנחנו מספקים עובדות רק על iPhone), ולכן אנחנו לא יכולים לקבל את המועמדות שלך כרגע.",
+    "yapLinkToggle": "הסרטון שלך כבד מדי? הדבק/י במקומו קישור",
+    "yapLinkLabel": "קישור לסרטון שלך",
+    "yapLinkHint": "YouTube (גם לא רשום), Instagram, TikTok, Google Drive, Dropbox, WeTransfer או iCloud. ודא/י שהקישור נגיש.",
+    "yapLinkInvalid": "השתמש/י בקישור https מ-YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer או iCloud.",
+    "yapLinkOk": "הקישור התקבל ✓",
+    "yapUploadFailed": "ההעלאה לא הצליחה. אין בעיה: הדבק/י למטה קישור לסרטון שלך (YouTube לא רשום, Google Drive, iCloud…).",
+    "yapTypeError": "הקובץ הזה הוא לא סרטון. בחר/י סרטון (MP4, MOV) או הדבק/י קישור למטה.",
+    "yapSizeError": "הסרטון הזה גדול מ-200 MB. הדבק/י במקומו קישור אליו למטה."
   },
   "nl": {
     "heroTitle": "Job: UGC-contentmaker voor een mobiele app",
@@ -377,7 +473,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Heb je een iPhone?",
     "yes": "Ja",
     "no": "Nee",
-    "iphoneBlocked": "Bedankt voor je interesse! Voor deze job is een iPhone nodig (de app en de premiumtoegang die we bieden werken alleen op iPhone), dus we kunnen je aanmelding voorlopig niet accepteren."
+    "iphoneBlocked": "Bedankt voor je interesse! Voor deze job is een iPhone nodig (de app en de premiumtoegang die we bieden werken alleen op iPhone), dus we kunnen je aanmelding voorlopig niet accepteren.",
+    "yapLinkToggle": "Is je video te groot? Plak een link",
+    "yapLinkLabel": "Link naar je video",
+    "yapLinkHint": "YouTube (ook als niet-vermeld), Instagram, TikTok, Google Drive, Dropbox, WeTransfer of iCloud. Controleer of de link toegankelijk is.",
+    "yapLinkInvalid": "Gebruik een https-link van YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer of iCloud.",
+    "yapLinkOk": "Link geaccepteerd ✓",
+    "yapUploadFailed": "De upload is niet gelukt. Geen zorgen: plak hieronder een link naar je video (YouTube niet-vermeld, Google Drive, iCloud…).",
+    "yapTypeError": "Dit bestand is geen video. Kies een video (MP4, MOV) of plak hieronder een link.",
+    "yapSizeError": "Deze video is groter dan 200 MB. Plak hieronder in plaats daarvan een link naar je video."
   },
   "no": {
     "heroTitle": "Jobb: UGC-skaper for en mobilapp",
@@ -406,7 +510,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Har du en iPhone?",
     "yes": "Ja",
     "no": "Nei",
-    "iphoneBlocked": "Takk for interessen din! Denne jobben krever en iPhone (appen og premium-tilgangen vi gir deg fungerer bare på iPhone), så vi kan dessverre ikke ta imot søknaden din for øyeblikket."
+    "iphoneBlocked": "Takk for interessen din! Denne jobben krever en iPhone (appen og premium-tilgangen vi gir deg fungerer bare på iPhone), så vi kan dessverre ikke ta imot søknaden din for øyeblikket.",
+    "yapLinkToggle": "Er videoen for stor? Lim inn en lenke i stedet",
+    "yapLinkLabel": "Lenke til videoen din",
+    "yapLinkHint": "YouTube (også uoppført), Instagram, TikTok, Google Drive, Dropbox, WeTransfer eller iCloud. Sjekk at lenken er tilgjengelig.",
+    "yapLinkInvalid": "Bruk en https-lenke fra YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer eller iCloud.",
+    "yapLinkOk": "Lenken er godkjent ✓",
+    "yapUploadFailed": "Opplastingen fungerte ikke. Ikke noe problem: lim inn en lenke til videoen din nedenfor (YouTube uoppført, Google Drive, iCloud …).",
+    "yapTypeError": "Denne filen er ikke en video. Velg en video (MP4, MOV) eller lim inn en lenke nedenfor.",
+    "yapSizeError": "Denne videoen er over 200 MB. Lim heller inn en lenke til den nedenfor."
   },
   "ja": {
     "heroTitle": "求人:モバイルアプリのUGCコンテンツクリエイター",
@@ -435,7 +547,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "iPhoneを持っていますか?",
     "yes": "はい",
     "no": "いいえ",
-    "iphoneBlocked": "ご興味を持ってくれてありがとう!この仕事にはiPhoneが必要で(アプリとこちらで提供するプレミアムアクセスはiPhone専用です)、残念ながら今回は応募を受け付けることができません。"
+    "iphoneBlocked": "ご興味を持ってくれてありがとう!この仕事にはiPhoneが必要で(アプリとこちらで提供するプレミアムアクセスはiPhone専用です)、残念ながら今回は応募を受け付けることができません。",
+    "yapLinkToggle": "動画が重すぎる?リンクを貼ってね",
+    "yapLinkLabel": "動画のリンク",
+    "yapLinkHint": "YouTube(限定公開もOK)、Instagram、TikTok、Google Drive、Dropbox、WeTransfer、iCloudに対応してるよ。リンクがちゃんと開けるか確認してね。",
+    "yapLinkInvalid": "YouTube、Instagram、TikTok、Google Drive、Dropbox、WeTransfer、iCloudのhttpsリンクを使ってね。",
+    "yapLinkOk": "リンクを確認したよ ✓",
+    "yapUploadFailed": "アップロードがうまくいかなかったよ。大丈夫、下に動画のリンクを貼ってね(YouTubeの限定公開、Google Drive、iCloudなど)。",
+    "yapTypeError": "このファイルは動画じゃないみたい。動画(MP4、MOV)を選ぶか、下にリンクを貼ってね。",
+    "yapSizeError": "この動画は200MBを超えてるよ。代わりに下へ動画のリンクを貼ってね。"
   },
   "ko": {
     "heroTitle": "직무: 모바일 앱 UGC 콘텐츠 크리에이터",
@@ -464,7 +584,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "iPhone 있어요?",
     "yes": "네",
     "no": "아니요",
-    "iphoneBlocked": "관심 가져 주셔서 고마워요! 이 일은 iPhone이 필요해서(앱과 저희가 제공하는 프리미엄 이용권은 iPhone 전용이에요) 아쉽지만 지금은 지원을 받을 수가 없어요."
+    "iphoneBlocked": "관심 가져 주셔서 고마워요! 이 일은 iPhone이 필요해서(앱과 저희가 제공하는 프리미엄 이용권은 iPhone 전용이에요) 아쉽지만 지금은 지원을 받을 수가 없어요.",
+    "yapLinkToggle": "영상 용량이 너무 커? 링크를 붙여넣어 봐",
+    "yapLinkLabel": "영상 링크",
+    "yapLinkHint": "YouTube(일부 공개 아님 포함), Instagram, TikTok, Google Drive, Dropbox, WeTransfer 또는 iCloud 링크를 사용할 수 있어. 링크에 접근할 수 있는지 꼭 확인해 줘.",
+    "yapLinkInvalid": "YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer 또는 iCloud의 https 링크를 사용해 줘.",
+    "yapLinkOk": "링크가 확인됐어 ✓",
+    "yapUploadFailed": "업로드가 제대로 되지 않았어. 괜찮아, 아래에 영상 링크를 붙여넣어 줘 (YouTube 일부 공개, Google Drive, iCloud 등).",
+    "yapTypeError": "이 파일은 영상이 아니야. 영상(MP4, MOV)을 선택하거나 아래에 링크를 붙여넣어 줘.",
+    "yapSizeError": "이 영상은 200MB를 넘어. 대신 아래에 영상 링크를 붙여넣어 줘."
   },
   "lv": {
     "heroTitle": "Darbs: UGC satura veidotājs/-a mobilajai lietotnei",
@@ -493,7 +621,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Vai tev ir iPhone?",
     "yes": "Jā",
     "no": "Nē",
-    "iphoneBlocked": "Paldies par interesi! Šim darbam nepieciešams iPhone (lietotne un premium piekļuve, ko mēs nodrošinām, darbojas tikai iPhone tālrunī), tāpēc pašlaik nevaram pieņemt tavu pieteikumu."
+    "iphoneBlocked": "Paldies par interesi! Šim darbam nepieciešams iPhone (lietotne un premium piekļuve, ko mēs nodrošinām, darbojas tikai iPhone tālrunī), tāpēc pašlaik nevaram pieņemt tavu pieteikumu.",
+    "yapLinkToggle": "Video par lielu? Ielīmē saiti",
+    "yapLinkLabel": "Saite uz tavu video",
+    "yapLinkHint": "YouTube (arī nelistēts), Instagram, TikTok, Google Drive, Dropbox, WeTransfer vai iCloud. Pārliecinies, ka saite ir pieejama.",
+    "yapLinkInvalid": "Izmanto https saiti no YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer vai iCloud.",
+    "yapLinkOk": "Saite pieņemta ✓",
+    "yapUploadFailed": "Augšupielāde neizdevās. Nekas vārgs: ielīmē zemāk saiti uz savu video (YouTube nelistēts, Google Drive, iCloud…).",
+    "yapTypeError": "Šis fails nav video. Izvēlies video (MP4, MOV) vai ielīmē saiti zemāk.",
+    "yapSizeError": "Šis video ir lielāks par 200 MB. Tā vietā zemāk ielīmē saiti uz to."
   },
   "lt": {
     "heroTitle": "Darbas: UGC turinio kūrėjas (-a) mobiliajai programėlei",
@@ -522,7 +658,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Ar turi iPhone?",
     "yes": "Taip",
     "no": "Ne",
-    "iphoneBlocked": "Ačiū už susidomėjimą! Šiam darbui reikalingas iPhone (programėlė ir premium prieiga, kurią suteikiame, veikia tik iPhone), todėl šiuo metu negalime priimti tavo paraiškos."
+    "iphoneBlocked": "Ačiū už susidomėjimą! Šiam darbui reikalingas iPhone (programėlė ir premium prieiga, kurią suteikiame, veikia tik iPhone), todėl šiuo metu negalime priimti tavo paraiškos.",
+    "yapLinkToggle": "Vaizdo įrašas per didelis? Įklijuok nuorodą",
+    "yapLinkLabel": "Nuoroda į tavo vaizdo įrašą",
+    "yapLinkHint": "YouTube (net ir nenurodytas viešai), Instagram, TikTok, Google Drive, Dropbox, WeTransfer arba iCloud. Įsitikink, kad nuoroda yra pasiekiama.",
+    "yapLinkInvalid": "Naudok https nuorodą iš YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer arba iCloud.",
+    "yapLinkOk": "Nuoroda priimta ✓",
+    "yapUploadFailed": "Įkelti nepavyko. Nieko tokio: žemiau įklijuok nuorodą į savo vaizdo įrašą (YouTube nenurodytas viešai, Google Drive, iCloud…).",
+    "yapTypeError": "Šis failas nėra vaizdo įrašas. Pasirink vaizdo įrašą (MP4, MOV) arba žemiau įklijuok nuorodą.",
+    "yapSizeError": "Šis vaizdo įrašas viršija 200 MB. Vietoj to žemiau įklijuok nuorodą į jį."
   },
   "pt": {
     "heroTitle": "Vaga: criador(a) de conteúdo UGC para um app de celular",
@@ -551,7 +695,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Você tem um iPhone?",
     "yes": "Sim",
     "no": "Não",
-    "iphoneBlocked": "Obrigado pelo seu interesse! Este trabalho exige um iPhone (o app e o acesso premium que oferecemos funcionam só no iPhone), então não podemos aceitar a sua candidatura por enquanto."
+    "iphoneBlocked": "Obrigado pelo seu interesse! Este trabalho exige um iPhone (o app e o acesso premium que oferecemos funcionam só no iPhone), então não podemos aceitar a sua candidatura por enquanto.",
+    "yapLinkToggle": "Vídeo muito pesado? Cole um link",
+    "yapLinkLabel": "Link do seu vídeo",
+    "yapLinkHint": "YouTube (mesmo não listado), Instagram, TikTok, Google Drive, Dropbox, WeTransfer ou iCloud. Confira se o link está acessível.",
+    "yapLinkInvalid": "Use um link https do YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer ou iCloud.",
+    "yapLinkOk": "Link aceito ✓",
+    "yapUploadFailed": "O envio não funcionou. Sem problemas: cole abaixo um link do seu vídeo (YouTube não listado, Google Drive, iCloud…).",
+    "yapTypeError": "Esse arquivo não é um vídeo. Escolha um vídeo (MP4, MOV) ou cole um link abaixo.",
+    "yapSizeError": "Esse vídeo tem mais de 200 MB. Cole abaixo um link dele."
   },
   "pl": {
     "heroTitle": "Praca: twórca/twórczyni treści UGC dla aplikacji mobilnej",
@@ -580,7 +732,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Masz iPhone'a?",
     "yes": "Tak",
     "no": "Nie",
-    "iphoneBlocked": "Dzięki za zainteresowanie! Ta praca wymaga iPhone'a (aplikacja i dostęp premium, które zapewniamy, działają tylko na iPhonie), więc na razie nie możemy przyjąć Twojego zgłoszenia."
+    "iphoneBlocked": "Dzięki za zainteresowanie! Ta praca wymaga iPhone'a (aplikacja i dostęp premium, które zapewniamy, działają tylko na iPhonie), więc na razie nie możemy przyjąć Twojego zgłoszenia.",
+    "yapLinkToggle": "Twój film jest za duży? Wklej link",
+    "yapLinkLabel": "Link do Twojego filmu",
+    "yapLinkHint": "YouTube (także jako niepubliczny), Instagram, TikTok, Google Drive, Dropbox, WeTransfer lub iCloud. Upewnij się, że link jest dostępny.",
+    "yapLinkInvalid": "Użyj linku https z YouTube, Instagrama, TikToka, Google Drive, Dropboxa, WeTransfer lub iCloud.",
+    "yapLinkOk": "Link zaakceptowany ✓",
+    "yapUploadFailed": "Nie udało się przesłać pliku. Spokojnie: wklej poniżej link do swojego filmu (YouTube jako niepubliczny, Google Drive, iCloud…).",
+    "yapTypeError": "Ten plik nie jest filmem. Wybierz film (MP4, MOV) lub wklej link poniżej.",
+    "yapSizeError": "Ten film waży ponad 200 MB. Zamiast tego wklej poniżej link do niego."
   },
   "sk": {
     "heroTitle": "Práca: tvorca/tvorkyňa UGC obsahu pre mobilnú aplikáciu",
@@ -609,7 +769,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Máš iPhone?",
     "yes": "Áno",
     "no": "Nie",
-    "iphoneBlocked": "Ďakujeme za tvoj záujem! Táto práca vyžaduje iPhone (aplikácia a prémiový prístup, ktorý poskytujeme, fungujú iba na iPhone), a preto zatiaľ nemôžeme prijať tvoju prihlášku."
+    "iphoneBlocked": "Ďakujeme za tvoj záujem! Táto práca vyžaduje iPhone (aplikácia a prémiový prístup, ktorý poskytujeme, fungujú iba na iPhone), a preto zatiaľ nemôžeme prijať tvoju prihlášku.",
+    "yapLinkToggle": "Video je príliš veľké? Vlož radšej odkaz",
+    "yapLinkLabel": "Odkaz na tvoje video",
+    "yapLinkHint": "YouTube (aj nezaradené), Instagram, TikTok, Google Drive, Dropbox, WeTransfer alebo iCloud. Skontroluj, či je odkaz dostupný.",
+    "yapLinkInvalid": "Použi https odkaz z YouTube, Instagramu, TikToku, Google Drive, Dropboxu, WeTransferu alebo iCloudu.",
+    "yapLinkOk": "Odkaz bol prijatý ✓",
+    "yapUploadFailed": "Nahrávanie sa nepodarilo. Žiadny problém: vlož nižšie odkaz na svoje video (YouTube nezaradené, Google Drive, iCloud…).",
+    "yapTypeError": "Tento súbor nie je video. Vyber video (MP4, MOV) alebo vlož odkaz nižšie.",
+    "yapSizeError": "Toto video má viac ako 200 MB. Vlož radšej nižšie odkaz na svoje video."
   },
   "sr": {
     "heroTitle": "Posao: UGC kreator sadržaja za mobilnu aplikaciju",
@@ -638,7 +806,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Imaš li iPhone?",
     "yes": "Da",
     "no": "Ne",
-    "iphoneBlocked": "Hvala ti na interesovanju! Za ovaj posao je potreban iPhone (aplikacija i premium pristup koje obezbeđujemo rade samo na iPhone-u), pa za sada ne možemo da prihvatimo tvoju prijavu."
+    "iphoneBlocked": "Hvala ti na interesovanju! Za ovaj posao je potreban iPhone (aplikacija i premium pristup koje obezbeđujemo rade samo na iPhone-u), pa za sada ne možemo da prihvatimo tvoju prijavu.",
+    "yapLinkToggle": "Video je prevelik? Nalepi link umesto toga",
+    "yapLinkLabel": "Link ka tvom videu",
+    "yapLinkHint": "YouTube (čak i nenavedeni), Instagram, TikTok, Google Drive, Dropbox, WeTransfer ili iCloud. Proveri da je link dostupan.",
+    "yapLinkInvalid": "Koristi https link sa YouTube-a, Instagrama, TikTok-a, Google Drive-a, Dropbox-a, WeTransfer-a ili iCloud-a.",
+    "yapLinkOk": "Link je prihvaćen ✓",
+    "yapUploadFailed": "Otpremanje nije uspelo. Nema problema: nalepi dole link ka svom videu (nenavedeni YouTube, Google Drive, iCloud…).",
+    "yapTypeError": "Ovaj fajl nije video. Izaberi video (MP4, MOV) ili nalepi link dole.",
+    "yapSizeError": "Ovaj video je veći od 200 MB. Umesto toga dole nalepi link ka njemu."
   },
   "ro": {
     "heroTitle": "Job: creator de conținut UGC pentru o aplicație mobilă",
@@ -667,7 +843,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Ai un iPhone?",
     "yes": "Da",
     "no": "Nu",
-    "iphoneBlocked": "Mulțumim pentru interes! Această colaborare necesită un iPhone (aplicația și accesul premium pe care le oferim funcționează doar pe iPhone), așa că deocamdată nu putem accepta aplicația ta."
+    "iphoneBlocked": "Mulțumim pentru interes! Această colaborare necesită un iPhone (aplicația și accesul premium pe care le oferim funcționează doar pe iPhone), așa că deocamdată nu putem accepta aplicația ta.",
+    "yapLinkToggle": "Videoclipul e prea mare? Lipește un link",
+    "yapLinkLabel": "Link către videoclipul tău",
+    "yapLinkHint": "YouTube (chiar și nelistat), Instagram, TikTok, Google Drive, Dropbox, WeTransfer sau iCloud. Verifică dacă linkul este accesibil.",
+    "yapLinkInvalid": "Folosește un link https de pe YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer sau iCloud.",
+    "yapLinkOk": "Link acceptat ✓",
+    "yapUploadFailed": "Încărcarea nu a funcționat. Nicio problemă: lipește mai jos un link către videoclipul tău (YouTube nelistat, Google Drive, iCloud…).",
+    "yapTypeError": "Acest fișier nu este un videoclip. Alege un videoclip (MP4, MOV) sau lipește un link mai jos.",
+    "yapSizeError": "Acest videoclip depășește 200 MB. Lipește mai jos, în schimb, un link către el."
   },
   "sl": {
     "heroTitle": "Delo: ustvarjalec/ustvarjalka UGC vsebin za mobilno aplikacijo",
@@ -696,7 +880,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Ali imaš iPhone?",
     "yes": "Da",
     "no": "Ne",
-    "iphoneBlocked": "Hvala za tvoje zanimanje! To delo zahteva iPhone (aplikacija in premium dostop, ki ga zagotovimo, delujeta samo na iPhonu), zato tvoje prijave za zdaj žal ne moremo sprejeti."
+    "iphoneBlocked": "Hvala za tvoje zanimanje! To delo zahteva iPhone (aplikacija in premium dostop, ki ga zagotovimo, delujeta samo na iPhonu), zato tvoje prijave za zdaj žal ne moremo sprejeti.",
+    "yapLinkToggle": "Je video prevelik? Raje prilepi povezavo",
+    "yapLinkLabel": "Povezava do tvojega videa",
+    "yapLinkHint": "YouTube (tudi nenavedeni video), Instagram, TikTok, Google Drive, Dropbox, WeTransfer ali iCloud. Poskrbi, da je povezava dostopna.",
+    "yapLinkInvalid": "Uporabi https povezavo iz YouTuba, Instagrama, TikToka, Google Drive, Dropboxa, WeTransferja ali iClouda.",
+    "yapLinkOk": "Povezava sprejeta ✓",
+    "yapUploadFailed": "Nalaganje ni uspelo. Brez skrbi: spodaj prilepi povezavo do svojega videa (nenavedeni video na YouTubu, Google Drive, iCloud …).",
+    "yapTypeError": "Ta datoteka ni video. Izberi video (MP4, MOV) ali spodaj prilepi povezavo.",
+    "yapSizeError": "Ta video presega 200 MB. Namesto tega spodaj prilepi povezavo do njega."
   },
   "sv": {
     "heroTitle": "Jobb: UGC-skapare för en mobilapp",
@@ -725,7 +917,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Har du en iPhone?",
     "yes": "Ja",
     "no": "Nej",
-    "iphoneBlocked": "Tack för ditt intresse! Det här jobbet kräver en iPhone (appen och premiumåtkomsten som vi tillhandahåller fungerar bara på iPhone), så vi kan tyvärr inte ta emot din ansökan just nu."
+    "iphoneBlocked": "Tack för ditt intresse! Det här jobbet kräver en iPhone (appen och premiumåtkomsten som vi tillhandahåller fungerar bara på iPhone), så vi kan tyvärr inte ta emot din ansökan just nu.",
+    "yapLinkToggle": "Är videon för stor? Klistra in en länk istället",
+    "yapLinkLabel": "Länk till din video",
+    "yapLinkHint": "YouTube (även olistad), Instagram, TikTok, Google Drive, Dropbox, WeTransfer eller iCloud. Se till att länken är tillgänglig.",
+    "yapLinkInvalid": "Använd en https-länk från YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer eller iCloud.",
+    "yapLinkOk": "Länken är godkänd ✓",
+    "yapUploadFailed": "Uppladdningen fungerade inte. Ingen fara: klistra in en länk till din video nedan (YouTube olistad, Google Drive, iCloud…).",
+    "yapTypeError": "Den här filen är inte en video. Välj en video (MP4, MOV) eller klistra in en länk nedan.",
+    "yapSizeError": "Den här videon är över 200 MB. Klistra in en länk till den nedan istället."
   },
   "uk": {
     "heroTitle": "Робота: UGC-креатор для мобільного застосунку",
@@ -754,7 +954,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "У тебе є iPhone?",
     "yes": "Так",
     "no": "Ні",
-    "iphoneBlocked": "Дякуємо за інтерес! Для цієї роботи потрібен iPhone (застосунок і преміум-доступ, який ми надаємо, працюють лише на iPhone), тому наразі ми не можемо прийняти твою заявку."
+    "iphoneBlocked": "Дякуємо за інтерес! Для цієї роботи потрібен iPhone (застосунок і преміум-доступ, який ми надаємо, працюють лише на iPhone), тому наразі ми не можемо прийняти твою заявку.",
+    "yapLinkToggle": "Відео занадто велике? Встав посилання",
+    "yapLinkLabel": "Посилання на твоє відео",
+    "yapLinkHint": "YouTube (навіть із обмеженим доступом за посиланням), Instagram, TikTok, Google Drive, Dropbox, WeTransfer або iCloud. Переконайся, що посилання доступне.",
+    "yapLinkInvalid": "Використай https-посилання з YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer або iCloud.",
+    "yapLinkOk": "Посилання прийнято ✓",
+    "yapUploadFailed": "Завантаження не вдалося. Не хвилюйся: встав нижче посилання на своє відео (YouTube з доступом за посиланням, Google Drive, iCloud…).",
+    "yapTypeError": "Цей файл не є відео. Обери відео (MP4, MOV) або встав посилання нижче.",
+    "yapSizeError": "Це відео більше за 200 МБ. Краще встав нижче посилання на нього."
   },
   "is": {
     "heroTitle": "Starf: UGC efnisskapari fyrir snjallforrit",
@@ -783,7 +991,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Áttu iPhone?",
     "yes": "Já",
     "no": "Nei",
-    "iphoneBlocked": "Takk fyrir áhugann! Þetta starf krefst iPhone (appið og premium-aðgangurinn sem við útvegum virka eingöngu á iPhone), þannig að við getum því miður ekki tekið við umsókninni þinni að svo stöddu."
+    "iphoneBlocked": "Takk fyrir áhugann! Þetta starf krefst iPhone (appið og premium-aðgangurinn sem við útvegum virka eingöngu á iPhone), þannig að við getum því miður ekki tekið við umsókninni þinni að svo stöddu.",
+    "yapLinkToggle": "Myndbandið of stórt? Límdu inn hlekk í staðinn",
+    "yapLinkLabel": "Hlekkur á myndbandið þitt",
+    "yapLinkHint": "YouTube (líka ótengt/óskráð myndband), Instagram, TikTok, Google Drive, Dropbox, WeTransfer eða iCloud. Gakktu úr skugga um að hlekkurinn sé aðgengilegur.",
+    "yapLinkInvalid": "Notaðu https-hlekk frá YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer eða iCloud.",
+    "yapLinkOk": "Hlekkur samþykktur ✓",
+    "yapUploadFailed": "Upphleðslan tókst ekki. Engar áhyggjur: límdu hér fyrir neðan inn hlekk á myndbandið þitt (óskráð YouTube-myndband, Google Drive, iCloud…).",
+    "yapTypeError": "Þessi skrá er ekki myndband. Veldu myndband (MP4, MOV) eða límdu inn hlekk hér fyrir neðan.",
+    "yapSizeError": "Þetta myndband er stærra en 200 MB. Límdu frekar inn hlekk á það hér fyrir neðan."
   },
   "tr": {
     "heroTitle": "İş: Mobil uygulama için UGC içerik üreticisi",
@@ -812,7 +1028,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "iPhone'un var mı?",
     "yes": "Evet",
     "no": "Hayır",
-    "iphoneBlocked": "İlgin için teşekkürler! Bu iş için iPhone gerekiyor (uygulama ve sağladığımız premium erişim sadece iPhone'da çalışıyor), bu yüzden başvurunu şimdilik kabul edemiyoruz."
+    "iphoneBlocked": "İlgin için teşekkürler! Bu iş için iPhone gerekiyor (uygulama ve sağladığımız premium erişim sadece iPhone'da çalışıyor), bu yüzden başvurunu şimdilik kabul edemiyoruz.",
+    "yapLinkToggle": "Videon çok mu büyük? Bunun yerine bir link yapıştır",
+    "yapLinkLabel": "Videonun linki",
+    "yapLinkHint": "YouTube (liste dışı da olur), Instagram, TikTok, Google Drive, Dropbox, WeTransfer veya iCloud. Linkin erişilebilir olduğundan emin ol.",
+    "yapLinkInvalid": "YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer veya iCloud'dan bir https linki kullan.",
+    "yapLinkOk": "Link kabul edildi ✓",
+    "yapUploadFailed": "Yükleme işe yaramadı. Sorun değil: aşağıya videonun linkini yapıştır (YouTube liste dışı, Google Drive, iCloud…).",
+    "yapTypeError": "Bu dosya bir video değil. Bir video seç (MP4, MOV) ya da aşağıya bir link yapıştır.",
+    "yapSizeError": "Bu video 200 MB'ı aşıyor. Bunun yerine aşağıya videonun linkini yapıştır."
   },
   "hy": {
     "heroTitle": "Աշխատանք՝ UGC կոնտենտ ստեղծող բջջային հավելվածի համար",
@@ -841,7 +1065,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "iPhone ունե՞ս։",
     "yes": "Այո",
     "no": "Ոչ",
-    "iphoneBlocked": "Շնորհակալություն հետաքրքրության համար։ Այս աշխատանքի համար անհրաժեշտ է iPhone (հավելվածը և մեր տրամադրած պրեմիում հասանելիությունը աշխատում են միայն iPhone-ով), ուստի առայժմ չենք կարող ընդունել քո հայտը։"
+    "iphoneBlocked": "Շնորհակալություն հետաքրքրության համար։ Այս աշխատանքի համար անհրաժեշտ է iPhone (հավելվածը և մեր տրամադրած պրեմիում հասանելիությունը աշխատում են միայն iPhone-ով), ուստի առայժմ չենք կարող ընդունել քո հայտը։",
+    "yapLinkToggle": "Տեսանյութդ շա՞տ մեծ է։ Փոխարենը տեղադրիր հղումը",
+    "yapLinkLabel": "Հղում քո տեսանյութին",
+    "yapLinkHint": "YouTube (նույնիսկ չցուցակագրված), Instagram, TikTok, Google Drive, Dropbox, WeTransfer կամ iCloud։ Համոզվիր, որ հղումը հասանելի է։",
+    "yapLinkInvalid": "Օգտագործիր https հղում YouTube-ից, Instagram-ից, TikTok-ից, Google Drive-ից, Dropbox-ից, WeTransfer-ից կամ iCloud-ից։",
+    "yapLinkOk": "Հղումը ընդունված է ✓",
+    "yapUploadFailed": "Վերբեռնումը չստացվեց։ Խնդիր չկա․ ներքևում տեղադրիր հղում քո տեսանյութին (YouTube-ի չցուցակագրված, Google Drive, iCloud…)։",
+    "yapTypeError": "Այս ֆայլը տեսանյութ չէ։ Ընտրիր տեսանյութ (MP4, MOV) կամ ներքևում տեղադրիր հղում։",
+    "yapSizeError": "Այս տեսանյութը գերազանցում է 200 ՄԲ-ը։ Փոխարենը ներքևում տեղադրիր հղում դեպի այն։"
   },
   "ka": {
     "heroTitle": "ვაკანსია: UGC კონტენტის შემქმნელი მობილური აპისთვის",
@@ -870,7 +1102,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "გაქვს iPhone?",
     "yes": "კი",
     "no": "არა",
-    "iphoneBlocked": "გმადლობთ დაინტერესებისთვის! ამ სამუშაოსთვის საჭიროა iPhone (აპლიკაცია და პრემიუმ წვდომა, რომელსაც ჩვენ გთავაზობთ, მხოლოდ iPhone-ზე მუშაობს), ამიტომ ამ ეტაპზე შენს განაცხადს ვერ მივიღებთ."
+    "iphoneBlocked": "გმადლობთ დაინტერესებისთვის! ამ სამუშაოსთვის საჭიროა iPhone (აპლიკაცია და პრემიუმ წვდომა, რომელსაც ჩვენ გთავაზობთ, მხოლოდ iPhone-ზე მუშაობს), ამიტომ ამ ეტაპზე შენს განაცხადს ვერ მივიღებთ.",
+    "yapLinkToggle": "ვიდეო ძალიან დიდია? ჩასვი ბმული",
+    "yapLinkLabel": "ბმული შენს ვიდეოზე",
+    "yapLinkHint": "YouTube (არალისტინგური ვიდეოც), Instagram, TikTok, Google Drive, Dropbox, WeTransfer ან iCloud. დარწმუნდი, რომ ბმული ხელმისაწვდომია.",
+    "yapLinkInvalid": "გამოიყენე https ბმული YouTube-დან, Instagram-იდან, TikTok-იდან, Google Drive-იდან, Dropbox-იდან, WeTransfer-იდან ან iCloud-იდან.",
+    "yapLinkOk": "ბმული მიღებულია ✓",
+    "yapUploadFailed": "ატვირთვა ვერ მოხერხდა. არაუშავს: ჩასვი ქვემოთ შენი ვიდეოს ბმული (YouTube-ის არალისტინგური, Google Drive, iCloud…).",
+    "yapTypeError": "ეს ფაილი ვიდეო არ არის. აირჩიე ვიდეო (MP4, MOV) ან ჩასვი ბმული ქვემოთ.",
+    "yapSizeError": "ეს ვიდეო 200 მბ-ზე დიდია. სანაცვლოდ ჩასვი მისი ბმული ქვემოთ."
   },
   "ms": {
     "heroTitle": "Kerja: Pencipta kandungan UGC untuk aplikasi mudah alih",
@@ -899,7 +1139,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Adakah kamu ada iPhone?",
     "yes": "Ya",
     "no": "Tidak",
-    "iphoneBlocked": "Terima kasih atas minat kamu! Kerja ini memerlukan iPhone (app dan akses premium yang kami sediakan hanya untuk iPhone), jadi buat masa ini kami tidak dapat menerima permohonan kamu."
+    "iphoneBlocked": "Terima kasih atas minat kamu! Kerja ini memerlukan iPhone (app dan akses premium yang kami sediakan hanya untuk iPhone), jadi buat masa ini kami tidak dapat menerima permohonan kamu.",
+    "yapLinkToggle": "Video terlalu besar? Tampal pautan sebagai ganti",
+    "yapLinkLabel": "Pautan ke video anda",
+    "yapLinkHint": "YouTube (walaupun tidak tersenarai), Instagram, TikTok, Google Drive, Dropbox, WeTransfer atau iCloud. Pastikan pautan itu boleh diakses.",
+    "yapLinkInvalid": "Gunakan pautan https daripada YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer atau iCloud.",
+    "yapLinkOk": "Pautan diterima ✓",
+    "yapUploadFailed": "Muat naik tidak berjaya. Tak apa: tampal pautan ke video anda di bawah (YouTube tidak tersenarai, Google Drive, iCloud…).",
+    "yapTypeError": "Fail ini bukan video. Pilih video (MP4, MOV) atau tampal pautan di bawah.",
+    "yapSizeError": "Video ini melebihi 200 MB. Sebaliknya, tampal pautan ke video itu di bawah."
   },
   "id": {
     "heroTitle": "Lowongan: kreator konten UGC untuk aplikasi mobile",
@@ -928,7 +1176,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Apakah kamu punya iPhone?",
     "yes": "Ya",
     "no": "Tidak",
-    "iphoneBlocked": "Terima kasih atas minatmu! Pekerjaan ini membutuhkan iPhone (aplikasi dan akses premium yang kami berikan hanya tersedia di iPhone), jadi untuk saat ini kami belum bisa menerima lamaranmu."
+    "iphoneBlocked": "Terima kasih atas minatmu! Pekerjaan ini membutuhkan iPhone (aplikasi dan akses premium yang kami berikan hanya tersedia di iPhone), jadi untuk saat ini kami belum bisa menerima lamaranmu.",
+    "yapLinkToggle": "Videomu terlalu besar? Tempel link saja",
+    "yapLinkLabel": "Link ke videomu",
+    "yapLinkHint": "YouTube (boleh yang tidak publik/unlisted), Instagram, TikTok, Google Drive, Dropbox, WeTransfer, atau iCloud. Pastikan link-nya bisa diakses.",
+    "yapLinkInvalid": "Gunakan link https dari YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer, atau iCloud.",
+    "yapLinkOk": "Link diterima ✓",
+    "yapUploadFailed": "Uploadnya gagal. Tenang, tempel saja link ke videomu di bawah (YouTube unlisted, Google Drive, iCloud…).",
+    "yapTypeError": "File ini bukan video. Pilih video (MP4, MOV) atau tempel link di bawah.",
+    "yapSizeError": "Video ini lebih dari 200 MB. Tempel link ke videomu di bawah saja ya."
   },
   "vi": {
     "heroTitle": "Việc làm: Nhà sáng tạo nội dung UGC cho một ứng dụng di động",
@@ -957,7 +1213,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Bạn có iPhone không?",
     "yes": "Có",
     "no": "Không",
-    "iphoneBlocked": "Cảm ơn bạn đã quan tâm! Công việc này yêu cầu có iPhone (ứng dụng và quyền truy cập premium mà tụi mình cung cấp chỉ dùng được trên iPhone), nên hiện tại tụi mình chưa thể nhận đơn ứng tuyển của bạn."
+    "iphoneBlocked": "Cảm ơn bạn đã quan tâm! Công việc này yêu cầu có iPhone (ứng dụng và quyền truy cập premium mà tụi mình cung cấp chỉ dùng được trên iPhone), nên hiện tại tụi mình chưa thể nhận đơn ứng tuyển của bạn.",
+    "yapLinkToggle": "Video nặng quá? Dán link vào đây nhé",
+    "yapLinkLabel": "Link video của bạn",
+    "yapLinkHint": "YouTube (kể cả video không công khai), Instagram, TikTok, Google Drive, Dropbox, WeTransfer hoặc iCloud. Nhớ kiểm tra xem link có truy cập được không nhé.",
+    "yapLinkInvalid": "Hãy dùng link https từ YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer hoặc iCloud.",
+    "yapLinkOk": "Link hợp lệ ✓",
+    "yapUploadFailed": "Tải lên không thành công. Không sao đâu: bạn dán link video vào bên dưới nhé (YouTube không công khai, Google Drive, iCloud…).",
+    "yapTypeError": "Tệp này không phải video. Hãy chọn một video (MP4, MOV) hoặc dán link vào bên dưới nhé.",
+    "yapSizeError": "Video này nặng hơn 200 MB. Bạn dán link video vào bên dưới nhé."
   },
   "th": {
     "heroTitle": "งาน: ครีเอเตอร์คอนเทนต์ UGC สำหรับแอปมือถือ",
@@ -986,7 +1250,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "คุณมี iPhone ไหม",
     "yes": "มี",
     "no": "ไม่มี",
-    "iphoneBlocked": "ขอบคุณที่สนใจนะ! งานนี้ต้องใช้ iPhone (แอปและสิทธิ์พรีเมียมที่เราให้ใช้ได้เฉพาะบน iPhone เท่านั้น) เราจึงยังไม่สามารถรับใบสมัครของคุณได้ในตอนนี้"
+    "iphoneBlocked": "ขอบคุณที่สนใจนะ! งานนี้ต้องใช้ iPhone (แอปและสิทธิ์พรีเมียมที่เราให้ใช้ได้เฉพาะบน iPhone เท่านั้น) เราจึงยังไม่สามารถรับใบสมัครของคุณได้ในตอนนี้",
+    "yapLinkToggle": "วิดีโอไฟล์ใหญ่เกินไปเหรอ? วางลิงก์แทนได้เลย",
+    "yapLinkLabel": "ลิงก์วิดีโอของคุณ",
+    "yapLinkHint": "รองรับ YouTube (แบบไม่ระบุรายการก็ได้), Instagram, TikTok, Google Drive, Dropbox, WeTransfer หรือ iCloud อย่าลืมเช็กว่าลิงก์เปิดดูได้นะ",
+    "yapLinkInvalid": "ใช้ลิงก์ https จาก YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer หรือ iCloud นะ",
+    "yapLinkOk": "ลิงก์ใช้ได้ ✓",
+    "yapUploadFailed": "อัปโหลดไม่สำเร็จ ไม่เป็นไรนะ วางลิงก์วิดีโอของคุณด้านล่างแทนได้เลย (YouTube แบบไม่ระบุรายการ, Google Drive, iCloud…)",
+    "yapTypeError": "ไฟล์นี้ไม่ใช่วิดีโอ เลือกไฟล์วิดีโอ (MP4, MOV) หรือวางลิงก์ด้านล่างได้เลย",
+    "yapSizeError": "วิดีโอนี้ใหญ่เกิน 200 MB วางลิงก์วิดีโอของคุณด้านล่างแทนนะ"
   },
   "kk": {
     "heroTitle": "Жұмыс: мобильді қосымшаға арналған UGC контент жасаушы",
@@ -1015,7 +1287,15 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "Сенде iPhone бар ма?",
     "yes": "Иә",
     "no": "Жоқ",
-    "iphoneBlocked": "Қызығушылық танытқаның үшін рахмет! Бұл жұмысқа iPhone қажет (қолданба мен біз беретін премиум қолжетімділік тек iPhone-да жұмыс істейді), сондықтан қазір сенің өтінімеңді қабылдай алмаймыз."
+    "iphoneBlocked": "Қызығушылық танытқаның үшін рахмет! Бұл жұмысқа iPhone қажет (қолданба мен біз беретін премиум қолжетімділік тек iPhone-да жұмыс істейді), сондықтан қазір сенің өтінімеңді қабылдай алмаймыз.",
+    "yapLinkToggle": "Видеоң тым ауыр ма? Оның орнына сілтеме қой",
+    "yapLinkLabel": "Видеоңа сілтеме",
+    "yapLinkHint": "YouTube (тізімде көрсетілмеген болса да), Instagram, TikTok, Google Drive, Dropbox, WeTransfer немесе iCloud. Сілтемеге кіруге болатынына көз жеткіз.",
+    "yapLinkInvalid": "YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer немесе iCloud сайттарының https сілтемесін пайдалан.",
+    "yapLinkOk": "Сілтеме қабылданды ✓",
+    "yapUploadFailed": "Жүктеу сәтсіз аяқталды. Уайымдама: төменге видеоңа сілтеме қой (YouTube-тағы тізімде көрсетілмеген видео, Google Drive, iCloud…).",
+    "yapTypeError": "Бұл файл видео емес. Видео таңда (MP4, MOV) немесе төменге сілтеме қой.",
+    "yapSizeError": "Бұл видео 200 МБ-тан асады. Оның орнына төменге видеоңа сілтеме қой."
   },
   "hi": {
     "heroTitle": "नौकरी: मोबाइल ऐप के लिए UGC कंटेंट क्रिएटर",
@@ -1044,6 +1324,14 @@ export const LANDING_JOB_GENERATED: Record<string, LandingJob> = {
     "applyIphone": "क्या तुम्हारे पास iPhone है?",
     "yes": "हाँ",
     "no": "नहीं",
-    "iphoneBlocked": "तुमने रुचि दिखाई, इसके लिए धन्यवाद! इस जॉब के लिए iPhone चाहिए (ऐप और हमारी तरफ़ से मिलने वाला प्रीमियम एक्सेस सिर्फ़ iPhone पर ही काम करते हैं), इसलिए हम अभी तुम्हारा आवेदन स्वीकार नहीं कर सकते।"
+    "iphoneBlocked": "तुमने रुचि दिखाई, इसके लिए धन्यवाद! इस जॉब के लिए iPhone चाहिए (ऐप और हमारी तरफ़ से मिलने वाला प्रीमियम एक्सेस सिर्फ़ iPhone पर ही काम करते हैं), इसलिए हम अभी तुम्हारा आवेदन स्वीकार नहीं कर सकते।",
+    "yapLinkToggle": "वीडियो बहुत बड़ा है? इसकी जगह लिंक पेस्ट करो",
+    "yapLinkLabel": "तुम्हारे वीडियो का लिंक",
+    "yapLinkHint": "YouTube (अनलिस्टेड भी चलेगा), Instagram, TikTok, Google Drive, Dropbox, WeTransfer या iCloud। पक्का कर लो कि लिंक खुल रहा हो।",
+    "yapLinkInvalid": "YouTube, Instagram, TikTok, Google Drive, Dropbox, WeTransfer या iCloud का https लिंक इस्तेमाल करो।",
+    "yapLinkOk": "लिंक मंज़ूर हो गया ✓",
+    "yapUploadFailed": "अपलोड नहीं हो पाया। कोई बात नहीं: नीचे अपने वीडियो का लिंक पेस्ट कर दो (YouTube अनलिस्टेड, Google Drive, iCloud…)।",
+    "yapTypeError": "यह फ़ाइल वीडियो नहीं है। कोई वीडियो चुनो (MP4, MOV) या नीचे लिंक पेस्ट करो।",
+    "yapSizeError": "यह वीडियो 200 MB से बड़ा है। इसकी जगह नीचे इसका लिंक पेस्ट कर दो।"
   }
 };

@@ -11,13 +11,13 @@ import { Button, Field, IconTile, Input, Select, Spinner, Textarea, type Tint } 
 import { uiLangForCountry } from "@/i18n";
 import { JobWarning } from "@/components/public/JobWarning";
 import { landingJob } from "@/i18n/landingJob";
+import { yapFileCheck, yapLinkProvider } from "@shared/yapVideo.ts";
 import { cn } from "@/lib/utils";
 import { ageOn } from "@shared/zones.ts";
 import { flag } from "@/lib/utils";
 import { LangSwitcher, keptParams, useOpenCountries } from "./Landing";
 import { Logo } from "@/components/brand/Logo";
 
-const MAX_BYTES = 200 * 1024 * 1024;
 const BRAND = "Vik Studios";
 
 type Form = {
@@ -43,6 +43,13 @@ export default function Apply() {
   const [yapPath, setYapPath] = useState<string | null>(null);
   const [progress, setProgress] = useState<number | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  // Lien de secours (17/11) : toujours proposé, ouvert automatiquement si l'envoi échoue.
+  const [yapUrl, setYapUrl] = useState("");
+  const [showLink, setShowLink] = useState(false);
+  const linkOk = !!yapUrl.trim() && !!yapLinkProvider(yapUrl);
+  const logFailure = (file: File | null, error: string) => {
+    callFn("apply", { action: "upload_failure", size: file?.size ?? null, mime: file?.type ?? "", ext: (file?.name.split(".").pop() ?? "").slice(0, 12), error, country: f.country }).catch(() => {});
+  };
   const uploadRef = useRef<tus.Upload | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
@@ -56,11 +63,15 @@ export default function Apply() {
   const upload = (file: File) => {
     setUploadError(null);
     setYapPath(null);
-    if (!file.type.startsWith("video/")) return setUploadError(t("apply.errors.yap_video"));
-    if (file.size > MAX_BYTES) return setUploadError(t("apply.yapHint"));
-    const ext = (file.name.split(".").pop() ?? "mp4").toLowerCase().replace(/[^a-z0-9]/g, "");
-    const safeExt = ["mp4", "mov", "webm", "m4v"].includes(ext) ? ext : "mp4";
-    const objectName = `pending/${crypto.randomUUID()}.${safeExt}`;
+    // iOS : type MIME souvent vide ou video/quicktime (HEVC) → contrôle par extension, puis par type.
+    const check = yapFileCheck(file.name, file.type, file.size);
+    if (!check.ok) {
+      setUploadError(check.reason === "size" ? lj.yapSizeError : lj.yapTypeError);
+      setShowLink(true);
+      logFailure(file, `client_${check.reason}`);
+      return;
+    }
+    const objectName = `pending/${crypto.randomUUID()}.${check.ext}`;
     uploadRef.current?.abort();
     const up = new tus.Upload(file, {
       endpoint: `${SUPABASE_URL}/storage/v1/upload/resumable`,
@@ -68,9 +79,9 @@ export default function Apply() {
       headers: { authorization: `Bearer ${ANON_KEY}`, apikey: ANON_KEY, "x-upsert": "false" },
       uploadDataDuringCreation: true,
       removeFingerprintOnSuccess: true,
-      metadata: { bucketName: "yap-videos", objectName, contentType: file.type || "video/mp4", cacheControl: "3600" },
+      metadata: { bucketName: "yap-videos", objectName, contentType: check.contentType, cacheControl: "3600" },
       chunkSize: 6 * 1024 * 1024,
-      onError: (e) => { setProgress(null); setUploadError(e.message); },
+      onError: (e) => { setProgress(null); setUploadError(lj.yapUploadFailed); setShowLink(true); logFailure(file, String(e?.message ?? e).slice(0, 300)); },
       onProgress: (sent, total) => setProgress(Math.round((sent / total) * 100)),
       onSuccess: () => { setProgress(100); setYapPath(objectName); },
     });
@@ -86,7 +97,7 @@ export default function Apply() {
     e.preventDefault();
     const errs: string[] = [];
     if (f.birthdate && ageOn(f.birthdate) < 18) errs.push("underage");
-    if (!yapPath) errs.push("yap_video");
+    if (!yapPath && !linkOk) errs.push("yap_video");
     if (f.has_iphone !== "yes") return; // iPhone requis (16/11) : bloqué en amont
     if (errs.length) return setErrors(errs);
     setBusy(true);
@@ -101,7 +112,7 @@ export default function Apply() {
         tiktok_followers: f.tiktok_followers ? Number(f.tiktok_followers) : null,
         instagram_followers: f.instagram_followers ? Number(f.instagram_followers) : null,
         languages: f.languages.split(",").map((s) => s.trim()).filter(Boolean),
-        yap_video_path: yapPath, locale: i18n.resolvedLanguage ?? "en", utm,
+        yap_video_path: yapPath, yap_video_url: yapPath ? null : yapUrl.trim() || null, locale: i18n.resolvedLanguage ?? "en", utm,
         tracking: attribution(eventId),
       });
       track("Lead", { content_name: "ugc_creator_application", country: f.country }, eventId);
@@ -116,6 +127,8 @@ export default function Apply() {
 
   const errText = (code: string) => {
     const known = ["underage", "already_applied", "yap_video", "country_closed"];
+    if (code === "yap_video_url") return lj.yapLinkInvalid;
+    if (code === "iphone_required") return lj.iphoneBlocked;
     return known.includes(code) ? t(`apply.errors.${code}`) : code === "yap_video_missing" ? t("apply.errors.yap_video") : null;
   };
   const messages = [...new Set(errors.map((c) => errText(c) ?? t("apply.errors.generic")))];
@@ -193,7 +206,7 @@ export default function Apply() {
                 <span className={`inline-flex h-11 w-11 items-center justify-center rounded-xl ${yapPath ? "bg-white text-success" : "bg-white text-accent shadow-xs"}`}>{yapPath ? <CheckCircle2 className="h-5 w-5" /> : <Upload className="h-5 w-5" />}</span>
                 <span className="text-sm font-semibold text-foreground">{yapPath ? t("apply.uploaded") : t("apply.chooseVideo")}</span>
                 <span className="text-xs text-subtle-foreground">MP4 · MOV · ≤ 200 MB</span>
-                <input type="file" accept="video/*" className="hidden" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
+                <input type="file" accept="video/*,.mov,.mp4,.m4v,.hevc,.qt" className="hidden" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
               </label>
               {progress !== null && !yapPath && (
                 <div>
@@ -201,7 +214,23 @@ export default function Apply() {
                   <p className="mt-1 text-xs text-muted-foreground">{t("apply.uploading", { pct: progress })}</p>
                 </div>
               )}
-              {uploadError && <p className="text-sm text-danger">{uploadError}</p>}
+              {uploadError && <p className="text-sm text-danger" role="alert">{uploadError}</p>}
+              {!yapPath && (
+                <div className="rounded-xl border border-border-strong bg-white p-3" data-testid="yap-link">
+                  {!showLink ? (
+                    <button type="button" className="text-sm font-medium text-accent hover:underline" onClick={() => setShowLink(true)}>{lj.yapLinkToggle} →</button>
+                  ) : (
+                    <>
+                      <label className="mb-1 block text-xs font-medium text-muted-foreground" htmlFor="yap-url">{lj.yapLinkLabel}</label>
+                      <input id="yap-url" type="url" inputMode="url" value={yapUrl} onChange={(e) => setYapUrl(e.target.value)} placeholder="https://youtube.com/…"
+                        className="h-12 w-full rounded-lg border border-border-strong bg-white px-3.5 text-[15px] focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/10" />
+                      <p className={`mt-1.5 text-xs ${yapUrl.trim() && !linkOk ? "text-danger" : linkOk ? "text-success" : "text-subtle-foreground"}`}>
+                        {yapUrl.trim() && !linkOk ? lj.yapLinkInvalid : linkOk ? lj.yapLinkOk : lj.yapLinkHint}
+                      </p>
+                    </>
+                  )}
+                </div>
+              )}
             </FormSection>
             {/* Pot de miel anti-bot */}
             <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" value={f.website} onChange={(e) => set("website", e.target.value)} aria-hidden="true" />
@@ -211,7 +240,7 @@ export default function Apply() {
             </div>
             {messages.length > 0 && <div className="rounded-xl bg-tint-red px-4 py-3 text-sm text-[#a52326]">{messages.map((m) => <p key={m}>{m}</p>)}</div>}
             <JobWarning lang={i18n.resolvedLanguage ?? "en"} />
-            <Button type="submit" size="lg" className="h-12 w-full text-[15px]" loading={busy} disabled={underage || f.has_iphone !== "yes" || (progress !== null && !yapPath)}>{t("apply.submit")}</Button>
+            <Button type="submit" size="lg" className="h-12 w-full text-[15px]" loading={busy} disabled={underage || f.has_iphone !== "yes" || (!yapPath && !linkOk && progress !== null)}>{t("apply.submit")}</Button>
             </>}
           </form>
         )}

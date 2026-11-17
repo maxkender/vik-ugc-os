@@ -5,6 +5,7 @@
 import { HttpError, serve } from "../_shared/http.ts";
 import { queueEmail } from "../_shared/outbox.ts";
 import { ageOn } from "../_shared/logic/zones.ts";
+import { yapLinkProvider } from "../_shared/logic/yapVideo.ts";
 import { getSetting } from "../_shared/http.ts";
 import { sendLead } from "../_shared/capi.ts";
 import { fbcFromFbclid, validEventId, validFbc, validFbp } from "../_shared/logic/pixel.ts";
@@ -24,6 +25,16 @@ serve(async (req, body, db) => {
     const meta = await getSetting<{ pixel_id?: string; tracking_enabled?: boolean }>(db, "meta");
     return { ok: true, country: c ?? null, tracking: meta.tracking_enabled !== false && meta.pixel_id ? { pixel_id: meta.pixel_id } : null };
   }
+  // Journal des échecs d'upload (public, champs bornés) : visible dans Admin → Candidats.
+  if (body.action === "upload_failure") {
+    const t = (v: unknown, n: number) => (typeof v === "string" ? v.slice(0, n) : null);
+    await db.from("upload_failures").insert({
+      context: "yap", file_size: Number.isFinite(Number(body.size)) ? Math.max(0, Math.round(Number(body.size))) : null,
+      mime: t(body.mime, 80), file_ext: t(body.ext, 12), error: t(body.error, 300),
+      user_agent: (req.headers.get("user-agent") ?? "").slice(0, 300), country: t(body.country, 2),
+    });
+    return { ok: true };
+  }
   if (body.action !== "submit") throw new HttpError(400, "unknown action");
 
   // Pot de miel anti-bot
@@ -39,17 +50,22 @@ serve(async (req, body, db) => {
   if (body.adult !== true) errors.push("adult");
   if (body.consent !== true) errors.push("consent");
   if (body.has_iphone !== true) errors.push("iphone_required"); // iPhone requis (16/11)
+  // Vidéo : fichier envoyé OU lien de secours (YouTube, Instagram, TikTok, Drive, Dropbox, WeTransfer, iCloud).
   const yap = s(body.yap_video_path, 300);
-  if (!/^pending\/[0-9a-f-]{36}\.(mp4|mov|webm|m4v)$/i.test(yap)) errors.push("yap_video");
+  const yapUrl = s(body.yap_video_url, 500);
+  const hasFile = /^pending\/[0-9a-f-]{36}\.(mp4|mov|webm|m4v)$/i.test(yap);
+  if (!hasFile && !(yapUrl && yapLinkProvider(yapUrl))) errors.push(yapUrl ? "yap_video_url" : "yap_video");
   const { data: c } = await db.from("countries").select("code, open, language").eq("code", country).maybeSingle();
   if (!c) errors.push("country");
   else if (!c.open) errors.push("country_closed");
   if (errors.length) throw new HttpError(422, errors.join(","));
 
-  // La vidéo doit exister dans Storage.
-  const [folder, file] = yap.split("/");
-  const { data: listed } = await db.storage.from("yap-videos").list(folder, { search: file, limit: 1 });
-  if (!listed?.length) throw new HttpError(422, "yap_video_missing");
+  // Un fichier annoncé doit exister dans Storage.
+  if (hasFile) {
+    const [folder, file] = yap.split("/");
+    const { data: listed } = await db.storage.from("yap-videos").list(folder, { search: file, limit: 1 });
+    if (!listed?.length) throw new HttpError(422, "yap_video_missing");
+  }
 
   const row = {
     first_name, last_name, email, birthdate, country, has_iphone: true,
@@ -63,7 +79,8 @@ serve(async (req, body, db) => {
     equipment: s(body.equipment, 1000) || null,
     availability: s(body.availability, 1000) || null,
     motivation: s(body.motivation, 2000) || null,
-    yap_video_path: yap,
+    yap_video_path: hasFile ? yap : null,
+    yap_video_url: hasFile ? null : yapUrl,
     locale: s(body.locale, 10) || c!.language || "en",
     utm: typeof body.utm === "object" && body.utm ? Object.fromEntries(Object.entries(body.utm).slice(0, 10).map(([k, v]) => [s(k, 40), s(v, 200)])) : {},
     attribution: attributionOf(body.tracking),
