@@ -250,6 +250,11 @@ describe("garde-fou email", () => {
   it("en-tête : logo PNG si fourni, sinon texte", () => {
     expect(renderEmail({ subject: "s", body: "b", logoUrl: "https://x.app/brand/vik-studios-logo.png" }).html).toContain('<img src="https://x.app/brand/vik-studios-logo.png"');
     expect(renderEmail({ subject: "s", body: "b" }).html).toContain(">Vik Studios</span>");
+    const r = renderEmail({ subject: "s", body: "tu as **3 jours** pour <ça>", language: "fr" });
+    expect(r.html).toContain("tu as <strong>3 jours</strong> pour &lt;ça&gt;");
+    expect(r.html).toContain("L'équipe Vik Studios");
+    expect(r.text).toContain("tu as 3 jours pour");
+    expect(r.text).not.toContain("**");
   });
   it("variables", () => {
     expect(fillTemplate("Hi {name}, {x}", { name: "Ana" })).toBe("Hi Ana, {x}");

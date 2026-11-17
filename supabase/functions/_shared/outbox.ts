@@ -76,7 +76,7 @@ export async function queueEmail(db: SupabaseClient, e: QueueEmail): Promise<str
   // Identifiant connu d'avance : le bouton passe par /track (clic) et un pixel suit l'ouverture.
   const id = crypto.randomUUID();
   const button = tpl.button_label && e.buttonUrl ? { label: fillTemplate(tpl.button_label, vars), url: trackedLink(id, e.buttonUrl) } : null;
-  const rendered = renderEmail({ subject, body: fillTemplate(tpl.body, vars), button, brand, logoUrl: logoUrl() });
+  const rendered = renderEmail({ subject, body: fillTemplate(tpl.body, vars), button, brand, logoUrl: logoUrl(), language: tpl.language });
   const html = rendered.html.replace("</body>", `${openPixel(id)}</body>`);
   // Le texte brut garde le lien direct (pas de suivi dans la version texte).
   const text = e.buttonUrl && button ? rendered.text.replace(button.url, e.buttonUrl) : rendered.text;
