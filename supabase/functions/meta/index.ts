@@ -63,13 +63,15 @@ async function syncInsights(db: SupabaseClient, cfg: MetaCfg) {
     const { data: rows } = await db.from(table).select("id, meta_id").not("meta_id", "is", null).not("status", "in", "(ARCHIVED,DELETED)");
     if (!rows?.length) continue;
     try {
-      const res = await graph(cfg, `${cfg.ad_account_id}/${edge}`, { params: { fields: "id,status,effective_status", limit: "500" } });
+      const res = await graph(cfg, `${cfg.ad_account_id}/${edge}`, { params: { fields: edge === "adsets" ? "id,status,effective_status,daily_budget" : "id,status,effective_status", limit: "500" } });
       const byId = new Map((res.data ?? []).map((m: any) => [m.id, m]));
       for (const r of rows) {
         const m: any = byId.get(r.meta_id);
         if (!m) continue;
         const patch: Record<string, unknown> = { status: m.status, effective_status: m.effective_status };
         if (table === "meta_campaigns") patch.last_synced_at = new Date().toISOString();
+        // Budget réel de l'ad set (modifié dans Ads Manager ou via l'API) : lecture seule, affiché dans l'UI et compté dans le plafond.
+        if (table === "meta_adsets" && m.daily_budget) patch.daily_budget = Number(m.daily_budget) / 100;
         await db.from(table).update(patch).eq("id", r.id);
       }
     } catch { /* on réessaiera à la prochaine heure */ }
