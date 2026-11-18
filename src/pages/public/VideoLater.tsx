@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { CheckCircle2, Clock, Video } from "lucide-react";
-import { callFn } from "@/lib/supabase";
+import { callPublicFn as callFn } from "@/lib/publicApi";
 import { Button, Spinner } from "@/components/ui";
 import { Logo } from "@/components/brand/Logo";
 import { landingJob } from "@/i18n/landingJob";

@@ -3,7 +3,7 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import * as tus from "tus-js-client";
 import { ArrowLeft, ArrowRight, CheckCircle2, Sparkles, Upload, User, Video } from "lucide-react";
-import { ANON_KEY, SUPABASE_URL, callFn } from "@/lib/supabase";
+import { ANON_KEY, SUPABASE_URL, callPublicFn as callFn } from "@/lib/publicApi";
 import { usePixel } from "@/lib/usePixel";
 import { attribution, newEventId, track } from "@/lib/pixel";
 import { ConsentBanner } from "@/components/public/ConsentBanner";

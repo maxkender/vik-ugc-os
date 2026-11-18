@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { callFn } from "@/lib/supabase";
+import { callPublicFn as callFn } from "@/lib/publicApi";
 import { captureClick, getConsent, loadPixel, track } from "@/lib/pixel";
 
 /**

@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import * as tus from "tus-js-client";
 import { CheckCircle2, Upload } from "lucide-react";
-import { ANON_KEY, SUPABASE_URL, callFn } from "@/lib/supabase";
+import { ANON_KEY, SUPABASE_URL, callPublicFn as callFn } from "@/lib/publicApi";
 import type { LandingJob } from "@/i18n/landingJob";
 import { yapFileCheck, yapLinkProvider } from "@shared/yapVideo.ts";
 

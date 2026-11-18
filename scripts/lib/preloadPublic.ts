@@ -30,7 +30,8 @@ export function preloadPublic(): Plugin {
         const map: { pages: Record<string, string[]>; lang: Record<string, string[]> } = { pages: {}, lang: {} };
         for (const [k, re] of Object.entries(PAGES)) {
           const c = chunks.find((x) => x.moduleIds.some((id) => re.test(id)));
-          if (c) map.pages[k] = deps(c).map((f) => "/" + f);
+          const shell = chunks.find((x) => x.moduleIds.some((id) => /src\/PublicApp\.tsx$/.test(id)));
+          if (c) map.pages[k] = [...new Set([...(shell ? deps(shell) : []), ...deps(c)])].map((f) => "/" + f);
         }
         for (const c of chunks) {
           const m = c.facadeModuleId?.match(LANG_FILE);

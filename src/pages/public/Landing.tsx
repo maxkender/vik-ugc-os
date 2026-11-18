@@ -8,7 +8,7 @@ import { landingJob, fillVars } from "@/i18n/landingJob";
 import { ConsentBanner } from "@/components/public/ConsentBanner";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, Check, ClipboardList, Globe2, Heart, MessageCircle, PenLine, Play, Plus, Share2, ShieldCheck, TrendingUp, Video, Wallet } from "lucide-react";
-import { publicUrl, supabase } from "@/lib/supabase";
+import { publicStorageUrl, rest, rpc } from "@/lib/publicApi";
 import PUBLIC_COUNTRIES from "@/data/publicCountries.json";
 import { Button, IconTile, Select, Spinner } from "@/components/ui";
 import { LANGS, uiLangForCountry } from "@/i18n";
@@ -32,8 +32,7 @@ export function useOpenCountries() {
     // Instantané embarqué (scripts/snapshot-public-countries.mts) : rendu immédiat, remplacé par les vraies données.
     placeholderData: PUBLIC_COUNTRIES as unknown as CountryWithZone[],
     queryFn: async () => {
-      const { data } = await supabase.from("countries").select("code, name, language, open, zone_code, zones(code, price_per_video, rpm, rpm_views, currency, videos_per_day, bonus_cap, active)").order("name");
-      return (data ?? []) as unknown as CountryWithZone[];
+      return rest<CountryWithZone>("countries", { select: "code,name,language,open,zone_code,zones(code,price_per_video,rpm,rpm_views,currency,videos_per_day,bonus_cap,active)", order: "name" });
     },
   });
 }
@@ -88,8 +87,8 @@ export default function Landing() {
     queryKey: ["landing-overrides", code, lang],
     enabled: !!code,
     queryFn: async () => {
-      const { data } = await supabase.from("landing_overrides").select("key, value").eq("country_code", code).eq("language", lang.split("-")[0]);
-      return Object.fromEntries((data ?? []).map((r: { key: string; value: string }) => [r.key, r.value])) as Record<string, string>;
+      const data = await rest<{ key: string; value: string }>("landing_overrides", { select: "key,value", country_code: `eq.${code}`, language: `eq.${lang.split("-")[0]}` });
+      return Object.fromEntries(data.map((r: { key: string; value: string }) => [r.key, r.value])) as Record<string, string>;
     },
   });
   const ov = overrides.data ?? {};
@@ -239,7 +238,7 @@ function JobExamples({ lang, limit = 4 }: { lang: string; limit?: number }) {
   const { data } = useQuery({
     queryKey: ["job-examples", lang.split("-")[0], limit],
     queryFn: async () => {
-      const { data } = await supabase.rpc("public_job_examples", { p_language: lang.split("-")[0], p_limit: limit });
+      const data = await rpc<unknown[]>("public_job_examples", { p_language: lang.split("-")[0], p_limit: limit });
       return (data ?? []) as { id: string; url: string | null; thumbnail_path: string | null; thumbnail_src: string | null; category: string | null }[];
     },
     staleTime: 3600_000,
@@ -253,7 +252,7 @@ function JobExamples({ lang, limit = 4 }: { lang: string; limit?: number }) {
   return (
     <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-5">
       {data.map((v) => {
-        const thumb = publicUrl("thumbnails", v.thumbnail_path) ?? v.thumbnail_src;
+        const thumb = publicStorageUrl("thumbnails", v.thumbnail_path) ?? v.thumbnail_src;
         return (
           <a key={v.id} href={v.url ?? undefined} target="_blank" rel="noopener noreferrer" className="group relative block aspect-[9/16] overflow-hidden rounded-2xl bg-[#0b0b0f] shadow-xs">
             {thumb && <img src={thumb} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform group-hover:scale-[1.03]" />}

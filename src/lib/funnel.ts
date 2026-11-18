@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { rpc } from "@/lib/publicApi";
 
 /**
  * Funnel first-party (sans cookie ni identifiant, aucune donnée personnelle) : view_join, start_apply, submit_apply.
@@ -11,7 +11,7 @@ export function trackFunnel(event: FunnelEvent, country: string | null | undefin
   if (event !== "submit_apply" && sent.has(key)) return;
   sent.add(key);
   const q = new URLSearchParams(location.search);
-  supabase.rpc("track_funnel", {
+  rpc("track_funnel", {
     p_event: event, p_country: country ?? null, p_lang: lang ?? null,
     p_utm_source: q.get("utm_source"), p_utm_campaign: q.get("utm_campaign"), p_utm_content: q.get("utm_content"),
   }).then(() => {}, () => {});
