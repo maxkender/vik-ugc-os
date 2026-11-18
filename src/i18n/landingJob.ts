@@ -3,7 +3,7 @@
  * d'avertissement (16/11, Max). EN / FR / ES écrits à la main ; autres langues générées (scripts/translate-landing-job.mts),
  * à faire relire. Repli anglais.
  */
-import { LANDING_JOB_GENERATED } from "./landingJob.generated";
+import i18n from "i18next";
 
 export interface LandingJob {
   heroTitle: string; heroSubtitle: string;
@@ -20,6 +20,8 @@ export interface LandingJob {
   yapUploadFailed: string; yapTypeError: string; yapSizeError: string;
   videoLater: string; videoLaterHint: string; doneVideoLater: string;
   videoPageTitle: string; videoPageIntro: string; videoPageSubmit: string; videoPageSent: string; videoPageExpired: string; videoPageInvalid: string; restart: string;
+  bullet1: string; bullet2: string; bullet3: string; ctaApply: string; faqVideosQ: string; faqDailyQ: string; warningSoft: string;
+  stepOf: string; continueBtn: string; backBtn: string;
 }
 
 export const LANDING_JOB: Record<string, LandingJob> = {
@@ -62,6 +64,16 @@ export const LANDING_JOB: Record<string, LandingJob> = {
     videoPageExpired: "This link has expired (3 days have passed). You can apply again, it takes 3 minutes.",
     videoPageInvalid: "This link isn't valid. Use the link from our email, or apply again.",
     restart: "Apply again",
+    bullet1: "You film 1 UGC video a day with your iPhone",
+    bullet2: "{{price}} per validated video + views bonus",
+    bullet3: "Paid every week · no followers needed",
+    ctaApply: "Apply (3 min)",
+    faqVideosQ: "What kind of videos?",
+    faqDailyQ: "How many videos, and how are they checked?",
+    warningSoft: "If the pay or the project doesn't suit you, please don't go any further.",
+    stepOf: "Step {{n}}/2",
+    continueBtn: "Continue",
+    backBtn: "Back",
   },
   fr: {
     heroTitle: "Job : créateur·rice de contenu UGC pour une app mobile",
@@ -102,6 +114,16 @@ export const LANDING_JOB: Record<string, LandingJob> = {
     videoPageExpired: "Ce lien a expiré (les 3 jours sont passés). Tu peux recommencer ta candidature, ça prend 3 minutes.",
     videoPageInvalid: "Ce lien n'est pas valide. Utilise le lien de notre email, ou recommence ta candidature.",
     restart: "Recommencer ma candidature",
+    bullet1: "Tu tournes 1 vidéo UGC par jour avec ton iPhone",
+    bullet2: "{{price}} par vidéo validée + bonus aux vues",
+    bullet3: "Payé chaque semaine · sans abonnés requis",
+    ctaApply: "Postuler (3 min)",
+    faqVideosQ: "Quel type de vidéos ?",
+    faqDailyQ: "Combien de vidéos, et comment sont-elles vérifiées ?",
+    warningSoft: "Si la rémunération ou le projet ne te convient pas, merci de ne pas aller plus loin.",
+    stepOf: "Étape {{n}}/2",
+    continueBtn: "Continuer",
+    backBtn: "Retour",
   },
   es: {
     heroTitle: "Trabajo: creador/a de contenido UGC para una app móvil",
@@ -142,13 +164,23 @@ export const LANDING_JOB: Record<string, LandingJob> = {
     videoPageExpired: "Este link expiró (pasaron los 3 días). Puedes volver a postular, toma 3 minutos.",
     videoPageInvalid: "Este link no es válido. Usa el link de nuestro email o vuelve a postular.",
     restart: "Volver a postular",
+    bullet1: "Grabas 1 video UGC al día con tu iPhone",
+    bullet2: "{{price}} por video validado + bono por vistas",
+    bullet3: "Pago cada semana · sin seguidores necesarios",
+    ctaApply: "Postularme (3 min)",
+    faqVideosQ: "¿Qué tipo de videos?",
+    faqDailyQ: "¿Cuántos videos y cómo se revisan?",
+    warningSoft: "Si el pago o el proyecto no te convienen, por favor no sigas adelante.",
+    stepOf: "Paso {{n}}/2",
+    continueBtn: "Continuar",
+    backBtn: "Atrás",
   },
-  ...LANDING_JOB_GENERATED,
 };
 
 export function landingJob(lang: string | null | undefined): LandingJob {
   const l = (lang ?? "en").split("-")[0];
-  return LANDING_JOB[l] ?? LANDING_JOB.en;
+  // EN/FR/ES embarqués ; les autres langues arrivent avec leur fichier (src/i18n/locales/job/<l>.json, chargé à la demande).
+  return LANDING_JOB[l] ?? (i18n.getResource(l, "translation", "job") as LandingJob | undefined) ?? LANDING_JOB.en;
 }
 
 export const fillVars = (s: string, v: Record<string, string | number>) => s.replace(/\{\{(\w+)\}\}/g, (_, k) => String(v[k] ?? ""));

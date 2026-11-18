@@ -77,5 +77,4 @@ for (const l of LANGS) {
   console.log(l, "ok");
 }
 writeFileSync(genPath, `// Généré par scripts/translate-launch.mts (fal / OpenRouter) : à faire relire par un natif.\nimport type { GuideText } from "./guide";\n\nexport const GUIDE_GENERATED: Record<string, GuideText> = ${JSON.stringify(guideGen, null, 2)};\n`);
-const all = [...new Set([...LANGS, ...(existsSync("src/i18n/locales/space/index.ts") ? [...readFileSync("src/i18n/locales/space/index.ts", "utf8").matchAll(/import (\w+) from/g)].map((m) => m[1]) : [])])].sort();
-writeFileSync("src/i18n/locales/space/index.ts", `// Espace créateur (compte, connexion, briefs, paiements) dans les langues de lancement. Généré.\nimport type { SpaceDict } from "./types";\n${all.map((l) => `import ${l} from "./${l}";`).join("\n")}\n\nexport const SPACE: Record<string, SpaceDict> = { ${all.join(", ")} };\n`);
+// Les fichiers src/i18n/locales/space/<l>.ts sont chargés à la demande par src/i18n/index.ts (import.meta.glob).

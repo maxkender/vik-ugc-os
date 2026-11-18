@@ -2,15 +2,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import * as tus from "tus-js-client";
-import { CheckCircle2, Sparkles, Upload, User, Video } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, Sparkles, Upload, User, Video } from "lucide-react";
 import { ANON_KEY, SUPABASE_URL, callFn } from "@/lib/supabase";
 import { usePixel } from "@/lib/usePixel";
 import { attribution, newEventId, track } from "@/lib/pixel";
 import { ConsentBanner } from "@/components/public/ConsentBanner";
 import { Button, Field, IconTile, Input, Select, Spinner, Textarea, type Tint } from "@/components/ui";
 import { uiLangForCountry } from "@/i18n";
-import { JobWarning } from "@/components/public/JobWarning";
-import { landingJob } from "@/i18n/landingJob";
+import { landingJob, fillVars } from "@/i18n/landingJob";
 import { trackFunnel } from "@/lib/funnel";
 import { yapFileCheck, yapLinkProvider } from "@shared/yapVideo.ts";
 import { cn } from "@/lib/utils";
@@ -58,6 +57,9 @@ export default function Apply() {
   // « Je l'enverrai plus tard » (17/11) : vidéo facultative, 3 jours pour l'ajouter via le lien de l'email.
   const [videoLater, setVideoLater] = useState(false);
   const [doneLater, setDoneLater] = useState(false);
+  // Formulaire en 2 étapes (18/11) : 1 = l'essentiel (nom, email, pays, 18+, iPhone), 2 = réseaux, expérience, vidéo.
+  const [step, setStep] = useState<1 | 2>(1);
+  const utmOf = () => { const u: Record<string, string> = {}; params.forEach((v, k) => { if (k.startsWith("utm_")) u[k] = v; }); return u; };
 
   // Funnel first-party (sans cookie) : arrivée sur le formulaire d'un pays ouvert.
   useEffect(() => {
@@ -104,15 +106,25 @@ export default function Apply() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (f.has_iphone !== "yes") return; // iPhone requis (16/11) : bloqué en amont
+    if (step === 1) {
+      if (f.birthdate && ageOn(f.birthdate) < 18) return setErrors(["underage"]);
+      setErrors([]);
+      // Brouillon pour relance (échec ignoré : ne bloque jamais la candidature).
+      callFn("apply", { action: "draft", first_name: f.first_name, last_name: f.last_name, email: f.email, country: f.country,
+        has_iphone: true, consent: f.consent, website: f.website, locale: i18n.resolvedLanguage ?? "en", utm: utmOf() }).catch(() => {});
+      trackFunnel("apply_step1_done", f.country, i18n.resolvedLanguage);
+      setStep(2);
+      window.scrollTo(0, 0);
+      return;
+    }
     const errs: string[] = [];
     if (f.birthdate && ageOn(f.birthdate) < 18) errs.push("underage");
     if (!yapPath && !linkOk && !videoLater) errs.push("yap_video");
-    if (f.has_iphone !== "yes") return; // iPhone requis (16/11) : bloqué en amont
     if (errs.length) return setErrors(errs);
     setBusy(true);
     setErrors([]);
-    const utm: Record<string, string> = {};
-    params.forEach((v, k) => { if (k.startsWith("utm_")) utm[k] = v; });
+    const utm = utmOf();
     // Même event_id pour le pixel (navigateur) et la Conversions API (serveur) : Meta déduplique.
     const eventId = newEventId();
     try {
@@ -168,10 +180,16 @@ export default function Apply() {
           <div className="flex justify-center py-20"><Spinner /></div>
         ) : (
           <form onSubmit={submit} className="space-y-5">
-            <div className="mb-8">
-              <h1 className="text-[28px] font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">{t("apply.title")}</h1>
-              <p className="mt-2 text-[15px] text-muted-foreground">{t("apply.subtitle")}</p>
+            <div className="mb-6">
+              <div className="flex items-center justify-between text-[12px] font-semibold uppercase tracking-[0.08em] text-subtle-foreground">
+                <span data-testid="step-label">{fillVars(lj.stepOf, { n: String(step) })}</span>
+                {step === 2 && <button type="button" onClick={() => { setStep(1); window.scrollTo(0, 0); }} className="inline-flex items-center gap-1 normal-case tracking-normal text-accent hover:underline"><ArrowLeft className="h-3.5 w-3.5" /> {lj.backBtn}</button>}
+              </div>
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#eef1f6]"><div className="h-full rounded-full bg-accent transition-all" style={{ width: step === 1 ? "50%" : "100%" }} /></div>
+              <h1 className="mt-5 text-[26px] font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">{t("apply.title")}</h1>
+              {step === 1 && <p className="mt-1.5 text-[15px] text-muted-foreground">{t("apply.subtitle")}</p>}
             </div>
+            {step === 1 && <>
             {/* iPhone requis (16/11, Max) : question obligatoire, « non » bloque la candidature. */}
             <div className="rounded-2xl border bg-white p-5 shadow-xs sm:p-6" data-testid="iphone-question">
               <p className="text-[15px] font-semibold text-foreground">{lj.applyIphone} <span className="text-danger">*</span></p>
@@ -185,8 +203,8 @@ export default function Apply() {
               </div>
               {f.has_iphone === "no" && <p className="mt-3 rounded-xl bg-tint-yellow px-4 py-3 text-sm text-[#8a5a00]" role="alert">{lj.iphoneBlocked}</p>}
             </div>
-            {f.has_iphone === "no" ? null : <>
-            <FormSection n={1} icon={<User />} tint="blue" title={t("apply.identity")}>
+            {f.has_iphone !== "no" && <>
+            <FormSection icon={<User />} tint="blue" title={t("apply.identity")}>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label={t("apply.firstName")}><Input required maxLength={80} value={f.first_name} onChange={(e) => set("first_name", e.target.value)} autoComplete="given-name" /></Field>
                 <Field label={t("apply.lastName")}><Input required maxLength={80} value={f.last_name} onChange={(e) => set("last_name", e.target.value)} autoComplete="family-name" /></Field>
@@ -200,11 +218,22 @@ export default function Apply() {
                   </Select>
                 </Field>
                 <Field label={t("apply.email")}><Input type="email" required value={f.email} onChange={(e) => set("email", e.target.value)} autoComplete="email" /></Field>
-                <Field label={t("apply.phone")}><Input type="tel" value={f.phone} onChange={(e) => set("phone", e.target.value)} autoComplete="tel" /></Field>
-                <Field label={t("apply.languages")} hint={t("apply.languagesHint")} className="sm:col-span-2"><Input value={f.languages} onChange={(e) => set("languages", e.target.value)} /></Field>
               </div>
             </FormSection>
-            <FormSection n={2} icon={<Sparkles />} tint="violet" title={t("apply.experience")}>
+            <div className="space-y-3 rounded-2xl border bg-white p-5 shadow-xs sm:p-6">
+              <label className="flex cursor-pointer items-start gap-3 text-sm text-foreground"><input type="checkbox" required className="mt-0.5 h-4 w-4 accent-[#004dff]" checked={f.adult} onChange={(e) => set("adult", e.target.checked)} /> {t("apply.adult")}</label>
+              <label className="flex cursor-pointer items-start gap-3 text-sm text-foreground"><input type="checkbox" required className="mt-0.5 h-4 w-4 accent-[#004dff]" checked={f.consent} onChange={(e) => set("consent", e.target.checked)} /> {t("apply.consent", { brand: BRAND })}</label>
+            </div>
+            {messages.length > 0 && <div className="rounded-xl bg-tint-red px-4 py-3 text-sm text-[#a52326]">{messages.map((m) => <p key={m}>{m}</p>)}</div>}
+            <Button type="submit" size="lg" className="h-12 w-full text-[15px]" disabled={underage} data-testid="step1-continue">{lj.continueBtn} <ArrowRight className="h-4 w-4" /></Button>
+            </>}
+            </>}
+            {step === 2 && <>
+            <FormSection icon={<Sparkles />} tint="violet" title={t("apply.experience")}>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label={t("apply.phone")}><Input type="tel" value={f.phone} onChange={(e) => set("phone", e.target.value)} autoComplete="tel" /></Field>
+                <Field label={t("apply.languages")} hint={t("apply.languagesHint")}><Input value={f.languages} onChange={(e) => set("languages", e.target.value)} /></Field>
+              </div>
               <Field label={t("apply.ugcExperience")}><Textarea maxLength={2000} value={f.ugc_experience} onChange={(e) => set("ugc_experience", e.target.value)} /></Field>
               <div className="grid gap-4 sm:grid-cols-[2fr_1fr]">
                 <Field label={t("apply.tiktok")}><Input type="url" placeholder="https://www.tiktok.com/@…" value={f.tiktok_url} onChange={(e) => set("tiktok_url", e.target.value)} /></Field>
@@ -216,7 +245,7 @@ export default function Apply() {
               <Field label={t("apply.availability")}><Input maxLength={1000} value={f.availability} onChange={(e) => set("availability", e.target.value)} /></Field>
               <Field label={t("apply.motivation")}><Textarea maxLength={2000} value={f.motivation} onChange={(e) => set("motivation", e.target.value)} /></Field>
             </FormSection>
-            <FormSection n={3} icon={<Video />} tint="cyan" title={t("apply.yap")} hint={t("apply.yapHint")}>
+            <FormSection icon={<Video />} tint="cyan" title={t("apply.yap")} hint={t("apply.yapHint")}>
               <label className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-4 py-8 text-center transition-colors ${yapPath ? "border-[#bfe8cd] bg-tint-green" : "border-border-strong bg-muted hover:border-[#cddcff] hover:bg-accent-soft"}`}>
                 <span className={`inline-flex h-11 w-11 items-center justify-center rounded-xl ${yapPath ? "bg-white text-success" : "bg-white text-accent shadow-xs"}`}>{yapPath ? <CheckCircle2 className="h-5 w-5" /> : <Upload className="h-5 w-5" />}</span>
                 <span className="text-sm font-semibold text-foreground">{yapPath ? t("apply.uploaded") : t("apply.chooseVideo")}</span>
@@ -255,12 +284,9 @@ export default function Apply() {
             </FormSection>
             {/* Pot de miel anti-bot */}
             <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" value={f.website} onChange={(e) => set("website", e.target.value)} aria-hidden="true" />
-            <div className="space-y-3 rounded-2xl border bg-white p-5 shadow-xs sm:p-6">
-              <label className="flex cursor-pointer items-start gap-3 text-sm text-foreground"><input type="checkbox" required className="mt-0.5 h-4 w-4 accent-[#004dff]" checked={f.adult} onChange={(e) => set("adult", e.target.checked)} /> {t("apply.adult")}</label>
-              <label className="flex cursor-pointer items-start gap-3 text-sm text-foreground"><input type="checkbox" required className="mt-0.5 h-4 w-4 accent-[#004dff]" checked={f.consent} onChange={(e) => set("consent", e.target.checked)} /> {t("apply.consent", { brand: BRAND })}</label>
-            </div>
             {messages.length > 0 && <div className="rounded-xl bg-tint-red px-4 py-3 text-sm text-[#a52326]">{messages.map((m) => <p key={m}>{m}</p>)}</div>}
-            <JobWarning lang={i18n.resolvedLanguage ?? "en"} />
+            {/* Avertissement (18/11) : une petite ligne grise au-dessus du bouton d'envoi, plus de gros encadré rouge. */}
+            <p className="text-center text-[12px] leading-snug text-subtle-foreground" data-testid="warning-soft">{lj.warningSoft}</p>
             <Button type="submit" size="lg" className="h-12 w-full text-[15px]" loading={busy} disabled={underage || f.has_iphone !== "yes" || (!yapPath && !linkOk && !videoLater && progress !== null)}>{t("apply.submit")}</Button>
             </>}
           </form>
@@ -271,13 +297,12 @@ export default function Apply() {
   );
 }
 
-function FormSection({ n, icon, tint, title, hint, children }: { n: number; icon: React.ReactNode; tint: Tint; title: string; hint?: string; children: React.ReactNode }) {
+function FormSection({ icon, tint, title, hint, children }: { icon: React.ReactNode; tint: Tint; title: string; hint?: string; children: React.ReactNode }) {
   return (
     <section className="rounded-2xl border bg-white p-5 shadow-xs sm:p-7">
       <div className="mb-5 flex items-start gap-3">
         <IconTile icon={icon} tint={tint} className="h-10 w-10 rounded-xl" />
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-subtle-foreground">{n} / 3</p>
           <h2 className="text-[16px] font-semibold text-foreground">{title}</h2>
           {hint && <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">{hint}</p>}
         </div>

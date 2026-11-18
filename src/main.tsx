@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import "./index.css";
-import "./i18n";
+import { i18nReady } from "./i18n";
 import { App } from "./App";
 import { AuthProvider } from "./lib/auth";
 import { ToastProvider } from "./components/ui";
@@ -12,7 +12,9 @@ import { applyTheme, currentTheme } from "./lib/theme";
 applyTheme(currentTheme());
 const qc = new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false, retry: 1 } } });
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+// Premier rendu après le chargement de la langue initiale (pas de flash en anglais).
+const root = ReactDOM.createRoot(document.getElementById("root")!);
+i18nReady.finally(() => root.render(
   <React.StrictMode>
     <QueryClientProvider client={qc}>
       <BrowserRouter>
@@ -24,4 +26,4 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       </BrowserRouter>
     </QueryClientProvider>
   </React.StrictMode>,
-);
+));

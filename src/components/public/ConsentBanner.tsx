@@ -46,7 +46,8 @@ const T: Record<string, [string, string, string]> = {
 };
 
 /** Bandeau de consentement publicitaire (RGPD) : le pixel ne se charge qu'après « Accepter ». */
-export function ConsentBanner({ enabled }: { enabled: boolean }) {
+/** aboveSticky : sur mobile, posé au-dessus du bouton « Postuler » collant (jamais de chevauchement). */
+export function ConsentBanner({ enabled, aboveSticky = false }: { enabled: boolean; aboveSticky?: boolean }) {
   const { i18n } = useTranslation();
   const [consent, set] = useState(getConsent());
   useEffect(() => {
@@ -57,11 +58,11 @@ export function ConsentBanner({ enabled }: { enabled: boolean }) {
   if (!enabled || consent) return null;
   const [text, yes, no] = T[(i18n.resolvedLanguage ?? "en").slice(0, 2)] ?? T.en;
   return (
-    <div className="fixed inset-x-3 bottom-3 z-50 mx-auto max-w-xl rounded-2xl border bg-white p-4 shadow-[0_16px_40px_-12px_rgba(16,24,40,0.3)]" role="dialog" aria-label="Cookies" data-testid="consent-banner">
-      <p className="text-[13px] leading-relaxed text-foreground">{text}</p>
-      <div className="mt-3 flex justify-end gap-2">
-        <button onClick={() => setConsent("no")} className="h-9 rounded-lg border border-border-strong px-4 text-[13px] font-medium text-muted-foreground hover:text-foreground">{no}</button>
-        <button onClick={() => setConsent("yes")} className="h-9 rounded-lg bg-accent px-4 text-[13px] font-medium text-white">{yes}</button>
+    <div className={`fixed inset-x-3 z-50 mx-auto flex max-w-xl items-center gap-3 rounded-xl border bg-white px-3 py-2.5 shadow-[0_12px_32px_-12px_rgba(16,24,40,0.3)] ${aboveSticky ? "bottom-[calc(env(safe-area-inset-bottom)+84px)] sm:bottom-3" : "bottom-3"}`} role="dialog" aria-label="Cookies" data-testid="consent-banner">
+      <p className="min-w-0 flex-1 text-[11.5px] leading-snug text-muted-foreground">{text}</p>
+      <div className="flex shrink-0 flex-col gap-1.5 sm:flex-row">
+        <button onClick={() => setConsent("yes")} className="h-8 rounded-lg bg-accent px-3 text-[12px] font-medium text-white">{yes}</button>
+        <button onClick={() => setConsent("no")} className="h-8 rounded-lg border border-border-strong px-3 text-[12px] font-medium text-muted-foreground hover:text-foreground">{no}</button>
       </div>
     </div>
   );

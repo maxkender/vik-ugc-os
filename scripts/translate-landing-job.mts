@@ -1,6 +1,7 @@
 // Traduit les nouvelles sections de la landing (src/i18n/landingJob.ts) dans toutes les langues publiques via fal.
 //   NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=… npx tsx scripts/translate-landing-job.mts
 import { writeFileSync } from "node:fs";
+import { writeJobFiles } from "./lib/jobFiles.mts";
 import { LANDING_JOB } from "../src/i18n/landingJob.ts";
 import { LOCALE_LABELS } from "../src/i18n/locales/index.ts";
 
@@ -26,5 +27,5 @@ for (let i = 0; i < langs.length; i += 6) {
     process.stdout.write(`${l} `);
   }));
 }
-writeFileSync("src/i18n/landingJob.generated.ts", `// Généré par scripts/translate-landing-job.mts (fal / OpenRouter) : à faire relire par un natif.\nimport type { LandingJob } from "./landingJob";\n\nexport const LANDING_JOB_GENERATED: Record<string, LandingJob> = ${JSON.stringify(out, null, 2)};\n`);
+writeJobFiles(out);
 console.log(`\n${Object.keys(out).length} langues`);

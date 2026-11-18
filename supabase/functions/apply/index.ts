@@ -1,6 +1,7 @@
 // apply — fonction publique de la landing.
 //   GET  ?country=FR        tarifs de la zone du pays (affichage landing)
 //   POST { action: "submit", ...candidature }   enregistre la candidature, email « Candidature reçue »
+//   POST { action: "draft", ...étape 1 }        brouillon pour relance (formulaire en 2 étapes)
 // La vidéo « yap » est envoyée avant par le navigateur (upload résumable TUS) dans yap-videos/pending/<uuid>.<ext>.
 import { HttpError, serve } from "../_shared/http.ts";
 import { queueEmail } from "../_shared/outbox.ts";
@@ -57,6 +58,23 @@ serve(async (req, body, db) => {
     await db.from("applications").update({ status: "new", yap_video_path: hasFile ? yap : null, yap_video_url: hasFile ? null : yapUrl,
       video_received_at: new Date().toISOString(), video_token: null }).eq("id", a.id).eq("status", "video_pending");
     await db.from("funnel_events").insert({ event: "video_added", country: a.country, lang: a.locale });
+    return { ok: true };
+  }
+  // Brouillon (18/11) : étape 1 du formulaire terminée (nom, email, pays, 18+, iPhone, consentement) → on peut relancer.
+  if (body.action === "draft") {
+    if (s(body.website)) return { ok: true };
+    const email = s(body.email, 200).toLowerCase();
+    const full_name = [s(body.first_name, 80), s(body.last_name, 80)].filter(Boolean).join(" ");
+    if (!EMAIL_RE.test(email) || !full_name || body.consent !== true) throw new HttpError(422, "draft");
+    if (email.endsWith("@vik-qa.test")) return { ok: true }; // comptes de test : pas de brouillon
+    const utm = typeof body.utm === "object" && body.utm ? body.utm as Record<string, unknown> : {};
+    const { data: existing } = await db.from("application_drafts").select("id, completed_at").eq("email", email).maybeSingle();
+    if (existing?.completed_at) return { ok: true };
+    await db.from("application_drafts").upsert({
+      email, full_name, country: s(body.country, 2).toUpperCase() || null, language: s(body.locale, 10) || null,
+      has_iphone: body.has_iphone === true, utm_source: s(utm.utm_source, 60) || null, utm_campaign: s(utm.utm_campaign, 120) || null,
+      utm_content: s(utm.utm_content, 120) || null, updated_at: new Date().toISOString(),
+    }, { onConflict: "email" });
     return { ok: true };
   }
   if (body.action !== "submit") throw new HttpError(400, "unknown action");
@@ -118,6 +136,7 @@ serve(async (req, body, db) => {
     if (error.code === "23505") throw new HttpError(409, "already_applied");
     throw error;
   }
+  await db.from("application_drafts").update({ completed_at: new Date().toISOString() }).eq("email", email).is("completed_at", null);
   if (videoLater) {
     // Un seul email : « candidature reçue, il manque ta vidéo (3 jours) » avec le lien personnel ; pas d'« application_received » en double.
     await queueEmail(db, { template: "video_missing", to: email, language: row.locale, vars: { first_name, due_date: fmtDate(data.video_due_at, row.locale) },

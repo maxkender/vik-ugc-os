@@ -2,7 +2,8 @@
 //   NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=… npx tsx scripts/translate-landing-missing.mts
 import { writeFileSync } from "node:fs";
 import { LANDING_JOB } from "../src/i18n/landingJob.ts";
-import { LANDING_JOB_GENERATED } from "../src/i18n/landingJob.generated.ts";
+import { readJobFiles, writeJobFiles } from "./lib/jobFiles.mts";
+const LANDING_JOB_GENERATED = readJobFiles();
 import { LOCALE_LABELS } from "../src/i18n/locales/index.ts";
 const en = LANDING_JOB.en as Record<string, string>, fr = LANDING_JOB.fr as Record<string, string>;
 const gen: Record<string, Record<string, string>> = JSON.parse(JSON.stringify(LANDING_JOB_GENERATED));
@@ -27,5 +28,5 @@ for (let i = 0; i < langs.length; i += 8) {
     process.stdout.write(`${l} `);
   }));
 }
-writeFileSync("src/i18n/landingJob.generated.ts", `// Généré par scripts/translate-landing-job.mts (fal / OpenRouter) : à faire relire par un natif.\nimport type { LandingJob } from "./landingJob";\n\nexport const LANDING_JOB_GENERATED: Record<string, LandingJob> = ${JSON.stringify(gen, null, 2)};\n`);
+writeJobFiles(gen);
 console.log("\nok");
