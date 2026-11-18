@@ -1,6 +1,7 @@
 // Plugin Vite (18/11, performance de /join) : précharge dès le HTML ce que la page publique attend sinon après
 // l'exécution du bundle principal : le code de la page (Landing / Apply + dépendances), le fichier de langue du
-// visiteur et les polices latines d'Inter. Un petit script inline choisit selon l'URL et la langue détectée.
+// visiteur (pas les polices : elles prenaient la bande passante du bundle principal en 4G). Un petit script inline choisit selon l'URL et la langue détectée et
+// remplit le cache HTTP par fetch() (fichiers immuables) : Chrome différait les <link rel="modulepreload"> ajoutés en JS.
 import type { Plugin } from "vite";
 import type { OutputBundle, OutputChunk } from "rollup";
 
@@ -28,20 +29,19 @@ export function preloadPublic(): Plugin {
         };
         const map: { pages: Record<string, string[]>; lang: Record<string, string[]> } = { pages: {}, lang: {} };
         for (const [k, re] of Object.entries(PAGES)) {
-          const c = chunks.find((x) => x.facadeModuleId && re.test(x.facadeModuleId));
+          const c = chunks.find((x) => x.moduleIds.some((id) => re.test(id)));
           if (c) map.pages[k] = deps(c).map((f) => "/" + f);
         }
         for (const c of chunks) {
           const m = c.facadeModuleId?.match(LANG_FILE);
           if (m && !/(index|types|labels)$/.test(m[1])) (map.lang[m[1]] ??= []).push("/" + c.fileName);
         }
-        const fonts = Object.keys(bundle).filter((f) => /inter-latin-(400|600)-normal-.*\.woff2$/.test(f));
-        const fontLinks = fonts.map((f) => `<link rel="preload" as="font" type="font/woff2" crossorigin href="/${f}" />`).join("\n    ");
         const script = `<script>(function(){try{var m=${JSON.stringify(map)},p=location.pathname,l="en";` +
           `try{l=new URLSearchParams(location.search).get("lang")||localStorage.getItem("i18nextLng")||navigator.language||"en"}catch(e){}` +
           `l=String(l).split("-")[0].toLowerCase();var u=(p.indexOf("/join")===0?m.pages.join:p.indexOf("/apply")===0&&p.indexOf("/apply/video")!==0?m.pages.apply:null);` +
-          `if(!u)return;u=u.concat(m.lang[l]||[]);for(var i=0;i<u.length;i++){var e=document.createElement("link");e.rel="modulepreload";e.href=u[i];document.head.appendChild(e)}}catch(e){}})()</script>`;
-        return html.replace("</head>", `    ${fontLinks}\n    ${script}\n  </head>`);
+          `if(!u)return;u=u.concat(m.lang[l]||[]);for(var i=0;i<u.length;i++)fetch(u[i],{priority:"high"}).catch(function(){})}catch(e){}})()</script>`;
+        // En tête du <head> : avant la feuille de style (un script inline attend les CSS qui le précèdent).
+        return html.replace("<head>", `<head>\n    ${script}`);
       },
     },
   };
